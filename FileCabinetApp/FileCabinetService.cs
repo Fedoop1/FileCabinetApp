@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 
 public class FileCabinetService
@@ -7,7 +7,6 @@ public class FileCabinetService
 
     public int CreateRecord(string firstName, string lastName, DateTime dateOfBirth)
     {
-
         var record = new FileCabinetRecord
         {
             Id = this.list.Count + 1,
@@ -23,8 +22,7 @@ public class FileCabinetService
 
     public FileCabinetRecord[] GetRecords()
     {
-        // TODO: добавьте реализацию метода
-        return Array.Empty<FileCabinetRecord>();
+        return this.list.ToArray();
     }
 
     public int GetStat()

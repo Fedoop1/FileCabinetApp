@@ -30,35 +30,49 @@ namespace FileCabinetApp
 
         private static void Create(string parameters)
         {
-            Console.WriteLine("First name: ");
-            string firstName = Console.ReadLine();
-            Console.WriteLine("Last name: ");
-            string lastName = Console.ReadLine();
-            Console.WriteLine("Date of birth: ");
+            string[] paramsArray = parameters.Split(" ", 3);
 
-            if (!DateTime.TryParse(Console.ReadLine(), out DateTime dateOfBirth))
+            if (paramsArray.Length < 3)
             {
-                throw new ArgumentException("incorrect date of birth");
+                Console.WriteLine(Program.HintMessage);
+                return;
             }
 
-            if (string.IsNullOrEmpty(firstName))
+            if (string.IsNullOrEmpty(paramsArray[0]))
             {
                 throw new ArgumentException("incorrect first name");
             }
 
-            if (string.IsNullOrEmpty(lastName))
+            if (string.IsNullOrEmpty(paramsArray[1]))
             {
                 throw new ArgumentException("incorrect last name");
             }
 
-            int result = fileCabinetService.CreateRecord(firstName, lastName, dateOfBirth);
-            Console.WriteLine($"Record #{result} is created.");
+            if (!DateTime.TryParse(paramsArray[2], out DateTime dateOfBirth))
+            {
+                throw new ArgumentException("incorrect date of birth");
+            }
+
+            int result = fileCabinetService.CreateRecord(paramsArray[0], paramsArray[1], dateOfBirth);
+
+            Console.WriteLine(
+                $"First name: {paramsArray[0]}\nLast name: {paramsArray[1]}\nDate of birth: {dateOfBirth.ToShortDateString()}\nRecord #{result} is created.");
         }
 
         private static void Stat(string parameters)
         {
             var recordsCount = fileCabinetService.GetStat();
             Console.WriteLine($"{recordsCount} record(s).");
+        }
+
+        private static void List(string parameters)
+        {
+            var recordsArray = fileCabinetService.GetRecords();
+
+            foreach (var record in recordsArray)
+            {
+                Console.WriteLine(record);
+            }
         }
 
         private static void Main(string[] args)
