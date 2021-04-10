@@ -9,28 +9,59 @@ namespace FileCabinetApp
         private const int CommandHelpIndex = 0;
         private const int DescriptionHelpIndex = 1;
         private const int ExplanationHelpIndex = 2;
-
+        private static FileCabinetService fileCabinetService = new FileCabinetService();
         private static bool isRunning = true;
 
         private static Tuple<string, Action<string>>[] commands = new Tuple<string, Action<string>>[]
         {
             new Tuple<string, Action<string>>("help", PrintHelp),
             new Tuple<string, Action<string>>("exit", Exit),
+            new Tuple<string, Action<string>>("stat", Stat),
+            new Tuple<string, Action<string>>("create", Create),
         };
 
         private static string[][] helpMessages = new string[][]
         {
             new string[] { "help", "prints the help screen", "The 'help' command prints the help screen." },
             new string[] { "exit", "exits the application", "The 'exit' command exits the application." },
+            new string[] { "stat", "prints the count if records", "The 'stat' command print the count of records." },
+            new string[] { "create", "create the record in file cabinet", "The 'create' command create the record in file cabinet." },
         };
 
-        private static void Stat(FileCabinetService fileCabinetService)
+        private static void Create(string parameters)
+        {
+            Console.WriteLine("First name: ");
+            string firstName = Console.ReadLine();
+            Console.WriteLine("Last name: ");
+            string lastName = Console.ReadLine();
+            Console.WriteLine("Date of birth: ");
+
+            if (!DateTime.TryParse(Console.ReadLine(), out DateTime dateOfBirth))
+            {
+                throw new ArgumentException("incorrect date of birth");
+            }
+
+            if (string.IsNullOrEmpty(firstName))
+            {
+                throw new ArgumentException("incorrect first name");
+            }
+
+            if (string.IsNullOrEmpty(lastName))
+            {
+                throw new ArgumentException("incorrect last name");
+            }
+
+            int result = fileCabinetService.CreateRecord(firstName, lastName, dateOfBirth);
+            Console.WriteLine($"Record #{result} is created.");
+        }
+
+        private static void Stat(string parameters)
         {
             var recordsCount = fileCabinetService.GetStat();
             Console.WriteLine($"{recordsCount} record(s).");
         }
 
-        public static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Console.WriteLine($"File Cabinet Application, developed by {Program.DeveloperName}");
             Console.WriteLine(Program.HintMessage);
