@@ -1,11 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using FileCabinetApp;
 
 public class FileCabinetService
 {
     private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
 
-    public int CreateRecord(string firstName, string lastName, DateTime dateOfBirth, short field1, decimal field2, char field3)
+    public (string firstName, string lastName, DateTime dateOfBirth, short height, decimal money, char gender) Input()
+    {
+        try
+        {
+            Console.WriteLine("\nFirst name: ");
+
+            string firstName = Console.ReadLine();
+
+            Console.WriteLine("Last name: ");
+
+            string lastName = Console.ReadLine();
+
+            Console.WriteLine("Date of birth: ");
+
+            if (!DateTime.TryParse(Console.ReadLine(), out DateTime dateOfBirth))
+            {
+                throw new ArgumentException("Date of birth is incorrect.");
+            }
+
+            Console.WriteLine("Height: ");
+
+            if (!short.TryParse(Console.ReadLine(), out short height))
+            {
+                throw new ArgumentException("Height is incorrect");
+            }
+
+            Console.WriteLine("Money: ");
+
+            if (!decimal.TryParse(Console.ReadLine(), out decimal money))
+            {
+                throw new ArgumentException("Money is incorrect");
+            }
+
+            Console.WriteLine("Gender(M/F): ");
+
+            if (!char.TryParse(Console.ReadLine(), out char gender))
+            {
+                throw new ArgumentException("Gender is incorrect");
+            }
+
+            return (firstName, lastName, dateOfBirth, height, money, gender);
+        }
+        catch (ArgumentException exception)
+        {
+            Console.WriteLine(exception.Message);
+            return this.Input();
+        }
+    }
+
+    public int CreateRecord(string firstName, string lastName, DateTime dateOfBirth, short height, decimal money, char gender)
     {
         var record = new FileCabinetRecord
         {
@@ -13,14 +64,68 @@ public class FileCabinetService
             FirstName = firstName,
             LastName = lastName,
             DateOfBirth = dateOfBirth,
-            Field1 = field1,
-            Field2 = field2,
-            Field3 = field3,
+            Height = height,
+            Money = money,
+            Gender = gender,
         };
 
         this.list.Add(record);
 
         return record.Id;
+    }
+
+    public void EditRecord(int id, string firstName, string lastName, DateTime dateOfBirth, short height, decimal money, char gender)
+    {
+        try
+        {
+            FileCabinetRecord record = this.list.FirstOrDefault(x => x.Id == id);
+
+            if (record == null)
+            {
+                throw new ArgumentException($"#{id} record is not found.");
+            }
+
+            record.FirstName = firstName;
+            record.LastName = lastName;
+            record.DateOfBirth = dateOfBirth;
+            record.Height = height;
+            record.Money = money;
+            record.Gender = gender;
+
+            Console.WriteLine($"Record #{id} is updated.");
+        }
+        catch (ArgumentException exception)
+        {
+            Console.WriteLine(exception.Message);
+            this.EditRecord(id.ToString(Program.Culture));
+        }
+    }
+
+    public void EditRecord(string id)
+    {
+        if (!int.TryParse(id, out int recordId))
+        {
+            throw new ArgumentException($"Id is incorrect.");
+        }
+
+        FileCabinetRecord record = this.list.FirstOrDefault(x => x.Id == recordId);
+
+        if (record == null)
+        {
+            throw new ArgumentException($"#{id} record is not found.");
+        }
+
+        var editData = this.Input();
+
+        try
+        {
+            this.EditRecord(recordId, editData.firstName, editData.lastName, editData.dateOfBirth, editData.height, editData.money, editData.gender);
+        }
+        catch (ArgumentException exception)
+        {
+            Console.WriteLine(exception.Message);
+            this.EditRecord(id);
+        }
     }
 
     public FileCabinetRecord[] GetRecords()

@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Globalization;
 
 namespace FileCabinetApp
 {
     public static class Program
     {
+        public static readonly CultureInfo Culture = CultureInfo.CurrentCulture;
         private const string DeveloperName = "Nikita Malukov";
         private const string HintMessage = "Enter your command, or enter 'help' to get help.";
         private const int CommandHelpIndex = 0;
@@ -19,6 +21,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("stat", Stat),
             new Tuple<string, Action<string>>("create", Create),
             new Tuple<string, Action<string>>("list", List),
+            new Tuple<string, Action<string>>("edit", Edit),
         };
 
         private static string[][] helpMessages = new string[][]
@@ -28,60 +31,38 @@ namespace FileCabinetApp
             new string[] { "stat", "prints the count if records", "The 'stat' command prints the count of the records." },
             new string[] { "create", "create the record in file cabinet", "The 'create' command create the record in file cabinet." },
             new string[] { "list", "prints the list if records", "The 'list' command prints the list of the records." },
+            new string[] { "edit", "edits the record", "The 'edit' command edits the value of the record." },
         };
 
         private static void Create(string parameters)
         {
-            Console.WriteLine("First name: ");
-
-            string firstName = Console.ReadLine();
-
-            if (string.IsNullOrEmpty(firstName))
+            try
             {
-                throw new ArgumentException("incorrect first name");
+                var recordData = fileCabinetService.Input();
+                int result = fileCabinetService.CreateRecord(
+                recordData.firstName, recordData.lastName, recordData.dateOfBirth, recordData.height, recordData.money, recordData.gender);
+
+                Console.WriteLine(
+                $"Record #{result} is created.");
             }
-
-            Console.WriteLine("Last name: ");
-
-            string lastName = Console.ReadLine();
-
-            if (string.IsNullOrEmpty(lastName))
+            catch (ArgumentException exception)
             {
-                throw new ArgumentException("incorrect last name");
+                Console.WriteLine(exception.Message);
+                Create(parameters);
+                return;
             }
+        }
 
-            Console.WriteLine("Date of birth: ");
-
-            if (!DateTime.TryParse(Console.ReadLine(), out DateTime dateOfBirth))
+        private static void Edit(string parameters)
+        {
+            try
             {
-                throw new ArgumentException("incorrect date of birth");
+                fileCabinetService.EditRecord(parameters);
             }
-
-            Console.WriteLine("Field1: ");
-
-            if (!short.TryParse(Console.ReadLine(), out short field1))
+            catch (ArgumentException exception)
             {
-                throw new ArgumentException("field1 is incorrect");
+                Console.WriteLine(exception.Message);
             }
-
-            Console.WriteLine("Field2: ");
-
-            if (!decimal.TryParse(Console.ReadLine(), out decimal field2))
-            {
-                throw new ArgumentException("field2 is incorrect");
-            }
-
-            Console.WriteLine("Field3: ");
-
-            if (!char.TryParse(Console.ReadLine(), out char field3))
-            {
-                throw new ArgumentException("field2 is incorrect");
-            }
-
-            int result = fileCabinetService.CreateRecord(firstName, lastName, dateOfBirth, field1, field2, field3);
-
-            Console.WriteLine(
-                $"First name: {firstName}\nLast name: {lastName}\nDate of birth: {dateOfBirth.ToShortDateString()}\nRecord #{result} is created.");
         }
 
         private static void Stat(string parameters)
