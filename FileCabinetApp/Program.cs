@@ -18,60 +18,70 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("exit", Exit),
             new Tuple<string, Action<string>>("stat", Stat),
             new Tuple<string, Action<string>>("create", Create),
+            new Tuple<string, Action<string>>("list", List),
         };
 
         private static string[][] helpMessages = new string[][]
         {
             new string[] { "help", "prints the help screen", "The 'help' command prints the help screen." },
             new string[] { "exit", "exits the application", "The 'exit' command exits the application." },
-            new string[] { "stat", "prints the count if records", "The 'stat' command print the count of records." },
-            new string[] { "create", "create the record in file cabinet", "The 'create' command create the record in file cabinet in the following format: create [name] [second name] [date of birth] [field1] [field2] [field3]." },
+            new string[] { "stat", "prints the count if records", "The 'stat' command prints the count of the records." },
+            new string[] { "create", "create the record in file cabinet", "The 'create' command create the record in file cabinet." },
+            new string[] { "list", "prints the list if records", "The 'list' command prints the list of the records." },
         };
 
         private static void Create(string parameters)
         {
-            string[] paramsArray = parameters.Split(" ", 6);
+            Console.WriteLine("First name: ");
 
-            if (paramsArray.Length < 6)
-            {
-                Console.WriteLine(Program.HintMessage);
-                return;
-            }
+            string firstName = Console.ReadLine();
 
-            if (string.IsNullOrEmpty(paramsArray[0]))
+            if (string.IsNullOrEmpty(firstName))
             {
                 throw new ArgumentException("incorrect first name");
             }
 
-            if (string.IsNullOrEmpty(paramsArray[1]))
+            Console.WriteLine("Last name: ");
+
+            string lastName = Console.ReadLine();
+
+            if (string.IsNullOrEmpty(lastName))
             {
                 throw new ArgumentException("incorrect last name");
             }
 
-            if (!DateTime.TryParse(paramsArray[2], out DateTime dateOfBirth))
+            Console.WriteLine("Date of birth: ");
+
+            if (!DateTime.TryParse(Console.ReadLine(), out DateTime dateOfBirth))
             {
                 throw new ArgumentException("incorrect date of birth");
             }
 
-            if (short.TryParse(paramsArray[3], out short field1))
+            Console.WriteLine("Field1: ");
+
+            if (!short.TryParse(Console.ReadLine(), out short field1))
             {
                 throw new ArgumentException("field1 is incorrect");
             }
 
-            if (decimal.TryParse(paramsArray[4], out decimal field2))
+            Console.WriteLine("Field2: ");
+
+            if (!decimal.TryParse(Console.ReadLine(), out decimal field2))
             {
                 throw new ArgumentException("field2 is incorrect");
             }
 
-            if (char.TryParse(paramsArray[4], out char field3))
+            Console.WriteLine("Field3: ");
+
+            if (!char.TryParse(Console.ReadLine(), out char field3))
             {
                 throw new ArgumentException("field2 is incorrect");
             }
 
-            int result = fileCabinetService.CreateRecord(paramsArray[0], paramsArray[1], dateOfBirth, field1, field2, field3);
+            int result = fileCabinetService.CreateRecord(firstName, lastName, dateOfBirth, field1, field2, field3);
 
             Console.WriteLine(
-                $"First name: {paramsArray[0]}\nLast name: {paramsArray[1]}\nDate of birth: {dateOfBirth.ToShortDateString()}\nRecord #{result} is created.");
+                $"First name: {firstName}\nLast name: {lastName}\nDate of birth: {dateOfBirth.ToShortDateString()}\nRecord #{result} is created.");
         }
 
         private static void Stat(string parameters)
