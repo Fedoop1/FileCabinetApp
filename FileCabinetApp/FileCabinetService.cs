@@ -7,6 +7,7 @@ public class FileCabinetService
 {
     private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
 
+    // Метод Input был добавлен для того, что бы не нарушить принцип DRY, а так же для сохранения гибкости и мастштабируемости программы.
     public (string firstName, string lastName, DateTime dateOfBirth, short height, decimal money, char gender) Input()
     {
         try
