@@ -25,14 +25,14 @@ namespace FileCabinetApp
             new string[] { "help", "prints the help screen", "The 'help' command prints the help screen." },
             new string[] { "exit", "exits the application", "The 'exit' command exits the application." },
             new string[] { "stat", "prints the count if records", "The 'stat' command print the count of records." },
-            new string[] { "create", "create the record in file cabinet", "The 'create' command create the record in file cabinet." },
+            new string[] { "create", "create the record in file cabinet", "The 'create' command create the record in file cabinet in the following format: create [name] [second name] [date of birth] [field1] [field2] [field3]." },
         };
 
         private static void Create(string parameters)
         {
-            string[] paramsArray = parameters.Split(" ", 3);
+            string[] paramsArray = parameters.Split(" ", 6);
 
-            if (paramsArray.Length < 3)
+            if (paramsArray.Length < 6)
             {
                 Console.WriteLine(Program.HintMessage);
                 return;
@@ -53,7 +53,22 @@ namespace FileCabinetApp
                 throw new ArgumentException("incorrect date of birth");
             }
 
-            int result = fileCabinetService.CreateRecord(paramsArray[0], paramsArray[1], dateOfBirth);
+            if (short.TryParse(paramsArray[3], out short field1))
+            {
+                throw new ArgumentException("field1 is incorrect");
+            }
+
+            if (decimal.TryParse(paramsArray[4], out decimal field2))
+            {
+                throw new ArgumentException("field2 is incorrect");
+            }
+
+            if (char.TryParse(paramsArray[4], out char field3))
+            {
+                throw new ArgumentException("field2 is incorrect");
+            }
+
+            int result = fileCabinetService.CreateRecord(paramsArray[0], paramsArray[1], dateOfBirth, field1, field2, field3);
 
             Console.WriteLine(
                 $"First name: {paramsArray[0]}\nLast name: {paramsArray[1]}\nDate of birth: {dateOfBirth.ToShortDateString()}\nRecord #{result} is created.");
