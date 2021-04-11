@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Globalization;
 
 namespace FileCabinetApp
 {
     public static class Program
     {
+        public static readonly CultureInfo Culture = CultureInfo.CurrentCulture;
         private const string DeveloperName = "Nikita Malukov";
         private const string HintMessage = "Enter your command, or enter 'help' to get help.";
         private const int CommandHelpIndex = 0;
@@ -19,6 +21,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("stat", Stat),
             new Tuple<string, Action<string>>("create", Create),
             new Tuple<string, Action<string>>("list", List),
+            new Tuple<string, Action<string>>("edit", Edit),
         };
 
         private static string[][] helpMessages = new string[][]
@@ -28,50 +31,16 @@ namespace FileCabinetApp
             new string[] { "stat", "prints the count if records", "The 'stat' command prints the count of the records." },
             new string[] { "create", "create the record in file cabinet", "The 'create' command create the record in file cabinet." },
             new string[] { "list", "prints the list if records", "The 'list' command prints the list of the records." },
+            new string[] { "edit", "edits the record", "The 'edit' command edits the value of the record." },
         };
 
         private static void Create(string parameters)
         {
             try
             {
-                int result = default(int);
-                Console.WriteLine("\nFirst name: ");
-
-                string firstName = Console.ReadLine();
-
-                Console.WriteLine("Last name: ");
-
-                string lastName = Console.ReadLine();
-
-                Console.WriteLine("Date of birth: ");
-
-                if (!DateTime.TryParse(Console.ReadLine(), out DateTime dateOfBirth))
-                {
-                    throw new ArgumentException("Date of birth is incorrect.");
-                }
-
-                Console.WriteLine("Height: ");
-
-                if (!short.TryParse(Console.ReadLine(), out short height))
-                {
-                    throw new ArgumentException("Height is incorrect");
-                }
-
-                Console.WriteLine("Money: ");
-
-                if (!decimal.TryParse(Console.ReadLine(), out decimal money))
-                {
-                    throw new ArgumentException("Money is incorrect");
-                }
-
-                Console.WriteLine("Gender(M/F): ");
-
-                if (!char.TryParse(Console.ReadLine(), out char gender))
-                {
-                    throw new ArgumentException("Gender is incorrect");
-                }
-
-                result = fileCabinetService.CreateRecord(firstName, lastName, dateOfBirth, height, money, gender);
+                var recordData = fileCabinetService.Input();
+                int result = fileCabinetService.CreateRecord(
+                recordData.firstName, recordData.lastName, recordData.dateOfBirth, recordData.height, recordData.money, recordData.gender);
 
                 Console.WriteLine(
                 $"Record #{result} is created.");
@@ -81,6 +50,18 @@ namespace FileCabinetApp
                 Console.WriteLine(exception.Message);
                 Create(parameters);
                 return;
+            }
+        }
+
+        private static void Edit(string parameters)
+        {
+            try
+            {
+                fileCabinetService.EditRecord(parameters);
+            }
+            catch (ArgumentException exception)
+            {
+                Console.WriteLine(exception.Message);
             }
         }
 

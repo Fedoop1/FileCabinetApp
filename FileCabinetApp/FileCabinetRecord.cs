@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Globalization;
+using FileCabinetApp;
 
 public class FileCabinetRecord
 {
-    private static readonly CultureInfo Culture = CultureInfo.CurrentCulture;
     private short height;
     private decimal money;
     private char gender;
@@ -122,7 +121,7 @@ public class FileCabinetRecord
 
         set
         {
-            if (value >= DateTime.Parse("01.12.1950", Culture) && value <= DateTime.Now)
+            if (value >= DateTime.Parse("01.12.1950", Program.Culture) && value <= DateTime.Now)
             {
                 this.dateOfBirth = value;
             }
