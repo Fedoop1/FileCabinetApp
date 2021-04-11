@@ -88,7 +88,7 @@ public class FileCabinetRecord
             }
             else
             {
-                throw new ArgumentException("first name is incorrect.");
+                throw new ArgumentException("First name is incorrect.");
             }
         }
     }
@@ -104,11 +104,11 @@ public class FileCabinetRecord
         {
             if (!string.IsNullOrWhiteSpace(value) && value.Length >= 2 && value.Length <= 60)
             {
-                this.firstName = value;
+                this.lastName = value;
             }
             else
             {
-                throw new ArgumentException("last name is incorrect.");
+                throw new ArgumentException("Last name is incorrect.");
             }
         }
     }

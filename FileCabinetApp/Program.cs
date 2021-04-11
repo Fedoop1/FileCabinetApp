@@ -32,56 +32,56 @@ namespace FileCabinetApp
 
         private static void Create(string parameters)
         {
-            Console.WriteLine("First name: ");
-
-            string firstName = Console.ReadLine();
-
-            if (string.IsNullOrEmpty(firstName))
+            try
             {
-                throw new ArgumentException("First name is incorrect.");
+                int result = default(int);
+                Console.WriteLine("\nFirst name: ");
+
+                string firstName = Console.ReadLine();
+
+                Console.WriteLine("Last name: ");
+
+                string lastName = Console.ReadLine();
+
+                Console.WriteLine("Date of birth: ");
+
+                if (!DateTime.TryParse(Console.ReadLine(), out DateTime dateOfBirth))
+                {
+                    throw new ArgumentException("Date of birth is incorrect.");
+                }
+
+                Console.WriteLine("Height: ");
+
+                if (!short.TryParse(Console.ReadLine(), out short height))
+                {
+                    throw new ArgumentException("Height is incorrect");
+                }
+
+                Console.WriteLine("Money: ");
+
+                if (!decimal.TryParse(Console.ReadLine(), out decimal money))
+                {
+                    throw new ArgumentException("Money is incorrect");
+                }
+
+                Console.WriteLine("Gender(M/F): ");
+
+                if (!char.TryParse(Console.ReadLine(), out char gender))
+                {
+                    throw new ArgumentException("Gender is incorrect");
+                }
+
+                result = fileCabinetService.CreateRecord(firstName, lastName, dateOfBirth, height, money, gender);
+
+                Console.WriteLine(
+                $"Record #{result} is created.");
             }
-
-            Console.WriteLine("Last name: ");
-
-            string lastName = Console.ReadLine();
-
-            if (string.IsNullOrEmpty(lastName))
+            catch (ArgumentException exception)
             {
-                throw new ArgumentException("Last name is incorrect.");
+                Console.WriteLine(exception.Message);
+                Create(parameters);
+                return;
             }
-
-            Console.WriteLine("Date of birth: ");
-
-            if (!DateTime.TryParse(Console.ReadLine(), out DateTime dateOfBirth))
-            {
-                throw new ArgumentException("Date of birth is incorrect.");
-            }
-
-            Console.WriteLine("Height: ");
-
-            if (!short.TryParse(Console.ReadLine(), out short height))
-            {
-                throw new ArgumentException("Height is incorrect");
-            }
-
-            Console.WriteLine("Money: ");
-
-            if (!decimal.TryParse(Console.ReadLine(), out decimal money))
-            {
-                throw new ArgumentException("Money is incorrect");
-            }
-
-            Console.WriteLine("Gender(M/F): ");
-
-            if (!char.TryParse(Console.ReadLine(), out char gender))
-            {
-                throw new ArgumentException("Gender is incorrect");
-            }
-
-            int result = fileCabinetService.CreateRecord(firstName, lastName, dateOfBirth, height, money, gender);
-
-            Console.WriteLine(
-                $"First name: {firstName}\nLast name: {lastName}\nDate of birth: {dateOfBirth.ToShortDateString()}\nRecord #{result} is created.");
         }
 
         private static void Stat(string parameters)
