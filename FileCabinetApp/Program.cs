@@ -9,22 +9,88 @@ namespace FileCabinetApp
         private const int CommandHelpIndex = 0;
         private const int DescriptionHelpIndex = 1;
         private const int ExplanationHelpIndex = 2;
-
+        private static FileCabinetService fileCabinetService = new FileCabinetService();
         private static bool isRunning = true;
 
         private static Tuple<string, Action<string>>[] commands = new Tuple<string, Action<string>>[]
         {
             new Tuple<string, Action<string>>("help", PrintHelp),
             new Tuple<string, Action<string>>("exit", Exit),
+            new Tuple<string, Action<string>>("stat", Stat),
+            new Tuple<string, Action<string>>("create", Create),
         };
 
         private static string[][] helpMessages = new string[][]
         {
             new string[] { "help", "prints the help screen", "The 'help' command prints the help screen." },
             new string[] { "exit", "exits the application", "The 'exit' command exits the application." },
+            new string[] { "stat", "prints the count if records", "The 'stat' command print the count of records." },
+            new string[] { "create", "create the record in file cabinet", "The 'create' command create the record in file cabinet in the following format: create [name] [second name] [date of birth] [field1] [field2] [field3]." },
         };
 
-        public static void Main(string[] args)
+        private static void Create(string parameters)
+        {
+            string[] paramsArray = parameters.Split(" ", 6);
+
+            if (paramsArray.Length < 6)
+            {
+                Console.WriteLine(Program.HintMessage);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(paramsArray[0]))
+            {
+                throw new ArgumentException("incorrect first name");
+            }
+
+            if (string.IsNullOrEmpty(paramsArray[1]))
+            {
+                throw new ArgumentException("incorrect last name");
+            }
+
+            if (!DateTime.TryParse(paramsArray[2], out DateTime dateOfBirth))
+            {
+                throw new ArgumentException("incorrect date of birth");
+            }
+
+            if (short.TryParse(paramsArray[3], out short field1))
+            {
+                throw new ArgumentException("field1 is incorrect");
+            }
+
+            if (decimal.TryParse(paramsArray[4], out decimal field2))
+            {
+                throw new ArgumentException("field2 is incorrect");
+            }
+
+            if (char.TryParse(paramsArray[4], out char field3))
+            {
+                throw new ArgumentException("field2 is incorrect");
+            }
+
+            int result = fileCabinetService.CreateRecord(paramsArray[0], paramsArray[1], dateOfBirth, field1, field2, field3);
+
+            Console.WriteLine(
+                $"First name: {paramsArray[0]}\nLast name: {paramsArray[1]}\nDate of birth: {dateOfBirth.ToShortDateString()}\nRecord #{result} is created.");
+        }
+
+        private static void Stat(string parameters)
+        {
+            var recordsCount = fileCabinetService.GetStat();
+            Console.WriteLine($"{recordsCount} record(s).");
+        }
+
+        private static void List(string parameters)
+        {
+            var recordsArray = fileCabinetService.GetRecords();
+
+            foreach (var record in recordsArray)
+            {
+                Console.WriteLine(record);
+            }
+        }
+
+        private static void Main(string[] args)
         {
             Console.WriteLine($"File Cabinet Application, developed by {Program.DeveloperName}");
             Console.WriteLine(Program.HintMessage);
