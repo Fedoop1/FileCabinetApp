@@ -38,7 +38,7 @@ namespace FileCabinetApp
 
             if (string.IsNullOrEmpty(firstName))
             {
-                throw new ArgumentException("incorrect first name");
+                throw new ArgumentException("First name is incorrect.");
             }
 
             Console.WriteLine("Last name: ");
@@ -47,38 +47,38 @@ namespace FileCabinetApp
 
             if (string.IsNullOrEmpty(lastName))
             {
-                throw new ArgumentException("incorrect last name");
+                throw new ArgumentException("Last name is incorrect.");
             }
 
             Console.WriteLine("Date of birth: ");
 
             if (!DateTime.TryParse(Console.ReadLine(), out DateTime dateOfBirth))
             {
-                throw new ArgumentException("incorrect date of birth");
+                throw new ArgumentException("Date of birth is incorrect.");
             }
 
-            Console.WriteLine("Field1: ");
+            Console.WriteLine("Height: ");
 
-            if (!short.TryParse(Console.ReadLine(), out short field1))
+            if (!short.TryParse(Console.ReadLine(), out short height))
             {
-                throw new ArgumentException("field1 is incorrect");
+                throw new ArgumentException("Height is incorrect");
             }
 
-            Console.WriteLine("Field2: ");
+            Console.WriteLine("Money: ");
 
-            if (!decimal.TryParse(Console.ReadLine(), out decimal field2))
+            if (!decimal.TryParse(Console.ReadLine(), out decimal money))
             {
-                throw new ArgumentException("field2 is incorrect");
+                throw new ArgumentException("Money is incorrect");
             }
 
-            Console.WriteLine("Field3: ");
+            Console.WriteLine("Gender(M/F): ");
 
-            if (!char.TryParse(Console.ReadLine(), out char field3))
+            if (!char.TryParse(Console.ReadLine(), out char gender))
             {
-                throw new ArgumentException("field2 is incorrect");
+                throw new ArgumentException("Gender is incorrect");
             }
 
-            int result = fileCabinetService.CreateRecord(firstName, lastName, dateOfBirth, field1, field2, field3);
+            int result = fileCabinetService.CreateRecord(firstName, lastName, dateOfBirth, height, money, gender);
 
             Console.WriteLine(
                 $"First name: {firstName}\nLast name: {lastName}\nDate of birth: {dateOfBirth.ToShortDateString()}\nRecord #{result} is created.");
