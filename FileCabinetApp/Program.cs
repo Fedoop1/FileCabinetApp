@@ -22,6 +22,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("create", Create),
             new Tuple<string, Action<string>>("list", List),
             new Tuple<string, Action<string>>("edit", Edit),
+            new Tuple<string, Action<string>>("find", Find),
         };
 
         private static string[][] helpMessages = new string[][]
@@ -32,7 +33,24 @@ namespace FileCabinetApp
             new string[] { "create", "create the record in file cabinet", "The 'create' command create the record in file cabinet." },
             new string[] { "list", "prints the list if records", "The 'list' command prints the list of the records." },
             new string[] { "edit", "edits the record", "The 'edit' command edits the value of the record." },
+            new string[] { "find", "finds a record", "The 'find' command find a record by the specified parameter." },
         };
+
+        private static void Find(string parameters)
+        {
+            FileCabinetRecord[] records = fileCabinetService.FindByFirstName(parameters);
+
+            if (records.Length == 0)
+            {
+                Console.WriteLine("There are no records with this parameters.");
+                return;
+            }
+
+            foreach (var record in records)
+            {
+                Console.WriteLine(record);
+            }
+        }
 
         private static void Create(string parameters)
         {
