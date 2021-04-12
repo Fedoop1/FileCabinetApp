@@ -112,6 +112,11 @@ public class FileCabinetService
         return this.list.Where(x => x.LastName.ToLower(Program.Culture) == lastName.ToLower(Program.Culture)).ToArray();
     }
 
+    public FileCabinetRecord[] FindByDayOfBirth(string dateOfBirth)
+    {
+        return this.list.Where(x => x.DateOfBirth == DateTime.Parse(dateOfBirth, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+    }
+
     public void EditRecord(string id)
     {
         if (!int.TryParse(id, out int recordId))

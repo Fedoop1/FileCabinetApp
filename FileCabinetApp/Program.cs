@@ -33,7 +33,7 @@ namespace FileCabinetApp
             new string[] { "create", "create the record in file cabinet", "The 'create' command create the record in file cabinet." },
             new string[] { "list", "prints the list if records", "The 'list' command prints the list of the records." },
             new string[] { "edit", "edits the record", "The 'edit' command edits the value of the record." },
-            new string[] { "find", "finds a record", "The 'find' command find a record by the specified parameter." },
+            new string[] { "find", "finds a record", "The 'find' command find a record by the specified parameter. Example '>find [param] [data]." },
         };
 
         private static void Find(string parameters)
@@ -48,6 +48,7 @@ namespace FileCabinetApp
             {
                 "firstname" => fileCabinetService.FindByFirstName(arrayParameters[FindData]),
                 "lastname" => fileCabinetService.FindByLastName(arrayParameters[FindData]),
+                "dateofbirth" =>fileCabinetService.FindByDayOfBirth(arrayParameters[FindData]),
                 _ => Array.Empty<FileCabinetRecord>()
             };
 
