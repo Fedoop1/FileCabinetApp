@@ -6,6 +6,7 @@ using FileCabinetApp;
 public class FileCabinetService
 {
     private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
+    private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
 
     // Метод Input был добавлен для того, что бы не нарушить принцип DRY, а так же для сохранения гибкости и мастштабируемости программы.
     public (string firstName, string lastName, DateTime dateOfBirth, short height, decimal money, char gender) Input()
@@ -72,6 +73,15 @@ public class FileCabinetService
 
         this.list.Add(record);
 
+        if (this.firstNameDictionary.TryGetValue(firstName, out List<FileCabinetRecord> recordsList))
+        {
+            recordsList.Add(record);
+        }
+        else
+        {
+            this.firstNameDictionary.Add(firstName, new List<FileCabinetRecord>() { record });
+        }
+
         return record.Id;
     }
 
@@ -86,12 +96,17 @@ public class FileCabinetService
                 throw new ArgumentException($"#{id} record is not found.");
             }
 
+            this.firstNameDictionary.TryGetValue(record.FirstName, out List<FileCabinetRecord> recordsList);
+            int recordIndex = recordsList.IndexOf(record);
+
             record.FirstName = firstName;
             record.LastName = lastName;
             record.DateOfBirth = dateOfBirth;
             record.Height = height;
             record.Money = money;
             record.Gender = gender;
+
+            recordsList[recordIndex] = record;
 
             Console.WriteLine($"Record #{id} is updated.");
         }
@@ -104,7 +119,8 @@ public class FileCabinetService
 
     public FileCabinetRecord[] FindByFirstName(string firstName)
     {
-        return this.list.Where(x => x.FirstName.ToLower(Program.Culture) == firstName.ToLower(Program.Culture)).ToArray();
+        this.firstNameDictionary.TryGetValue(firstName, out List<FileCabinetRecord> recordList);
+        return recordList.ToArray();
     }
 
     public FileCabinetRecord[] FindByLastName(string lastName)
