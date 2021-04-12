@@ -107,6 +107,11 @@ public class FileCabinetService
         return this.list.Where(x => x.FirstName.ToLower(Program.Culture) == firstName.ToLower(Program.Culture)).ToArray();
     }
 
+    public FileCabinetRecord[] FindByLastName(string lastName)
+    {
+        return this.list.Where(x => x.LastName.ToLower(Program.Culture) == lastName.ToLower(Program.Culture)).ToArray();
+    }
+
     public void EditRecord(string id)
     {
         if (!int.TryParse(id, out int recordId))

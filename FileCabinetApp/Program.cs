@@ -38,7 +38,18 @@ namespace FileCabinetApp
 
         private static void Find(string parameters)
         {
-            FileCabinetRecord[] records = fileCabinetService.FindByFirstName(parameters);
+            const int FindParam = 0;
+            const int FindData = 1;
+
+            FileCabinetRecord[] records = null;
+            string[] arrayParameters = parameters.Split(" ", 2);
+
+            records = arrayParameters[FindParam] switch
+            {
+                "firstname" => fileCabinetService.FindByFirstName(arrayParameters[FindData]),
+                "lastname" => fileCabinetService.FindByLastName(arrayParameters[FindData]),
+                _ => Array.Empty<FileCabinetRecord>()
+            };
 
             if (records.Length == 0)
             {
