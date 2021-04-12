@@ -6,6 +6,9 @@ using FileCabinetApp;
 public class FileCabinetService
 {
     private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
+    private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+    private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+    private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
 
     // Метод Input был добавлен для того, что бы не нарушить принцип DRY, а так же для сохранения гибкости и мастштабируемости программы.
     public (string firstName, string lastName, DateTime dateOfBirth, short height, decimal money, char gender) Input()
@@ -71,6 +74,7 @@ public class FileCabinetService
         };
 
         this.list.Add(record);
+        this.DictionaryAdd(firstName, lastName, dateOfBirth, record);
 
         return record.Id;
     }
@@ -79,19 +83,29 @@ public class FileCabinetService
     {
         try
         {
-            FileCabinetRecord record = this.list.FirstOrDefault(x => x.Id == id);
+            FileCabinetRecord editingRecord = this.list.FirstOrDefault(x => x.Id == id);
 
-            if (record == null)
+            if (editingRecord == null)
             {
                 throw new ArgumentException($"#{id} record is not found.");
             }
 
-            record.FirstName = firstName;
-            record.LastName = lastName;
-            record.DateOfBirth = dateOfBirth;
-            record.Height = height;
-            record.Money = money;
-            record.Gender = gender;
+            this.firstNameDictionary.TryGetValue(editingRecord.FirstName.ToLower(Program.Culture), out List<FileCabinetRecord> firstNameList);
+            this.lastNameDictionary.TryGetValue(editingRecord.LastName.ToLower(Program.Culture), out List<FileCabinetRecord> lastNameList);
+            this.dateOfBirthDictionary.TryGetValue(editingRecord.DateOfBirth, out List<FileCabinetRecord> dateOfBirthList);
+
+            editingRecord.FirstName = firstName;
+            editingRecord.LastName = lastName;
+            editingRecord.DateOfBirth = dateOfBirth;
+            editingRecord.Height = height;
+            editingRecord.Money = money;
+            editingRecord.Gender = gender;
+
+            firstNameList.Remove(editingRecord);
+            lastNameList.Remove(editingRecord);
+            dateOfBirthList.Remove(editingRecord);
+
+            this.DictionaryAdd(firstName, lastName, dateOfBirth, editingRecord);
 
             Console.WriteLine($"Record #{id} is updated.");
         }
@@ -100,6 +114,43 @@ public class FileCabinetService
             Console.WriteLine(exception.Message);
             this.EditRecord(id.ToString(Program.Culture));
         }
+    }
+
+    public FileCabinetRecord[] FindByFirstName(string firstName)
+    {
+        if (this.firstNameDictionary.TryGetValue(firstName?.ToLower(Program.Culture), out List<FileCabinetRecord> recordList))
+        {
+            return recordList.ToArray();
+        }
+        else
+        {
+            return Array.Empty<FileCabinetRecord>();
+        }
+    }
+
+    public FileCabinetRecord[] FindByLastName(string lastName)
+    {
+        if (this.lastNameDictionary.TryGetValue(lastName?.ToLower(Program.Culture), out List<FileCabinetRecord> recordList))
+        {
+            return recordList.ToArray();
+        }
+        else
+        {
+            return Array.Empty<FileCabinetRecord>();
+        }
+    }
+
+    public FileCabinetRecord[] FindByDayOfBirth(string dateOfBirth)
+    {
+        if (DateTime.TryParse(dateOfBirth, out DateTime birthDate))
+        {
+            if (this.dateOfBirthDictionary.TryGetValue(birthDate, out List<FileCabinetRecord> recordList))
+            {
+                return recordList.ToArray();
+            }
+        }
+
+        return Array.Empty<FileCabinetRecord>();
     }
 
     public void EditRecord(string id)
@@ -137,5 +188,38 @@ public class FileCabinetService
     public int GetStat()
     {
         return this.list.Count;
+    }
+
+    private void DictionaryAdd(string firstName, string lastName, DateTime dateOfBirth, FileCabinetRecord record)
+    {
+        firstName = firstName.ToLower(Program.Culture);
+        lastName = lastName.ToLower(Program.Culture);
+
+        if (this.firstNameDictionary.TryGetValue(firstName, out List<FileCabinetRecord> firstNamefList))
+        {
+            firstNamefList.Add(record);
+        }
+        else
+        {
+            this.firstNameDictionary.Add(firstName, new List<FileCabinetRecord>() { record });
+        }
+
+        if (this.lastNameDictionary.TryGetValue(lastName, out List<FileCabinetRecord> lastNameList))
+        {
+            lastNameList.Add(record);
+        }
+        else
+        {
+            this.lastNameDictionary.Add(lastName, new List<FileCabinetRecord>() { record });
+        }
+
+        if (this.dateOfBirthDictionary.TryGetValue(dateOfBirth, out List<FileCabinetRecord> dateOfBirthList))
+        {
+            dateOfBirthList.Add(record);
+        }
+        else
+        {
+            this.dateOfBirthDictionary.Add(dateOfBirth, new List<FileCabinetRecord>() { record });
+        }
     }
 }
