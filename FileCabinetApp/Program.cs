@@ -68,9 +68,9 @@ namespace FileCabinetApp
         {
             try
             {
-                var recordData = fileCabinetService.Input();
-                int result = fileCabinetService.CreateRecord(
-                recordData.firstName, recordData.lastName, recordData.dateOfBirth, recordData.height, recordData.money, recordData.gender);
+                var recordData = new FileCabinetRecordData();
+                recordData.InputData();
+                int result = fileCabinetService.CreateRecord(recordData);
 
                 Console.WriteLine(
                 $"Record #{result} is created.");

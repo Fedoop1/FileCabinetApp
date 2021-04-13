@@ -10,76 +10,26 @@ public class FileCabinetService
     private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
     private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
 
-    // Метод Input был добавлен для того, что бы не нарушить принцип DRY, а так же для сохранения гибкости и мастштабируемости программы.
-    public (string firstName, string lastName, DateTime dateOfBirth, short height, decimal money, char gender) Input()
-    {
-        try
-        {
-            Console.WriteLine("\nFirst name: ");
-
-            string firstName = Console.ReadLine();
-
-            Console.WriteLine("Last name: ");
-
-            string lastName = Console.ReadLine();
-
-            Console.WriteLine("Date of birth: ");
-
-            if (!DateTime.TryParse(Console.ReadLine(), out DateTime dateOfBirth))
-            {
-                throw new ArgumentException("Date of birth is incorrect.");
-            }
-
-            Console.WriteLine("Height: ");
-
-            if (!short.TryParse(Console.ReadLine(), out short height))
-            {
-                throw new ArgumentException("Height is incorrect");
-            }
-
-            Console.WriteLine("Money: ");
-
-            if (!decimal.TryParse(Console.ReadLine(), out decimal money))
-            {
-                throw new ArgumentException("Money is incorrect");
-            }
-
-            Console.WriteLine("Gender(M/F): ");
-
-            if (!char.TryParse(Console.ReadLine(), out char gender))
-            {
-                throw new ArgumentException("Gender is incorrect");
-            }
-
-            return (firstName, lastName, dateOfBirth, height, money, gender);
-        }
-        catch (ArgumentException exception)
-        {
-            Console.WriteLine(exception.Message);
-            return this.Input();
-        }
-    }
-
-    public int CreateRecord(string firstName, string lastName, DateTime dateOfBirth, short height, decimal money, char gender)
+    public int CreateRecord(FileCabinetRecordData recordData)
     {
         var record = new FileCabinetRecord
         {
             Id = this.list.Count + 1,
-            FirstName = firstName,
-            LastName = lastName,
-            DateOfBirth = dateOfBirth,
-            Height = height,
-            Money = money,
-            Gender = gender,
+            FirstName = recordData?.FirstName,
+            LastName = recordData.LastName,
+            DateOfBirth = recordData.DateOfBirth,
+            Height = recordData.Height,
+            Money = recordData.Money,
+            Gender = recordData.Gender,
         };
 
         this.list.Add(record);
-        this.DictionaryAdd(firstName, lastName, dateOfBirth, record);
+        this.DictionaryAdd(recordData.FirstName, recordData.LastName, recordData.DateOfBirth, record);
 
         return record.Id;
     }
 
-    public void EditRecord(int id, string firstName, string lastName, DateTime dateOfBirth, short height, decimal money, char gender)
+    public void EditRecord(int id, FileCabinetRecordData recordData)
     {
         try
         {
@@ -94,18 +44,18 @@ public class FileCabinetService
             this.lastNameDictionary.TryGetValue(editingRecord.LastName.ToLower(Program.Culture), out List<FileCabinetRecord> lastNameList);
             this.dateOfBirthDictionary.TryGetValue(editingRecord.DateOfBirth, out List<FileCabinetRecord> dateOfBirthList);
 
-            editingRecord.FirstName = firstName;
-            editingRecord.LastName = lastName;
-            editingRecord.DateOfBirth = dateOfBirth;
-            editingRecord.Height = height;
-            editingRecord.Money = money;
-            editingRecord.Gender = gender;
+            editingRecord.FirstName = recordData?.FirstName;
+            editingRecord.LastName = recordData.LastName;
+            editingRecord.DateOfBirth = recordData.DateOfBirth;
+            editingRecord.Height = recordData.Height;
+            editingRecord.Money = recordData.Money;
+            editingRecord.Gender = recordData.Gender;
 
             firstNameList.Remove(editingRecord);
             lastNameList.Remove(editingRecord);
             dateOfBirthList.Remove(editingRecord);
 
-            this.DictionaryAdd(firstName, lastName, dateOfBirth, editingRecord);
+            this.DictionaryAdd(recordData.FirstName, recordData.LastName, recordData.DateOfBirth, editingRecord);
 
             Console.WriteLine($"Record #{id} is updated.");
         }
@@ -167,11 +117,12 @@ public class FileCabinetService
             throw new ArgumentException($"#{id} record is not found.");
         }
 
-        var editData = this.Input();
+        FileCabinetRecordData newData = new FileCabinetRecordData();
+        newData.InputData();
 
         try
         {
-            this.EditRecord(recordId, editData.firstName, editData.lastName, editData.dateOfBirth, editData.height, editData.money, editData.gender);
+            this.EditRecord(recordId, newData);
         }
         catch (ArgumentException exception)
         {
