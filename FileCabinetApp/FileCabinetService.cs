@@ -83,7 +83,7 @@ public class FileCabinetService
     {
         try
         {
-            FileCabinetRecord editingRecord = this.list.FirstOrDefault(x => x.Id == id);
+            FileCabinetRecord editingRecord = this.list.FirstOrDefault(record => record.Id == id);
 
             if (editingRecord == null)
             {
