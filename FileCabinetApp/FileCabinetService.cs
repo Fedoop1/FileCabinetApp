@@ -3,15 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using FileCabinetApp;
 
-public class FileCabinetService
+public abstract class FileCabinetService
 {
-    private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
-    private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-    private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-    private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
+    protected readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
+    protected readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+    protected readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+    protected readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
+
+    public abstract bool ValidateParameters(FileCabinetRecordData recordData);
 
     public int CreateRecord(FileCabinetRecordData recordData)
     {
+        if (!this.ValidateParameters(recordData))
+        {
+            throw new ArgumentException("Incorrect record data.");
+        }
+
         var record = new FileCabinetRecord
         {
             Id = this.list.Count + 1,
@@ -38,6 +45,10 @@ public class FileCabinetService
             if (editingRecord == null)
             {
                 throw new ArgumentException($"#{id} record is not found.");
+            }
+            else if (!this.ValidateParameters(recordData))
+            {
+                throw new ArgumentException($"Incorrect record data.");
             }
 
             this.firstNameDictionary.TryGetValue(editingRecord.FirstName.ToLower(Program.Culture), out List<FileCabinetRecord> firstNameList);
@@ -141,10 +152,10 @@ public class FileCabinetService
         return this.list.Count;
     }
 
-    private void DictionaryAdd(string firstName, string lastName, DateTime dateOfBirth, FileCabinetRecord record)
+    protected void DictionaryAdd(string firstName, string lastName, DateTime dateOfBirth, FileCabinetRecord record)
     {
-        firstName = firstName.ToLower(Program.Culture);
-        lastName = lastName.ToLower(Program.Culture);
+        firstName = firstName?.ToLower(Program.Culture);
+        lastName = lastName?.ToLower(Program.Culture);
 
         if (this.firstNameDictionary.TryGetValue(firstName, out List<FileCabinetRecord> firstNamefList))
         {

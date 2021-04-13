@@ -6,19 +6,8 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp
 {
-    public class FileCabinetRecordData
+    public class FileCabinetRecordData : FileCabinetRecord
     {
-        public short Height { get; private set; }
-
-        public decimal Money { get; private set; }
-
-        public char Gender { get; private set; }
-
-        public string FirstName { get; private set; }
-
-        public string LastName { get; private set; }
-
-        public DateTime DateOfBirth { get; private set; }
 
         public void InputData()
         {
