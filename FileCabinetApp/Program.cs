@@ -11,7 +11,7 @@ namespace FileCabinetApp
         private const int CommandHelpIndex = 0;
         private const int DescriptionHelpIndex = 1;
         private const int ExplanationHelpIndex = 2;
-        private static FileCabinetService fileCabinetService = new FileCabinetCustomService();
+        private static FileCabinetService fileCabinetService = new FileCabinetDefaultService();
         private static bool isRunning = true;
 
         private static Tuple<string, Action<string>>[] commands = new Tuple<string, Action<string>>[]
@@ -23,6 +23,8 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("list", List),
             new Tuple<string, Action<string>>("edit", Edit),
             new Tuple<string, Action<string>>("find", Find),
+            new Tuple<string, Action<string>>("-v", ChangeValidationRules),
+            new Tuple<string, Action<string>>("--validation-rules", ChangeValidationRules),
         };
 
         private static string[][] helpMessages = new string[][]
@@ -34,7 +36,35 @@ namespace FileCabinetApp
             new string[] { "list", "prints the list if records", "The 'list' command prints the list of the records." },
             new string[] { "edit", "edits the record", "The 'edit' command edits the value of the record." },
             new string[] { "find", "finds a record", "The 'find' command find a record by the specified parameter. Example '>find [param] [data]." },
+            new string[] { "--validation-rules", "changes the type of check rules", "The '--validation-rules' or '-v' changes the type of check rules." },
         };
+
+        private static void ChangeValidationRules(string parameters)
+        {
+            if (string.IsNullOrEmpty(parameters))
+            {
+                Console.WriteLine("Empty flag.");
+                return;
+            }
+
+            switch (parameters.ToLower(Culture))
+            {
+                case "default":
+                    fileCabinetService = new FileCabinetDefaultService();
+                    Console.WriteLine("Using default validation rules.");
+                    Console.WriteLine(HintMessage);
+                    return;
+                case "custom":
+                    fileCabinetService = new FileCabinetCustomService();
+                    Console.WriteLine("Using custom validation rules.");
+                    Console.WriteLine(HintMessage);
+                    return;
+                default:
+                    Console.WriteLine("Unknown flag.");
+                    Console.WriteLine(HintMessage);
+                    return;
+            }
+        }
 
         private static void Find(string parameters)
         {
@@ -120,7 +150,14 @@ namespace FileCabinetApp
             do
             {
                 Console.Write("> ");
-                var inputs = Console.ReadLine().Split(' ', 2);
+
+                string inputCommand = Console.ReadLine();
+                var inputs = inputCommand.IndexOf(":", StringComparison.InvariantCultureIgnoreCase) switch
+                {
+                    -1 => inputCommand.Split(" ", 2),
+                    _ => inputCommand.Split(":", 2),
+                };
+
                 const int commandIndex = 0;
                 var command = inputs[commandIndex];
 
