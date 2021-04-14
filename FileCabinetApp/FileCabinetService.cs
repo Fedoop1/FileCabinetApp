@@ -3,20 +3,39 @@ using System.Collections.Generic;
 using System.Linq;
 using FileCabinetApp;
 
-public abstract class FileCabinetService
+public class FileCabinetService : IRecordValidator
 {
-    protected readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
-    protected readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-    protected readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-    protected readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
+    private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
+    private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+    private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+    private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
+    private IRecordValidator recordValidateRules = new DefaultValidator();
 
-    public abstract bool ValidateParameters(FileCabinetRecordData recordData);
+    public void ValidateParameters(FileCabinetRecordData recordData)
+    {
+        this.recordValidateRules.ValidateParameters(recordData);
+    }
+
+    public void SetValidateRules(IRecordValidator recordValidator)
+    {
+        this.recordValidateRules = recordValidator ?? new DefaultValidator();
+    }
+
+    public virtual IRecordValidator CreateValidator()
+    {
+        return new DefaultValidator();
+    }
 
     public int CreateRecord(FileCabinetRecordData recordData)
     {
-        if (!this.ValidateParameters(recordData))
+        try
         {
-            throw new ArgumentException("Incorrect record data.");
+            this.ValidateParameters(recordData);
+        }
+        catch (ArgumentException exception)
+        {
+            // Пробрасывание исключения на уровень выше.
+            throw new ArgumentException(exception.Message);
         }
 
         var record = new FileCabinetRecord
@@ -46,9 +65,14 @@ public abstract class FileCabinetService
             {
                 throw new ArgumentException($"#{id} record is not found.");
             }
-            else if (!this.ValidateParameters(recordData))
+
+            try
             {
-                throw new ArgumentException($"Incorrect record data.");
+                this.ValidateParameters(recordData);
+            }
+            catch (ArgumentException exception)
+            {
+                throw new ArgumentException(exception.Message);
             }
 
             this.firstNameDictionary.TryGetValue(editingRecord.FirstName.ToLower(Program.Culture), out List<FileCabinetRecord> firstNameList);
