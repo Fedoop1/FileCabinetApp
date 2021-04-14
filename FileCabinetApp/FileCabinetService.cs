@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using FileCabinetApp;
 
@@ -141,9 +142,9 @@ public abstract class FileCabinetService : IRecordValidator
         this.EditRecord(recordId, newData);
     }
 
-    public FileCabinetRecord[] GetRecords()
+    public ReadOnlyCollection<FileCabinetRecord> GetRecords()
     {
-        return this.list.ToArray();
+        return this.list.AsReadOnly();
     }
 
     public int GetStat()
