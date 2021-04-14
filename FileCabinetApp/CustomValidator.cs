@@ -24,7 +24,7 @@ namespace FileCabinetApp
             }
             else if (recordData.LastName.Length < MinNameLength || recordData.LastName.Length > MaxNameLength || recordData.LastName.Any(symbol => char.IsNumber(symbol)))
             {
-                throw new AggregateException("Last name is incorrect.");
+                throw new ArgumentException("Last name is incorrect.");
             }
             else if (recordData.Height < MinHeight || recordData.Height > MaxHeight)
             {

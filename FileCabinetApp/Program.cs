@@ -11,7 +11,7 @@ namespace FileCabinetApp
         private const int CommandHelpIndex = 0;
         private const int DescriptionHelpIndex = 1;
         private const int ExplanationHelpIndex = 2;
-        private static FileCabinetService fileCabinetService = new FileCabinetService();
+        private static FileCabinetService fileCabinetService;
         private static bool isRunning = true;
 
         private static Tuple<string, Action<string>>[] commands = new Tuple<string, Action<string>>[]
@@ -23,8 +23,6 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("list", List),
             new Tuple<string, Action<string>>("edit", Edit),
             new Tuple<string, Action<string>>("find", Find),
-            new Tuple<string, Action<string>>("-v", ChangeValidationRules),
-            new Tuple<string, Action<string>>("--validation-rules", ChangeValidationRules),
         };
 
         private static string[][] helpMessages = new string[][]
@@ -39,29 +37,30 @@ namespace FileCabinetApp
             new string[] { "--validation-rules", "changes the type of check rules", "The '--validation-rules' or '-v' changes the type of check rules." },
         };
 
-        private static void ChangeValidationRules(string parameters)
+        private static void ChangeValidationRules(string[] parameters)
         {
-            if (string.IsNullOrEmpty(parameters))
+            Console.Write("$ FileCabinetApp.exe");
+            foreach (var parameter in parameters)
             {
-                Console.WriteLine("Empty flag.");
-                return;
+                Console.Write(" " + parameter);
             }
 
-            switch (parameters.ToLower(Culture))
+            string validationParameter = parameters.Length switch
+            {
+                1 => parameters[0].Substring(parameters[0].LastIndexOf("=", StringComparison.InvariantCultureIgnoreCase) + 1),
+                2 => parameters[1],
+                _ => "default",
+            };
+
+            switch (validationParameter.ToLower(Culture))
             {
                 case "default":
-                    fileCabinetService.SetValidateRules(new FileCabinetDefaultService().CreateValidator());
-                    Console.WriteLine("Using default validation rules.");
-                    Console.WriteLine(HintMessage);
+                    fileCabinetService = new FileCabinetDefaultService();
                     return;
                 case "custom":
-                    fileCabinetService.SetValidateRules(new FileCabinetCustomService().CreateValidator());
-                    Console.WriteLine("Using custom validation rules.");
-                    Console.WriteLine(HintMessage);
+                    fileCabinetService = new FileCabinetCustomService();
                     return;
                 default:
-                    Console.WriteLine("Unknown flag.");
-                    Console.WriteLine(HintMessage);
                     return;
             }
         }
@@ -143,20 +142,15 @@ namespace FileCabinetApp
 
         private static void Main(string[] args)
         {
-            Console.WriteLine($"File Cabinet Application, developed by {Program.DeveloperName}");
+            ChangeValidationRules(args);
+            Console.WriteLine($"\nFile Cabinet Application, developed by {Program.DeveloperName}");
             Console.WriteLine(Program.HintMessage);
             Console.WriteLine();
 
             do
             {
                 Console.Write("> ");
-
-                string inputCommand = Console.ReadLine();
-                var inputs = inputCommand.IndexOf(":", StringComparison.InvariantCultureIgnoreCase) switch
-                {
-                    -1 => inputCommand.Split(" ", 2),
-                    _ => inputCommand.Split(":", 2),
-                };
+                var inputs = Console.ReadLine().Split(" ", 2);
 
                 const int commandIndex = 0;
                 var command = inputs[commandIndex];
@@ -221,6 +215,4 @@ namespace FileCabinetApp
             isRunning = false;
         }
     }
-
-    // test
 }

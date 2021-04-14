@@ -3,40 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using FileCabinetApp;
 
-public class FileCabinetService : IRecordValidator
+public abstract class FileCabinetService : IRecordValidator
 {
-    private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
-    private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-    private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-    private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
-    private IRecordValidator recordValidateRules = new DefaultValidator();
+    protected readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
+    protected readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+    protected readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+    protected readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
 
     public void ValidateParameters(FileCabinetRecordData recordData)
     {
-        this.recordValidateRules.ValidateParameters(recordData);
+        this.CreateValidator().ValidateParameters(recordData);
     }
 
-    public void SetValidateRules(IRecordValidator recordValidator)
-    {
-        this.recordValidateRules = recordValidator ?? new DefaultValidator();
-    }
-
-    public virtual IRecordValidator CreateValidator()
-    {
-        return new DefaultValidator();
-    }
+    public abstract IRecordValidator CreateValidator();
 
     public int CreateRecord(FileCabinetRecordData recordData)
     {
-        try
-        {
-            this.ValidateParameters(recordData);
-        }
-        catch (ArgumentException exception)
-        {
-            // Пробрасывание исключения на уровень выше.
-            throw new ArgumentException(exception.Message);
-        }
+        this.ValidateParameters(recordData);
 
         var record = new FileCabinetRecord
         {
@@ -155,15 +138,7 @@ public class FileCabinetService : IRecordValidator
         FileCabinetRecordData newData = new FileCabinetRecordData();
         newData.InputData();
 
-        try
-        {
-            this.EditRecord(recordId, newData);
-        }
-        catch (ArgumentException exception)
-        {
-            Console.WriteLine(exception.Message);
-            this.EditRecord(id);
-        }
+        this.EditRecord(recordId, newData);
     }
 
     public FileCabinetRecord[] GetRecords()
