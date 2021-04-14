@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp
 {
-    public class FileCabinetCustomService : FileCabinetService
+    public class FileCabinetCustomService : FileCabinetService, IFileCabinetService
     {
         public override IRecordValidator CreateValidator()
         {

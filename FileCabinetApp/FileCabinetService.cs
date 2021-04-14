@@ -4,12 +4,12 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using FileCabinetApp;
 
-public abstract class FileCabinetService : IRecordValidator
+public abstract class FileCabinetService : IRecordValidator, IFileCabinetService
 {
-    protected readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
-    protected readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-    protected readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-    protected readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
+    private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
+    private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+    private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+    private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
 
     public void ValidateParameters(FileCabinetRecordData recordData)
     {
@@ -152,7 +152,7 @@ public abstract class FileCabinetService : IRecordValidator
         return this.list.Count;
     }
 
-    protected void DictionaryAdd(string firstName, string lastName, DateTime dateOfBirth, FileCabinetRecord record)
+    private void DictionaryAdd(string firstName, string lastName, DateTime dateOfBirth, FileCabinetRecord record)
     {
         firstName = firstName?.ToLower(Program.Culture);
         lastName = lastName?.ToLower(Program.Culture);
