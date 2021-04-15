@@ -8,20 +8,21 @@ namespace FileCabinetApp
 {
     public class DefaultValidator : IRecordValidator
     {
-        protected const short MaxHeight = short.MaxValue;
-        protected const short MinHeight = 10;
-        protected const decimal MinMoney = 0;
-        protected const int MinNameLength = 2;
-        protected const int MaxNameLength = 60;
-        protected static char[] validGenderValue = { 'm', 'M', 'F', 'F' };
+        public const short MaxHeight = short.MaxValue;
+        public const short MinHeight = 10;
+        public const decimal MinMoney = 0;
+        public const int MinNameLength = 2;
+        public const int MaxNameLength = 60;
+        public static readonly char[] ValidGenderValue = { 'm', 'M', 'F', 'F' };
+        public static readonly DateTime MinDateOfBirth = DateTime.Parse("1.12.1950", System.Globalization.CultureInfo.InvariantCulture);
 
         public void ValidateParameters(FileCabinetRecordData recordData)
         {
-            if (recordData?.FirstName.Length < MinNameLength || recordData.FirstName.Length > MaxNameLength)
+            if (recordData?.FirstName.Length < MinNameLength || recordData.FirstName.Length > MaxNameLength || recordData.FirstName.Any(symbol => char.IsNumber(symbol)))
             {
                 throw new ArgumentException("First name is incorrect.");
             }
-            else if (recordData.LastName.Length < MinNameLength || recordData.LastName.Length > MaxNameLength)
+            else if (recordData.LastName.Length < MinNameLength || recordData.LastName.Length > MaxNameLength || recordData.FirstName.Any(symbol => char.IsNumber(symbol)))
             {
                 throw new AggregateException("Last name is incorrect.");
             }
@@ -33,11 +34,11 @@ namespace FileCabinetApp
             {
                 throw new ArgumentException("Money can't be lower than zero.");
             }
-            else if (!validGenderValue.Contains(recordData.Gender))
+            else if (!ValidGenderValue.Contains(recordData.Gender))
             {
                 throw new ArgumentException("Gender is incorrect.");
             }
-            else if (recordData.DateOfBirth < DateTime.Parse("1.12.1950", System.Globalization.CultureInfo.InvariantCulture) || recordData.DateOfBirth > DateTime.Now)
+            else if (recordData.DateOfBirth < MinDateOfBirth || recordData.DateOfBirth > DateTime.Now)
             {
                 throw new ArgumentException("Date of birth is incorrect.");
             }

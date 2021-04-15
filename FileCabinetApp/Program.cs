@@ -12,6 +12,7 @@ namespace FileCabinetApp
         private const int DescriptionHelpIndex = 1;
         private const int ExplanationHelpIndex = 2;
         private static IFileCabinetService fileCabinetService;
+        private static FileCabinetRecordData recordDataContainer;
         private static bool isRunning = true;
 
         private static Tuple<string, Action<string>>[] commands = new Tuple<string, Action<string>>[]
@@ -56,11 +57,14 @@ namespace FileCabinetApp
             {
                 case "default":
                     fileCabinetService = new FileCabinetDefaultService();
+                    recordDataContainer = new FileCabinetRecordData("default");
                     return;
                 case "custom":
                     fileCabinetService = new FileCabinetCustomService();
+                    recordDataContainer = new FileCabinetRecordData("custom");
                     return;
                 default:
+                    recordDataContainer = new FileCabinetRecordData("default");
                     return;
             }
         }
@@ -95,33 +99,16 @@ namespace FileCabinetApp
 
         private static void Create(string parameters)
         {
-            try
-            {
-                var recordData = new FileCabinetRecordData();
-                recordData.InputData();
-                int result = fileCabinetService.CreateRecord(recordData);
+            recordDataContainer.InputData();
+            int result = fileCabinetService.CreateRecord(recordDataContainer);
 
-                Console.WriteLine(
-                $"Record #{result} is created.");
-            }
-            catch (ArgumentException exception)
-            {
-                Console.WriteLine(exception.Message);
-                Create(parameters);
-                return;
-            }
+            Console.WriteLine($"Record #{result} is created.");
         }
 
         private static void Edit(string parameters)
         {
-            try
-            {
-                fileCabinetService.EditRecord(parameters);
-            }
-            catch (ArgumentException exception)
-            {
-                Console.WriteLine(exception.Message);
-            }
+            recordDataContainer.InputData();
+            fileCabinetService.EditRecord(parameters, recordDataContainer);
         }
 
         private static void Stat(string parameters)

@@ -8,13 +8,13 @@ namespace FileCabinetApp
 {
     public class CustomValidator : IRecordValidator
     {
-        protected const short MaxHeight = short.MaxValue;
-        protected const short MinHeight = 55;
-        protected const decimal MinMoney = 1;
-        protected const int MinNameLength = 2;
-        protected const int MaxNameLength = 60;
-        protected static char[] validGenderValue = { 'm', 'M', 'F', 'f' };
-        protected static DateTime minDateOfBirth = DateTime.Parse("01.12.1950", System.Globalization.CultureInfo.InvariantCulture);
+        public const short MaxHeight = short.MaxValue;
+        public const short MinHeight = 100;
+        public const decimal MinMoney = 1;
+        public const int MinNameLength = 3;
+        public const int MaxNameLength = 25;
+        public static readonly char[] ValidGenderValue = { 'm', 'M', 'F', 'f' };
+        public static readonly DateTime MinDateOfBirth = DateTime.Parse("01.12.1970", System.Globalization.CultureInfo.InvariantCulture);
 
         public void ValidateParameters(FileCabinetRecordData recordData)
         {
@@ -34,11 +34,11 @@ namespace FileCabinetApp
             {
                 throw new ArgumentException("Money can't be lower than zero.");
             }
-            else if (!validGenderValue.Contains(recordData.Gender))
+            else if (!ValidGenderValue.Contains(recordData.Gender))
             {
                 throw new ArgumentException("Gender is incorrect.");
             }
-            else if (DateTime.Now.Year - recordData.DateOfBirth.Year < 18 || recordData.DateOfBirth < minDateOfBirth || recordData.DateOfBirth > DateTime.Now)
+            else if (recordData.DateOfBirth < MinDateOfBirth || recordData.DateOfBirth > DateTime.Now)
             {
                 throw new ArgumentException("Date of birth is incorrect.");
             }

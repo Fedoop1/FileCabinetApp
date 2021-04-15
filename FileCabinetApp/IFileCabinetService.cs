@@ -14,7 +14,7 @@ namespace FileCabinetApp
 
         public FileCabinetRecord[] FindByDayOfBirth(string dateOfBirth);
 
-        public void EditRecord(string id);
+        public void EditRecord(string id, FileCabinetRecordData recordData);
 
         public ReadOnlyCollection<FileCabinetRecord> GetRecords();
 

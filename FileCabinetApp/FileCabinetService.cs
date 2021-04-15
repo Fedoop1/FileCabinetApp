@@ -81,7 +81,6 @@ public abstract class FileCabinetService : IRecordValidator, IFileCabinetService
         catch (ArgumentException exception)
         {
             Console.WriteLine(exception.Message);
-            this.EditRecord(id.ToString(Program.Culture));
         }
     }
 
@@ -122,7 +121,7 @@ public abstract class FileCabinetService : IRecordValidator, IFileCabinetService
         return Array.Empty<FileCabinetRecord>();
     }
 
-    public void EditRecord(string id)
+    public void EditRecord(string id, FileCabinetRecordData newData)
     {
         if (!int.TryParse(id, out int recordId))
         {
@@ -135,9 +134,6 @@ public abstract class FileCabinetService : IRecordValidator, IFileCabinetService
         {
             throw new ArgumentException($"#{id} record is not found.");
         }
-
-        FileCabinetRecordData newData = new FileCabinetRecordData();
-        newData.InputData();
 
         this.EditRecord(recordId, newData);
     }
