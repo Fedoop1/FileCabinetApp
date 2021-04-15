@@ -3,17 +3,27 @@ using System.Globalization;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// The main class from where all available functions are called.
+    /// </summary>
     public static class Program
     {
+        /// <summary>
+        /// Fields containing the culture of the user, which is necessary for the correct operation of the application.
+        /// </summary>
         public static readonly CultureInfo Culture = CultureInfo.CurrentCulture;
         private const string DeveloperName = "Nikita Malukov";
         private const string HintMessage = "Enter your command, or enter 'help' to get help.";
         private const int CommandHelpIndex = 0;
         private const int DescriptionHelpIndex = 1;
         private const int ExplanationHelpIndex = 2;
-        private static FileCabinetService fileCabinetService = new FileCabinetService();
+        private static IFileCabinetService fileCabinetService;
+        private static FileCabinetRecordData recordDataContainer;
         private static bool isRunning = true;
 
+        /// <summary>
+        /// A tuple that includes the name of the command and the Action delegate to call the function.
+        /// </summary>
         private static Tuple<string, Action<string>>[] commands = new Tuple<string, Action<string>>[]
         {
             new Tuple<string, Action<string>>("help", PrintHelp),
@@ -25,6 +35,9 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("find", Find),
         };
 
+        /// <summary>
+        /// The jagged array needed to get help with all the available commands consists of the command name, a short description, and an extended description.
+        /// </summary>
         private static string[][] helpMessages = new string[][]
         {
             new string[] { "help", "prints the help screen", "The 'help' command prints the help screen." },
@@ -34,8 +47,48 @@ namespace FileCabinetApp
             new string[] { "list", "prints the list if records", "The 'list' command prints the list of the records." },
             new string[] { "edit", "edits the record", "The 'edit' command edits the value of the record." },
             new string[] { "find", "finds a record", "The 'find' command find a record by the specified parameter. Example '>find [param] [data]." },
+            new string[] { "--validation-rules", "changes the type of check rules", "The '--validation-rules' or '-v' changes the type of check rules." },
         };
 
+        /// <summary>
+        /// A method that accepts command line parameters to control the check rules depending on the passed argument.
+        /// </summary>
+        /// <param name="parameters">An array of arguments passed to the Main method.</param>
+        private static void ChangeValidationRules(string[] parameters)
+        {
+            Console.Write("$ FileCabinetApp.exe");
+            foreach (var parameter in parameters)
+            {
+                Console.Write(" " + parameter);
+            }
+
+            string validationParameter = parameters.Length switch
+            {
+                1 => parameters[0].Substring(parameters[0].LastIndexOf("=", StringComparison.InvariantCultureIgnoreCase) + 1),
+                2 => parameters[1],
+                _ => "default",
+            };
+
+            switch (validationParameter.ToLower(Culture))
+            {
+                case "default":
+                    fileCabinetService = new FileCabinetDefaultService();
+                    recordDataContainer = new FileCabinetRecordData("default");
+                    return;
+                case "custom":
+                    fileCabinetService = new FileCabinetCustomService();
+                    recordDataContainer = new FileCabinetRecordData("custom");
+                    return;
+                default:
+                    recordDataContainer = new FileCabinetRecordData("default");
+                    return;
+            }
+        }
+
+        /// <summary>
+        /// A method that searches for records by a specific parameter with output to the console.
+        /// </summary>
+        /// <param name="parameters">Parameter line including 1.search criterion 2.unique information.</param>
         private static void Find(string parameters)
         {
             const int FindParam = 0;
@@ -66,41 +119,36 @@ namespace FileCabinetApp
 
         private static void Create(string parameters)
         {
-            try
-            {
-                var recordData = fileCabinetService.Input();
-                int result = fileCabinetService.CreateRecord(
-                recordData.firstName, recordData.lastName, recordData.dateOfBirth, recordData.height, recordData.money, recordData.gender);
+            recordDataContainer.InputData();
+            int result = fileCabinetService.CreateRecord(recordDataContainer);
 
-                Console.WriteLine(
-                $"Record #{result} is created.");
-            }
-            catch (ArgumentException exception)
-            {
-                Console.WriteLine(exception.Message);
-                Create(parameters);
-                return;
-            }
+            Console.WriteLine($"Record #{result} is created.");
         }
 
+        /// <summary>
+        /// A method that edits information about a specific record.
+        /// </summary>
+        /// <param name="parameters">A parameter consisting of a unique identifier required to search for a record.</param>
         private static void Edit(string parameters)
         {
-            try
-            {
-                fileCabinetService.EditRecord(parameters);
-            }
-            catch (ArgumentException exception)
-            {
-                Console.WriteLine(exception.Message);
-            }
+            recordDataContainer.InputData();
+            fileCabinetService.EditRecord(parameters, recordDataContainer);
         }
 
+        /// <summary>
+        /// A method that displays the number of records in the application.
+        /// </summary>
+        /// <param name="parameters">Typically an empty parameter that does not affect method execution.</param>
         private static void Stat(string parameters)
         {
             var recordsCount = fileCabinetService.GetStat();
             Console.WriteLine($"{recordsCount} record(s).");
         }
 
+        /// <summary>
+        /// A method that returns all available records in the application, outputting from the console.
+        /// </summary>
+        /// <param name="parameters">Typically an empty parameter that does not affect method execution.</param>
         private static void List(string parameters)
         {
             var recordsArray = fileCabinetService.GetRecords();
@@ -111,16 +159,22 @@ namespace FileCabinetApp
             }
         }
 
+        /// <summary>
+        /// The main application method from which the user interacts with all available methods.
+        /// </summary>
+        /// <param name="args">Command line arguments required to control check parameters.</param>
         private static void Main(string[] args)
         {
-            Console.WriteLine($"File Cabinet Application, developed by {Program.DeveloperName}");
+            ChangeValidationRules(args);
+            Console.WriteLine($"\nFile Cabinet Application, developed by {Program.DeveloperName}");
             Console.WriteLine(Program.HintMessage);
             Console.WriteLine();
 
             do
             {
                 Console.Write("> ");
-                var inputs = Console.ReadLine().Split(' ', 2);
+                var inputs = Console.ReadLine().Split(" ", 2);
+
                 const int commandIndex = 0;
                 var command = inputs[commandIndex];
 
@@ -145,12 +199,20 @@ namespace FileCabinetApp
             while (isRunning);
         }
 
+        /// <summary>
+        /// A method that is executed if a non-existent command is selected.
+        /// </summary>
+        /// <param name="command">User invoked command.</param>
         private static void PrintMissedCommandInfo(string command)
         {
             Console.WriteLine($"There is no '{command}' command.");
             Console.WriteLine();
         }
 
+        /// <summary>
+        /// Method displays all auxiliary information about existing methods, or additional information about a specific method.
+        /// </summary>
+        /// <param name="parameters">Parameter with the choice of a specific command to display help about it.</param>
         private static void PrintHelp(string parameters)
         {
             if (!string.IsNullOrEmpty(parameters))
@@ -178,12 +240,14 @@ namespace FileCabinetApp
             Console.WriteLine();
         }
 
+        /// <summary>
+        /// A method that produces a safe exit from the application.
+        /// </summary>
+        /// <param name="parameters">Typically an empty parameter that does not affect method execution.</param>
         private static void Exit(string parameters)
         {
             Console.WriteLine("Exiting an application...");
             isRunning = false;
         }
     }
-
-    // test
 }

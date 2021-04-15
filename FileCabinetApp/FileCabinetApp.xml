@@ -4,5 +4,459 @@
         <name>FileCabinetApp</name>
     </assembly>
     <members>
+        <member name="T:FileCabinetApp.CustomValidator">
+            <summary>
+            The class contains custom rules for records.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.CustomValidator.MaxHeight">
+            <summary>
+            Максимальное значения высота роста.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.CustomValidator.MinHeight">
+            <summary>
+            The maximum value is the height of growth.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.CustomValidator.MinMoney">
+            <summary>
+            The minimum amount of money.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.CustomValidator.MinNameLength">
+            <summary>
+            The minimum length of the first or last name.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.CustomValidator.MaxNameLength">
+            <summary>
+            The maximum length of a given name or surname.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.CustomValidator.ValidGenderValue">
+            <summary>
+            An array of valid values for gender.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.CustomValidator.MinDateOfBirth">
+            <summary>
+            The minimum allowed date of birth.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CustomValidator.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
+            <summary>
+            A method that checks values according to established rules.
+            </summary>
+            <param name="recordData">The class "container" with information about the record.</param>
+        </member>
+        <member name="T:FileCabinetApp.DefaultValidator">
+            <summary>
+            The class contains the standard rules for records.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.DefaultValidator.MaxHeight">
+            <summary>
+            The maximum value is the height of growth.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.DefaultValidator.MinHeight">
+            <summary>
+            The minimum value is the height of the growth.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.DefaultValidator.MinMoney">
+            <summary>
+            The minimum amount of money.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.DefaultValidator.MinNameLength">
+            <summary>
+            The minimum length of the first or last name.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.DefaultValidator.MaxNameLength">
+            <summary>
+            The maximum length of a given name or surname.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.DefaultValidator.ValidGenderValue">
+            <summary>
+            An array of valid values for gender.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.DefaultValidator.MinDateOfBirth">
+            <summary>
+            The minimum allowed date of birth.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.DefaultValidator.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
+            <summary>
+            A method that checks values according to established rules.
+            </summary>
+            <param name="recordData">The class "container" with information about the record.</param>
+        </member>
+        <member name="T:FileCabinetApp.FileCabinetCustomService">
+            <summary>
+            A class that implements custom rules for data validation.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetCustomService.CreateValidator">
+            <inheritdoc/>
+        </member>
+        <member name="T:FileCabinetApp.FileCabinetDefaultService">
+            <summary>
+            A class that implements standard rules for data validation.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetDefaultService.CreateValidator">
+            <inheritdoc/>
+        </member>
+        <member name="T:FileCabinetApp.FileCabinetRecordData">
+            <summary>
+            A container class for receiving and storing new information about a record.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordData.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetRecordData"/> class.
+            </summary>
+            <param name="parameters">The parameter corresponding to the selected check rules.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordData.InputData">
+            /// <summary>
+            A method that collects information about a record from a user.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordData.ReadInput``1(System.Func{System.String,System.Tuple{System.Boolean,System.String,``0}},System.Func{``0,System.Tuple{System.Boolean,System.String}})">
+            <summary>
+            Method for getting and validating input.
+            </summary>
+            <typeparam name="T">Generic variable denoting the type for conversion and validation.</typeparam>
+            <param name="converter">A converter method that performs conversion according to certain rules.</param>
+            <param name="validator">A validator method that performs validation according to certain rules.</param>
+            <returns>Returns the entered data as T.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordData.DataTimeValidator(System.DateTime)">
+            <summary>
+            The validator of the entered date of birth.
+            </summary>
+            <param name="dateOfBirth">Information for verification.</param>
+            <returns>A tuple with the result of the check and a string representation of the entered information.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordData.ShortValidator(System.Int16)">
+            <summary>
+            The entered growth validator.
+            </summary>
+            <param name="height">Information for verification.</param>
+            <returns>A tuple with the result of validation and a string representation of the entered information.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordData.DecimalValidator(System.Decimal)">
+            <summary>
+            Validator of the entered amount of money.
+            </summary>
+            <param name="money">Information for verification.</param>
+            <returns>A tuple with the result of the check and a string representation of the entered information.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordData.CharValidator(System.Char)">
+            <summary>
+            The entered gender validator.
+            </summary>
+            <param name="gender">Information for verification.</param>
+            <returns>A tuple with the result of the check and a string representation of the entered information.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordData.CharConverter(System.String)">
+            <summary>
+            Method for converting from String to Char.
+            </summary>
+            <param name="gender">Information for verification.</param>
+            <returns>A tuple with the result of the check, a string representation of the entered information, and the converted variable.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordData.DataTimeConverter(System.String)">
+            <summary>
+            A method that converts from a string representation to a DateTime.
+            </summary>
+            <param name="dateOfBirth">Information for verification.</param>
+            <returns>A tuple with the result of the check, a string representation of the entered information, as well as the converted variable.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordData.ShortConverter(System.String)">
+            <summary>
+            A method that converts from String to Short.
+            </summary>
+            <param name="height">Information for conversion.</param>
+            <returns>A tuple with the result of the check, a string representation of the entered information, as well as the converted variable.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordData.DecimalConverter(System.String)">
+            <summary>
+            A method that converts from String to Decimal.
+            </summary>
+            <param name="money">Information for conversion.</param>
+            <returns>A tuple with the result of the check, a string representation of the entered information, as well as the converted variable.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordData.StringValidator(System.String)">
+            <summary>
+            The validator of the entered first or last name.
+            </summary>
+            <param name="name">Information for validation.</param>
+            <returns>A tuple with the result of the check and a string representation of the entered information.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordData.StringConverter(System.String)">
+            <summary>
+            A method that checks the entered string value.
+            </summary>
+            <param name="name">Information for verification.</param>
+            <returns>A tuple with the result of the check, a string representation of the entered information, and the converted variable.</returns>
+        </member>
+        <member name="T:FileCabinetApp.IFileCabinetService">
+            <summary>
+            The interface includes all the methods common to the classes inherited from FileCabinetService.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.CreateValidator">
+            <summary>
+            A method that creates an instance of the IRecordValidator interface required for data validation.
+            </summary>
+            <returns>Returns an instance of the IRecordValidator interface.</returns>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.CreateRecord(FileCabinetApp.FileCabinetRecordData)">
+            <summary>
+            The method that creates a new FileCabinetRecord.
+            </summary>
+            <param name="recordData">The "container" class with all the information about the record.</param>
+            <returns>Returns the unique identifier of the record.</returns>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.FindByFirstName(System.String)">
+            <summary>
+            A method that searches for a record by name.
+            </summary>
+            <param name="firstName">A parameter consisting of the first name.</param>
+            <returns>Returns an array of all records matching the search term.</returns>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.FindByLastName(System.String)">
+            <summary>
+            A method that searches for a record by second name.
+            </summary>
+            <param name="lastName">A parameter consisting of the last name.</param>
+            <returns>Returns an array of all records matching the search term.</returns>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.FindByDayOfBirth(System.String)">
+            <summary>
+            A method that searches for a record by date of birth.
+            </summary>
+            <param name="dateOfBirth">A parameter consisting of the date of birth.</param>
+            <returns>Returns an array of all records matching the search term.</returns>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.EditRecord(System.String,FileCabinetApp.FileCabinetRecordData)">
+            <summary>
+            A method for editing data in a particular record.
+            </summary>
+            <param name="id">A unique identifier by which the editing will take place.</param>
+            <param name="recordData">A container class with updated record information.</param>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.GetRecords">
+            <summary>
+            A method that returns a collection of records (read-only).
+            </summary>
+            <returns>Collection of records (read-only).</returns>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.GetStat">
+            <summary>
+            A method that returns the count of records.
+            </summary>
+            <returns>Count of records.</returns>
+        </member>
+        <member name="T:FileCabinetApp.IRecordValidator">
+            <summary>
+            The interface required to validate the parameters in accordance with the selected rules.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.IRecordValidator.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
+            <summary>
+            A method that invokes parameter validation through the class that implements this interface.
+            </summary>
+            <param name="recordData">The container class includes all the information about the record.</param>
+        </member>
+        <member name="T:FileCabinetApp.Program">
+            <summary>
+            The main class from where all available functions are called.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.Program.Culture">
+            <summary>
+            Fields containing the culture of the user, which is necessary for the correct operation of the application.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.Program.commands">
+            <summary>
+            A tuple that includes the name of the command and the Action delegate to call the function.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.Program.helpMessages">
+            <summary>
+            The jagged array needed to get help with all the available commands consists of the command name, a short description, and an extended description.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.Program.ChangeValidationRules(System.String[])">
+            <summary>
+            A method that accepts command line parameters to control the check rules depending on the passed argument.
+            </summary>
+            <param name="parameters">An array of arguments passed to the Main method.</param>
+        </member>
+        <member name="M:FileCabinetApp.Program.Find(System.String)">
+            <summary>
+            A method that searches for records by a specific parameter with output to the console.
+            </summary>
+            <param name="parameters">Parameter line including 1.search criterion 2.unique information.</param>
+        </member>
+        <member name="M:FileCabinetApp.Program.Edit(System.String)">
+            <summary>
+            A method that edits information about a specific record.
+            </summary>
+            <param name="parameters">A parameter consisting of a unique identifier required to search for a record.</param>
+        </member>
+        <member name="M:FileCabinetApp.Program.Stat(System.String)">
+            <summary>
+            A method that displays the number of records in the application.
+            </summary>
+            <param name="parameters">Typically an empty parameter that does not affect method execution.</param>
+        </member>
+        <member name="M:FileCabinetApp.Program.List(System.String)">
+            <summary>
+            A method that returns all available records in the application, outputting from the console.
+            </summary>
+            <param name="parameters">Typically an empty parameter that does not affect method execution.</param>
+        </member>
+        <member name="M:FileCabinetApp.Program.Main(System.String[])">
+            <summary>
+            The main application method from which the user interacts with all available methods.
+            </summary>
+            <param name="args">Command line arguments required to control check parameters.</param>
+        </member>
+        <member name="M:FileCabinetApp.Program.PrintMissedCommandInfo(System.String)">
+            <summary>
+            A method that is executed if a non-existent command is selected.
+            </summary>
+            <param name="command">User invoked command.</param>
+        </member>
+        <member name="M:FileCabinetApp.Program.PrintHelp(System.String)">
+            <summary>
+            Method displays all auxiliary information about existing methods, or additional information about a specific method.
+            </summary>
+            <param name="parameters">Parameter with the choice of a specific command to display help about it.</param>
+        </member>
+        <member name="M:FileCabinetApp.Program.Exit(System.String)">
+            <summary>
+            A method that produces a safe exit from the application.
+            </summary>
+            <param name="parameters">Typically an empty parameter that does not affect method execution.</param>
+        </member>
+        <member name="T:FileCabinetRecord">
+            <summary>
+            A class describing the fields and behavior of a unit such as a record.
+            </summary>
+        </member>
+        <member name="P:FileCabinetRecord.Height">
+            <summary>
+            Height property.
+            </summary>
+            <value>
+            Gets and sets the height field.
+            </value>
+        </member>
+        <member name="P:FileCabinetRecord.Money">
+            <summary>
+            Money property.
+            </summary>
+            <value>
+            Gets and sets the money field.
+            </value>
+        </member>
+        <member name="P:FileCabinetRecord.Gender">
+            <summary>
+            Gender property.
+            </summary>
+            <value>
+            Gets and sets the gender field.
+            </value>
+        </member>
+        <member name="P:FileCabinetRecord.Id">
+            <summary>
+            Id property.
+            </summary>
+            <value>
+            Gets and sets the id field.
+            </value>
+        </member>
+        <member name="P:FileCabinetRecord.FirstName">
+            <summary>
+            First name property.
+            </summary>
+            <value>
+            Gets and sets the first name field.
+            </value>
+        </member>
+        <member name="P:FileCabinetRecord.LastName">
+            <summary>
+            Last name property.
+            </summary>
+            <value>
+            Gets and sets the last name field.
+            </value>
+        </member>
+        <member name="P:FileCabinetRecord.DateOfBirth">
+            <summary>
+            Date of birth property.
+            </summary>
+            <value>
+            Gets and sets the date of birth field.
+            </value>
+        </member>
+        <member name="M:FileCabinetRecord.ToString">
+            <summary>
+            Overriding the ToString() method.
+            </summary>
+            <returns>Returns an overridden version of the ToString() method.</returns>
+        </member>
+        <member name="T:FileCabinetService">
+            <summary>
+            An abstract class that describes the general behavior for classes of descendants, which implements the main work with records.
+            </summary>
+        </member>
+        <member name="M:FileCabinetService.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetService.CreateValidator">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetService.CreateRecord(FileCabinetApp.FileCabinetRecordData)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetService.FindByFirstName(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetService.FindByLastName(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetService.FindByDayOfBirth(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetService.EditRecord(System.String,FileCabinetApp.FileCabinetRecordData)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetService.GetRecords">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetService.GetStat">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetService.DictionaryAdd(System.String,System.String,System.DateTime,FileCabinetRecord)">
+            <summary>
+            An internal method that calls data updates in dictionaries.
+            </summary>
+            <param name="firstName">New name.</param>
+            <param name="lastName">New surname.</param>
+            <param name="dateOfBirth">New date of birth.</param>
+            <param name="record">A record corresponding to these parameters.</param>
+        </member>
     </members>
 </doc>
