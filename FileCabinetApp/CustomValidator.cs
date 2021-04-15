@@ -6,16 +6,50 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// The class contains custom rules for records.
+    /// </summary>
     public class CustomValidator : IRecordValidator
     {
+        /// <summary>
+        /// Максимальное значения высота роста.
+        /// </summary>
         public const short MaxHeight = short.MaxValue;
+
+        /// <summary>
+        /// The maximum value is the height of growth.
+        /// </summary>
         public const short MinHeight = 100;
+
+        /// <summary>
+        /// The minimum amount of money.
+        /// </summary>
         public const decimal MinMoney = 1;
+
+        /// <summary>
+        /// The minimum length of the first or last name.
+        /// </summary>
         public const int MinNameLength = 3;
+
+        /// <summary>
+        /// The maximum length of a given name or surname.
+        /// </summary>
         public const int MaxNameLength = 25;
+
+        /// <summary>
+        /// An array of valid values for gender.
+        /// </summary>
         public static readonly char[] ValidGenderValue = { 'm', 'M', 'F', 'f' };
+
+        /// <summary>
+        /// The minimum allowed date of birth.
+        /// </summary>
         public static readonly DateTime MinDateOfBirth = DateTime.Parse("01.12.1970", System.Globalization.CultureInfo.InvariantCulture);
 
+        /// <summary>
+        /// A method that checks values according to established rules.
+        /// </summary>
+        /// <param name="recordData">The class "container" with information about the record.</param>
         public void ValidateParameters(FileCabinetRecordData recordData)
         {
             if (recordData?.FirstName.Length < MinNameLength || recordData.FirstName.Length > MaxNameLength || recordData.FirstName.Any(symbol => char.IsNumber(symbol)))

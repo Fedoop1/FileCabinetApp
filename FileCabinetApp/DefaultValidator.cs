@@ -6,16 +6,50 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// The class contains the standard rules for records.
+    /// </summary>
     public class DefaultValidator : IRecordValidator
     {
+        /// <summary>
+        /// The maximum value is the height of growth.
+        /// </summary>
         public const short MaxHeight = short.MaxValue;
+
+        /// <summary>
+        /// The minimum value is the height of the growth.
+        /// </summary>
         public const short MinHeight = 10;
+
+        /// <summary>
+        /// The minimum amount of money.
+        /// </summary>
         public const decimal MinMoney = 0;
+
+        /// <summary>
+        /// The minimum length of the first or last name.
+        /// </summary>
         public const int MinNameLength = 2;
+
+        /// <summary>
+        /// The maximum length of a given name or surname.
+        /// </summary>
         public const int MaxNameLength = 60;
+
+        /// <summary>
+        /// An array of valid values for gender.
+        /// </summary>
         public static readonly char[] ValidGenderValue = { 'm', 'M', 'F', 'F' };
+
+        /// <summary>
+        /// The minimum allowed date of birth.
+        /// </summary>
         public static readonly DateTime MinDateOfBirth = DateTime.Parse("1.12.1950", System.Globalization.CultureInfo.InvariantCulture);
 
+        /// <summary>
+        /// A method that checks values according to established rules.
+        /// </summary>
+        /// <param name="recordData">The class "container" with information about the record.</param>
         public void ValidateParameters(FileCabinetRecordData recordData)
         {
             if (recordData?.FirstName.Length < MinNameLength || recordData.FirstName.Length > MaxNameLength || recordData.FirstName.Any(symbol => char.IsNumber(symbol)))
@@ -43,6 +77,5 @@ namespace FileCabinetApp
                 throw new ArgumentException("Date of birth is incorrect.");
             }
         }
-
     }
 }

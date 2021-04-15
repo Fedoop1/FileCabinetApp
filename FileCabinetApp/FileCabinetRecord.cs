@@ -1,6 +1,9 @@
 ﻿using System;
 using FileCabinetApp;
 
+/// <summary>
+/// A class describing the fields and behavior of a unit such as a record.
+/// </summary>
 public class FileCabinetRecord
 {
     private short height;
@@ -10,6 +13,12 @@ public class FileCabinetRecord
     private string lastName;
     private DateTime dateOfBirth;
 
+    /// <summary>
+    /// Height property.
+    /// </summary>
+    /// <value>
+    /// Gets and sets the height field.
+    /// </value>
     public short Height
     {
         get
@@ -30,6 +39,12 @@ public class FileCabinetRecord
         }
     }
 
+    /// <summary>
+    /// Money property.
+    /// </summary>
+    /// <value>
+    /// Gets and sets the money field.
+    /// </value>
     public decimal Money
     {
         get
@@ -50,6 +65,12 @@ public class FileCabinetRecord
         }
     }
 
+    /// <summary>
+    /// Gender property.
+    /// </summary>
+    /// <value>
+    /// Gets and sets the gender field.
+    /// </value>
     public char Gender
     {
         get
@@ -70,8 +91,20 @@ public class FileCabinetRecord
         }
     }
 
+    /// <summary>
+    /// Id property.
+    /// </summary>
+    /// <value>
+    /// Gets and sets the id field.
+    /// </value>
     public int Id { get; set; }
 
+    /// <summary>
+    /// First name property.
+    /// </summary>
+    /// <value>
+    /// Gets and sets the first name field.
+    /// </value>
     public string FirstName
     {
         get
@@ -92,6 +125,12 @@ public class FileCabinetRecord
         }
     }
 
+    /// <summary>
+    /// Last name property.
+    /// </summary>
+    /// <value>
+    /// Gets and sets the last name field.
+    /// </value>
     public string LastName
     {
         get
@@ -112,6 +151,12 @@ public class FileCabinetRecord
         }
     }
 
+    /// <summary>
+    /// Date of birth property.
+    /// </summary>
+    /// <value>
+    /// Gets and sets the date of birth field.
+    /// </value>
     public DateTime DateOfBirth
     {
         get
@@ -132,6 +177,10 @@ public class FileCabinetRecord
         }
     }
 
+    /// <summary>
+    /// Overriding the ToString() method.
+    /// </summary>
+    /// <returns>Returns an overridden version of the ToString() method.</returns>
     public override string ToString()
     {
         return $"#{this.Id}, {this.FirstName}, {this.LastName}, {this.DateOfBirth.Year}-{this.DateOfBirth.Month}-{this.DateOfBirth.Day}, {this.Height}, {this.Money}, {this.Gender}.";
