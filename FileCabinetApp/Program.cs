@@ -33,6 +33,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("list", List),
             new Tuple<string, Action<string>>("edit", Edit),
             new Tuple<string, Action<string>>("find", Find),
+            new Tuple<string, Action<string>>("export", Export),
         };
 
         /// <summary>
@@ -48,7 +49,42 @@ namespace FileCabinetApp
             new string[] { "edit", "edits the record", "The 'edit' command edits the value of the record." },
             new string[] { "find", "finds a record", "The 'find' command find a record by the specified parameter. Example '>find [param] [data]." },
             new string[] { "--validation-rules", "changes the type of check rules", "The '--validation-rules' or '-v' changes the type of check rules." },
+            new string[] { "export", "Make snapshot and save it to file.", "The export command make snapshot of you record list and save it to special file." },
         };
+
+        private static void Export(string parameters)
+        {
+            string[] parameterArray = parameters.Split(" ", 2);
+
+            const int fileTypeIndex = 0;
+            const int fileNameIndex = 1;
+            FileCabinetServiceShapshot snapshot = null;
+
+            if (parameters?.Length == 0)
+            {
+                Console.WriteLine("Empty parameters");
+                return;
+            }
+
+            switch (parameterArray[fileTypeIndex].ToLower(Culture))
+            {
+                case "csv":
+                    snapshot = fileCabinetService.MakeSnapshot();
+                    break;
+                case "xml":
+                    break;
+                default:
+                    Console.WriteLine("Unknown file format.");
+                    return;
+            }
+
+            if (parameterArray[fileNameIndex].Length > 0)
+            {
+                var streamWriter = new System.IO.StreamWriter(parameterArray[fileNameIndex]);
+                snapshot.SaveToCSV(streamWriter);
+                streamWriter.Close();
+            }
+        }
 
         /// <summary>
         /// A method that accepts command line parameters to control the check rules depending on the passed argument.

@@ -14,6 +14,11 @@ public abstract class FileCabinetService : IRecordValidator, IFileCabinetService
     private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
     private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
 
+    public FileCabinetServiceShapshot MakeSnapshot()
+    {
+        return new FileCabinetServiceShapshot(this.list.ToArray());
+    }
+
     /// <inheritdoc/>
     public void ValidateParameters(FileCabinetRecordData recordData)
     {
