@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 
 namespace FileCabinetApp
 {
@@ -33,6 +34,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("list", List),
             new Tuple<string, Action<string>>("edit", Edit),
             new Tuple<string, Action<string>>("find", Find),
+            new Tuple<string, Action<string>>("export", Export),
         };
 
         /// <summary>
@@ -48,7 +50,70 @@ namespace FileCabinetApp
             new string[] { "edit", "edits the record", "The 'edit' command edits the value of the record." },
             new string[] { "find", "finds a record", "The 'find' command find a record by the specified parameter. Example '>find [param] [data]." },
             new string[] { "--validation-rules", "changes the type of check rules", "The '--validation-rules' or '-v' changes the type of check rules." },
+            new string[] { "export", "Make snapshot and save it to file.", "The export command make snapshot of you record list and save it to special file." },
         };
+
+        private static void Export(string parameters)
+        {
+            string[] parameterArray = parameters.Split(" ", 2);
+
+            const int fileTypeIndex = 0;
+            const int filePathIndex = 1;
+            bool append = true;
+            FileCabinetServiceShapshot snapshot = null;
+
+            if (parameters?.Length == 0)
+            {
+                Console.WriteLine("Empty parameters");
+                return;
+            }
+            else if (parameterArray.Length < 2)
+            {
+                Console.WriteLine("File path or export type is empty.");
+                return;
+            }
+            else if (string.IsNullOrWhiteSpace(parameterArray[filePathIndex]) || parameterArray[filePathIndex].Length == 0)
+            {
+                Console.WriteLine("File path is empty or incorrect.");
+            }
+
+            try
+            {
+                if (File.Exists(parameterArray[filePathIndex]))
+                {
+                    Console.WriteLine($"File is exist - rewrite {parameterArray[filePathIndex]} ? [Y/N]");
+                    if (Console.ReadKey().Key == ConsoleKey.Y)
+                    {
+                        append = false;
+                    }
+                }
+
+                using (var streamWriter = new StreamWriter(parameterArray[filePathIndex], append))
+                {
+                    snapshot = fileCabinetService.MakeSnapshot();
+
+                    switch (parameterArray[fileTypeIndex].ToLower(Culture))
+                    {
+                        case "csv":
+                            snapshot.SaveToCSV(streamWriter);
+                            break;
+                        case "xml":
+                            snapshot.SaveToXML(streamWriter);
+                            break;
+                        default:
+                            Console.WriteLine("Unknown export type format.");
+                            return;
+                    }
+                }
+            }
+            catch (IOException)
+            {
+                Console.WriteLine($"Can't open file {parameterArray[filePathIndex]}");
+                return;
+            }
+
+            Console.WriteLine($"\nAll records are exported to file {parameterArray[filePathIndex]}.");
+        }
 
         /// <summary>
         /// A method that accepts command line parameters to control the check rules depending on the passed argument.

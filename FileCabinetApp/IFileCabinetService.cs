@@ -59,6 +59,8 @@ namespace FileCabinetApp
         /// A method that returns the count of records.
         /// </summary>
         /// <returns>Count of records.</returns>
+        public FileCabinetServiceShapshot MakeSnapshot();
+
         public int GetStat();
     }
 }
