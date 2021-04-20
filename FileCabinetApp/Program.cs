@@ -76,10 +76,6 @@ namespace FileCabinetApp
             {
                 Console.WriteLine("File path is empty or incorrect.");
             }
-            else if (!parameterArray[filePathIndex].Contains(".csv"))
-            {
-                parameterArray[filePathIndex] += ".csv";
-            }
 
             try
             {
@@ -94,19 +90,20 @@ namespace FileCabinetApp
 
                 using (var streamWriter = new StreamWriter(parameterArray[filePathIndex], append))
                 {
+                    snapshot = fileCabinetService.MakeSnapshot();
+
                     switch (parameterArray[fileTypeIndex].ToLower(Culture))
                     {
                         case "csv":
-                            snapshot = fileCabinetService.MakeSnapshot();
+                            snapshot.SaveToCSV(streamWriter);
                             break;
                         case "xml":
+                            snapshot.SaveToXML(streamWriter);
                             break;
                         default:
                             Console.WriteLine("Unknown export type format.");
                             return;
                     }
-
-                    snapshot.SaveToCSV(streamWriter);
                 }
             }
             catch (IOException)

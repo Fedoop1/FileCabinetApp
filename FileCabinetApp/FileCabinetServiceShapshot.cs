@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace FileCabinetApp
 {
@@ -20,6 +15,12 @@ namespace FileCabinetApp
         {
             var fileCabinetRecordCSVWriter = new FileCabinetRecordCSVWriter(writer);
             fileCabinetRecordCSVWriter.Write(this.fileCabinetRecordsArray);
+        }
+
+        public void SaveToXML(StreamWriter writer)
+        {
+            var fileCabinetRecordXMLWriter = new FileCabinetRecordXMLWriter(writer);
+            fileCabinetRecordXMLWriter.Write(this.fileCabinetRecordsArray);
         }
     }
 }

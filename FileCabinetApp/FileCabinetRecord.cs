@@ -4,6 +4,7 @@ using FileCabinetApp;
 /// <summary>
 /// A class describing the fields and behavior of a unit such as a record.
 /// </summary>
+[Serializable]
 public class FileCabinetRecord
 {
     private short height;
