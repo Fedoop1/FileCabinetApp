@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 
 namespace FileCabinetApp
 {
@@ -57,7 +58,8 @@ namespace FileCabinetApp
             string[] parameterArray = parameters.Split(" ", 2);
 
             const int fileTypeIndex = 0;
-            const int fileNameIndex = 1;
+            const int filePathIndex = 1;
+            bool append = true;
             FileCabinetServiceShapshot snapshot = null;
 
             if (parameters?.Length == 0)
@@ -65,25 +67,55 @@ namespace FileCabinetApp
                 Console.WriteLine("Empty parameters");
                 return;
             }
-
-            switch (parameterArray[fileTypeIndex].ToLower(Culture))
+            else if (parameterArray.Length < 2)
             {
-                case "csv":
-                    snapshot = fileCabinetService.MakeSnapshot();
-                    break;
-                case "xml":
-                    break;
-                default:
-                    Console.WriteLine("Unknown file format.");
-                    return;
+                Console.WriteLine("File path or export type is empty.");
+                return;
+            }
+            else if (string.IsNullOrWhiteSpace(parameterArray[filePathIndex]) || parameterArray[filePathIndex].Length == 0)
+            {
+                Console.WriteLine("File path is empty or incorrect.");
+            }
+            else if (!parameterArray[filePathIndex].Contains(".csv"))
+            {
+                parameterArray[filePathIndex] += ".csv";
             }
 
-            if (parameterArray[fileNameIndex].Length > 0)
+            try
             {
-                var streamWriter = new System.IO.StreamWriter(parameterArray[fileNameIndex]);
-                snapshot.SaveToCSV(streamWriter);
-                streamWriter.Close();
+                if (File.Exists(parameterArray[filePathIndex]))
+                {
+                    Console.WriteLine($"File is exist - rewrite {parameterArray[filePathIndex]} ? [Y/N]");
+                    if (Console.ReadKey().Key == ConsoleKey.Y)
+                    {
+                        append = false;
+                    }
+                }
+
+                using (var streamWriter = new StreamWriter(parameterArray[filePathIndex], append))
+                {
+                    switch (parameterArray[fileTypeIndex].ToLower(Culture))
+                    {
+                        case "csv":
+                            snapshot = fileCabinetService.MakeSnapshot();
+                            break;
+                        case "xml":
+                            break;
+                        default:
+                            Console.WriteLine("Unknown export type format.");
+                            return;
+                    }
+
+                    snapshot.SaveToCSV(streamWriter);
+                }
             }
+            catch (IOException)
+            {
+                Console.WriteLine($"Can't open file {parameterArray[filePathIndex]}");
+                return;
+            }
+
+            Console.WriteLine($"\nAll records are exported to file {parameterArray[filePathIndex]}.");
         }
 
         /// <summary>

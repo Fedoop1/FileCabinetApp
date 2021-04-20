@@ -18,7 +18,16 @@ namespace FileCabinetApp
 
         public void Write(FileCabinetRecord[] fileCabinetRecordsArray)
         {
+            if (fileCabinetRecordsArray?.Length == 0)
+            {
+                return;
+            }
 
+            // Id,First Name,Last Name,Date of Birth,...
+            foreach (var record in fileCabinetRecordsArray)
+            {
+                this.writer.WriteLine($"{record.Id},{record.FirstName},{record.LastName},{record.DateOfBirth.ToShortDateString()},{record.Height},{record.Money},{record.Gender}.");
+            }
         }
     }
 }

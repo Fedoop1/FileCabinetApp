@@ -259,7 +259,7 @@
             </summary>
             <returns>Collection of records (read-only).</returns>
         </member>
-        <member name="M:FileCabinetApp.IFileCabinetService.GetStat">
+        <member name="M:FileCabinetApp.IFileCabinetService.MakeSnapshot">
             <summary>
             A method that returns the count of records.
             </summary>
