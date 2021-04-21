@@ -14,6 +14,10 @@ public abstract class FileCabinetService : IRecordValidator, IFileCabinetService
     private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
     private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
 
+    /// <summary>
+    /// Initialize a new <see cref="FileCabinetServiceShapshot"/> which contains <see cref="FileCabinetRecord"/> array.
+    /// </summary>
+    /// <returns>Returns <see cref="FileCabinetServiceShapshot"/> with data about existing records.</returns>
     public FileCabinetServiceShapshot MakeSnapshot()
     {
         return new FileCabinetServiceShapshot(this.list.ToArray());

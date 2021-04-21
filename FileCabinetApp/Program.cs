@@ -53,6 +53,10 @@ namespace FileCabinetApp
             new string[] { "export", "Make snapshot and save it to file.", "The export command make snapshot of you record list and save it to special file." },
         };
 
+        /// <summary>
+        /// Make snapshot and export record list in special format to disk. Supports XML and CSV serialization.
+        /// </summary>
+        /// <param name="parameters">Containы type of export document and filename to save document.</param>
         private static void Export(string parameters)
         {
             string[] parameterArray = parameters.Split(" ", 2);

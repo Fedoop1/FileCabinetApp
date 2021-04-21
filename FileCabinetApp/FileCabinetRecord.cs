@@ -4,7 +4,6 @@ using FileCabinetApp;
 /// <summary>
 /// A class describing the fields and behavior of a unit such as a record.
 /// </summary>
-[Serializable]
 public class FileCabinetRecord
 {
     private short height;
@@ -15,10 +14,10 @@ public class FileCabinetRecord
     private DateTime dateOfBirth;
 
     /// <summary>
-    /// Height property.
+    /// Gets or sets the height field.
     /// </summary>
     /// <value>
-    /// Gets and sets the height field.
+    /// Height property.
     /// </value>
     public short Height
     {
@@ -41,10 +40,10 @@ public class FileCabinetRecord
     }
 
     /// <summary>
-    /// Money property.
+    /// Gets or sets the money field.
     /// </summary>
     /// <value>
-    /// Gets and sets the money field.
+    /// Money property.
     /// </value>
     public decimal Money
     {
@@ -67,10 +66,10 @@ public class FileCabinetRecord
     }
 
     /// <summary>
-    /// Gender property.
+    /// Gets or sets the gender field.
     /// </summary>
     /// <value>
-    /// Gets and sets the gender field.
+    /// Gender property.
     /// </value>
     public char Gender
     {
@@ -93,18 +92,18 @@ public class FileCabinetRecord
     }
 
     /// <summary>
-    /// Id property.
+    /// Gets or sets the id field.
     /// </summary>
     /// <value>
-    /// Gets and sets the id field.
+    /// Id property.
     /// </value>
     public int Id { get; set; }
 
     /// <summary>
-    /// First name property.
+    /// Gets or sets the first name field.
     /// </summary>
     /// <value>
-    /// Gets and sets the first name field.
+    /// First name property.
     /// </value>
     public string FirstName
     {
@@ -127,10 +126,10 @@ public class FileCabinetRecord
     }
 
     /// <summary>
-    /// Last name property.
+    /// Gets or sets the last name field.
     /// </summary>
     /// <value>
-    /// Gets and sets the last name field.
+    /// Last name property.
     /// </value>
     public string LastName
     {
@@ -153,10 +152,10 @@ public class FileCabinetRecord
     }
 
     /// <summary>
-    /// Date of birth property.
+    /// Gets or sets the date of birth field.
     /// </summary>
     /// <value>
-    /// Gets and sets the date of birth field.
+    /// Date of birth property.
     /// </value>
     public DateTime DateOfBirth
     {

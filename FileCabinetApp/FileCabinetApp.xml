@@ -207,6 +207,23 @@
             <param name="name">Information for verification.</param>
             <returns>A tuple with the result of the check, a string representation of the entered information, and the converted variable.</returns>
         </member>
+        <member name="T:FileCabinetApp.FileCabinetRecordXMLWriter">
+            <summary>
+            Create XMLDocument based on records array data, serialize and save it to disk.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordXMLWriter.#ctor(System.IO.StreamWriter)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetRecordXMLWriter"/> class and create <see cref="F:FileCabinetApp.FileCabinetRecordXMLWriter.xmlWriter"/> object based on <see cref="T:System.IO.StreamWriter"/> argument.
+            </summary>
+            <param name="writer"><see cref="T:System.IO.StreamWriter"/> that contains file path and other settings.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordXMLWriter.Write(FileCabinetRecord[])">
+            <summary>
+            Create and Write <see cref="T:FileCabinetRecord"/> array into <see cref="T:System.Xml.XmlDocument"/> and save it throught <see cref="T:System.Xml.XmlWriter"/>.
+            </summary>
+            <param name="fileCabinetRecordsArray">Array of <see cref="T:FileCabinetRecord"/>.</param>
+        </member>
         <member name="T:FileCabinetApp.IFileCabinetService">
             <summary>
             The interface includes all the methods common to the classes inherited from FileCabinetService.
@@ -357,58 +374,58 @@
         </member>
         <member name="P:FileCabinetRecord.Height">
             <summary>
-            Height property.
+            Gets or sets the height field.
             </summary>
             <value>
-            Gets and sets the height field.
+            Height property.
             </value>
         </member>
         <member name="P:FileCabinetRecord.Money">
             <summary>
-            Money property.
+            Gets or sets the money field.
             </summary>
             <value>
-            Gets and sets the money field.
+            Money property.
             </value>
         </member>
         <member name="P:FileCabinetRecord.Gender">
             <summary>
-            Gender property.
+            Gets or sets the gender field.
             </summary>
             <value>
-            Gets and sets the gender field.
+            Gender property.
             </value>
         </member>
         <member name="P:FileCabinetRecord.Id">
             <summary>
-            Id property.
+            Gets or sets the id field.
             </summary>
             <value>
-            Gets and sets the id field.
+            Id property.
             </value>
         </member>
         <member name="P:FileCabinetRecord.FirstName">
             <summary>
-            First name property.
+            Gets or sets the first name field.
             </summary>
             <value>
-            Gets and sets the first name field.
+            First name property.
             </value>
         </member>
         <member name="P:FileCabinetRecord.LastName">
             <summary>
-            Last name property.
+            Gets or sets the last name field.
             </summary>
             <value>
-            Gets and sets the last name field.
+            Last name property.
             </value>
         </member>
         <member name="P:FileCabinetRecord.DateOfBirth">
             <summary>
-            Date of birth property.
+            Gets or sets the date of birth field.
             </summary>
             <value>
-            Gets and sets the date of birth field.
+            Date of birth property.
             </value>
         </member>
         <member name="M:FileCabinetRecord.ToString">
@@ -421,6 +438,12 @@
             <summary>
             An abstract class that describes the general behavior for classes of descendants, which implements the main work with records.
             </summary>
+        </member>
+        <member name="M:FileCabinetService.MakeSnapshot">
+            <summary>
+            Initialize a new <see cref="T:FileCabinetApp.FileCabinetServiceShapshot"/> which contains <see cref="T:FileCabinetRecord"/> array.
+            </summary>
+            <returns>Returns <see cref="T:FileCabinetApp.FileCabinetServiceShapshot"/> with data about existing records.</returns>
         </member>
         <member name="M:FileCabinetService.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
             <inheritdoc/>

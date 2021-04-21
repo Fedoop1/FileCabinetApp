@@ -3,15 +3,26 @@ using System.Xml;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Create XMLDocument based on records array data, serialize and save it to disk.
+    /// </summary>
     public class FileCabinetRecordXMLWriter
     {
         private XmlWriter xmlWriter;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileCabinetRecordXMLWriter"/> class and create <see cref="xmlWriter"/> object based on <see cref="StreamWriter"/> argument.
+        /// </summary>
+        /// <param name="writer"><see cref="StreamWriter"/> with file path and other additional settings.</param>
         public FileCabinetRecordXMLWriter(StreamWriter writer)
         {
             this.xmlWriter = XmlWriter.Create(writer, new XmlWriterSettings() { Indent = true });
         }
 
+        /// <summary>
+        /// Create and Write <see cref="FileCabinetRecord"/> array into <see cref="XmlDocument"/> and save it throught <see cref="XmlWriter"/>.
+        /// </summary>
+        /// <param name="fileCabinetRecordsArray">Array of <see cref="FileCabinetRecord"/>.</param>
         public void Write(FileCabinetRecord[] fileCabinetRecordsArray)
         {
             if (fileCabinetRecordsArray?.Length == 0)
