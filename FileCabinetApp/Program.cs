@@ -131,26 +131,15 @@ namespace FileCabinetApp
                 Console.Write(" " + parameters[parameterIndex]);
                 switch (parameters[parameterIndex])
                 {
-                    case "-s":
-                        if (parameters[parameterIndex + 1].ToLower(Culture) == "file")
-                        {
-                            fileCabinetService = new FileCabinetFilesystemService(new FileStream("cabinet-records.db", FileMode.Create));
-                        }
-                        else
-                        {
-                            fileCabinetService = new FileCabinetDefaultService();
-                        }
-
-                        recordDataContainer = new FileCabinetRecordData("default");
-                        break;
                     case "--storage":
+                    case "-s":
                         if (parameterIndex + 1 != parameters.Length && parameters[parameterIndex + 1].ToLower(Culture) == "memory")
                         {
                             fileCabinetService = new FileCabinetDefaultService();
                         }
                         else
                         {
-                            fileCabinetService = new FileCabinetFilesystemService(new FileStream("cabinet-records.db", FileMode.Create));
+                            fileCabinetService = new FileCabinetFilesystemService(new FileStream("cabinet-records.db", FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite));
                         }
 
                         recordDataContainer = new FileCabinetRecordData("default");
@@ -350,6 +339,11 @@ namespace FileCabinetApp
         private static void Exit(string parameters)
         {
             Console.WriteLine("Exiting an application...");
+            if (fileCabinetService is FileCabinetFilesystemService service)
+            {
+                service.Dispose();
+            }
+
             isRunning = false;
         }
     }
