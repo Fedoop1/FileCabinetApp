@@ -7,7 +7,7 @@ using FileCabinetApp;
 /// <summary>
 /// An abstract class that describes the general behavior for classes of descendants, which implements the main work with records.
 /// </summary>
-public abstract class FileCabinetService : IRecordValidator, IFileCabinetService
+public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetService
 {
     private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
     private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();

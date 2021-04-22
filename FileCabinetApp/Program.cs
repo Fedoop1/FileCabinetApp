@@ -18,8 +18,8 @@ namespace FileCabinetApp
         private const int CommandHelpIndex = 0;
         private const int DescriptionHelpIndex = 1;
         private const int ExplanationHelpIndex = 2;
-        private static IFileCabinetService fileCabinetService;
-        private static FileCabinetRecordData recordDataContainer;
+        private static IFileCabinetService fileCabinetService = new FileCabinetDefaultService();
+        private static FileCabinetRecordData recordDataContainer = new FileCabinetRecordData("default");
         private static bool isRunning = true;
 
         /// <summary>
@@ -49,14 +49,13 @@ namespace FileCabinetApp
             new string[] { "list", "prints the list if records", "The 'list' command prints the list of the records." },
             new string[] { "edit", "edits the record", "The 'edit' command edits the value of the record." },
             new string[] { "find", "finds a record", "The 'find' command find a record by the specified parameter. Example '>find [param] [data]." },
-            new string[] { "--validation-rules", "changes the type of check rules", "The '--validation-rules' or '-v' changes the type of check rules." },
             new string[] { "export", "Make snapshot and save it to file.", "The export command make snapshot of you record list and save it to special file." },
         };
 
         /// <summary>
         /// Make snapshot and export record list in special format to disk. Supports XML and CSV serialization.
         /// </summary>
-        /// <param name="parameters">Containы type of export document and filename to save document.</param>
+        /// <param name="parameters">Contain type of export document and filename to save document.</param>
         private static void Export(string parameters)
         {
             string[] parameterArray = parameters.Split(" ", 2);
@@ -123,34 +122,69 @@ namespace FileCabinetApp
         /// A method that accepts command line parameters to control the check rules depending on the passed argument.
         /// </summary>
         /// <param name="parameters">An array of arguments passed to the Main method.</param>
-        private static void ChangeValidationRules(string[] parameters)
+        private static void HandlingCommandLineArgs(string[] parameters)
         {
-            Console.Write("$ FileCabinetApp.exe");
-            foreach (var parameter in parameters)
-            {
-                Console.Write(" " + parameter);
-            }
+            Console.Write("$FileCabinetApp.exe");
 
-            string validationParameter = parameters.Length switch
+            for (int parameterIndex = 0; parameterIndex < parameters.Length; parameterIndex++)
             {
-                1 => parameters[0].Substring(parameters[0].LastIndexOf("=", StringComparison.InvariantCultureIgnoreCase) + 1),
-                2 => parameters[1],
-                _ => "default",
-            };
+                Console.Write(" " + parameters[parameterIndex]);
+                switch (parameters[parameterIndex])
+                {
+                    case "-s":
+                        if (parameters[parameterIndex + 1].ToLower(Culture) == "file")
+                        {
+                            fileCabinetService = new FileCabinetFilesystemService(new FileStream("cabinet-records.db", FileMode.Create));
+                        }
+                        else
+                        {
+                            fileCabinetService = new FileCabinetDefaultService();
+                        }
 
-            switch (validationParameter.ToLower(Culture))
-            {
-                case "default":
-                    fileCabinetService = new FileCabinetDefaultService();
-                    recordDataContainer = new FileCabinetRecordData("default");
-                    return;
-                case "custom":
-                    fileCabinetService = new FileCabinetCustomService();
-                    recordDataContainer = new FileCabinetRecordData("custom");
-                    return;
-                default:
-                    recordDataContainer = new FileCabinetRecordData("default");
-                    return;
+                        recordDataContainer = new FileCabinetRecordData("default");
+                        break;
+                    case "--storage":
+                        if (parameterIndex + 1 != parameters.Length && parameters[parameterIndex + 1].ToLower(Culture) == "memory")
+                        {
+                            fileCabinetService = new FileCabinetDefaultService();
+                        }
+                        else
+                        {
+                            fileCabinetService = new FileCabinetFilesystemService(new FileStream("cabinet-records.db", FileMode.Create));
+                        }
+
+                        recordDataContainer = new FileCabinetRecordData("default");
+                        break;
+                    case "-v":
+                        if (parameterIndex + 1 != parameters.Length && parameters[parameterIndex + 1] == "custom")
+                        {
+                            fileCabinetService = new FileCabinetCustomService();
+                            recordDataContainer = new FileCabinetRecordData("custom");
+                        }
+                        else
+                        {
+                            fileCabinetService = new FileCabinetDefaultService();
+                            recordDataContainer = new FileCabinetRecordData("default");
+                        }
+
+                        break;
+                    case string attribute when attribute.Contains("--validation-rule"):
+                        attribute = attribute.Substring(attribute.LastIndexOf("=", StringComparison.InvariantCultureIgnoreCase) + 1);
+                        if (attribute.ToLower(Culture) == "custom")
+                        {
+                            fileCabinetService = new FileCabinetCustomService();
+                            recordDataContainer = new FileCabinetRecordData("custom");
+                        }
+                        else
+                        {
+                            fileCabinetService = new FileCabinetDefaultService();
+                            recordDataContainer = new FileCabinetRecordData("default");
+                        }
+
+                        break;
+                    default:
+                        continue;
+                }
             }
         }
 
@@ -234,7 +268,7 @@ namespace FileCabinetApp
         /// <param name="args">Command line arguments required to control check parameters.</param>
         private static void Main(string[] args)
         {
-            ChangeValidationRules(args);
+            HandlingCommandLineArgs(args);
             Console.WriteLine($"\nFile Cabinet Application, developed by {Program.DeveloperName}");
             Console.WriteLine(Program.HintMessage);
             Console.WriteLine();
