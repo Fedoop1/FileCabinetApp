@@ -7,13 +7,17 @@ using FileCabinetApp;
 /// <summary>
 /// An abstract class that describes the general behavior for classes of descendants, which implements the main work with records.
 /// </summary>
-public abstract class FileCabinetService : IRecordValidator, IFileCabinetService
+public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetService
 {
     private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
     private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
     private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
     private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
 
+    /// <summary>
+    /// Initialize a new <see cref="FileCabinetServiceShapshot"/> which contains <see cref="FileCabinetRecord"/> array.
+    /// </summary>
+    /// <returns>Returns <see cref="FileCabinetServiceShapshot"/> with data about existing records.</returns>
     public FileCabinetServiceShapshot MakeSnapshot()
     {
         return new FileCabinetServiceShapshot(this.list.ToArray());
@@ -25,10 +29,17 @@ public abstract class FileCabinetService : IRecordValidator, IFileCabinetService
         this.CreateValidator().ValidateParameters(recordData);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Create an instance of <see cref="IRecordValidator"/> and return it.
+    /// </summary>
+    /// <returns>Class wich realize <see cref="IRecordValidator"/> for calling .ValidateParameters() method.</returns>
     public abstract IRecordValidator CreateValidator();
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Create a new instance of <see cref="FileCabinetRecord"/> and save it to storage.
+    /// </summary>
+    /// <param name="recordData">Class "container" with data for new record.</param>
+    /// <returns>Returns the unique identifier of the record.</returns>
     public int CreateRecord(FileCabinetRecordData recordData)
     {
         this.ValidateParameters(recordData);

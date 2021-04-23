@@ -14,7 +14,7 @@ namespace FileCabinetApp
         /// <summary>
         /// The maximum value is the height of growth.
         /// </summary>
-        public const short MaxHeight = short.MaxValue;
+        public const short MaxHeight = 250;
 
         /// <summary>
         /// The minimum value is the height of the growth.
@@ -39,7 +39,7 @@ namespace FileCabinetApp
         /// <summary>
         /// An array of valid values for gender.
         /// </summary>
-        public static readonly char[] ValidGenderValue = { 'm', 'M', 'F', 'F' };
+        public static readonly char[] ValidGenderValue = { 'm', 'M', 'F', 'f' };
 
         /// <summary>
         /// The minimum allowed date of birth.
