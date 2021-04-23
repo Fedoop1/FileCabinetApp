@@ -14,7 +14,7 @@ namespace FileCabinetApp
         /// <summary>
         /// The maximum value is the height of growth.
         /// </summary>
-        public const short MaxHeight = short.MaxValue;
+        public const short MaxHeight = 250;
 
         /// <summary>
         /// The minimum value is the height of the growth.

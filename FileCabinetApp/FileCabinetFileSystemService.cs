@@ -23,7 +23,6 @@ namespace FileCabinetApp
         public FileCabinetFilesystemService(FileStream fileStream)
         {
             this.fileStream = fileStream;
-
         }
 
         /// <inheritdoc/>
@@ -42,6 +41,15 @@ namespace FileCabinetApp
                 Gender = recordData.Gender,
             };
 
+            byte[] recordByteArray = RecordToByteConverter(record);
+            this.fileStream.Write(recordByteArray, 0, recordByteArray.Length);
+
+            Console.WriteLine("File length is: " + this.FileLength);
+            return record.Id;
+        }
+
+        private static byte[] RecordToByteConverter(FileCabinetRecord record)
+        {
             byte[] recordByteArray = new byte[MaxRecordLength];
 
             using (var memoryStream = new MemoryStream(recordByteArray))
@@ -61,11 +69,8 @@ namespace FileCabinetApp
                 binaryWriter.Write(record.Money);
                 binaryWriter.Write(record.Gender);
 
-                this.fileStream.Write(recordByteArray, 0, recordByteArray.Length);
+                return recordByteArray;
             }
-
-            Console.WriteLine("File length is: " + this.FileLength);
-            return record.Id;
         }
 
         private static byte[] StringToASCII(string text)
@@ -83,19 +88,6 @@ namespace FileCabinetApp
             return result;
         }
 
-        /*
-            0   short   2   Status  Reserved
-            2   int32   4   Id            Record ID
-            6   char[]  120 FirstName    First name
-            126 char[]  120 LastName     Last name
-            246 int32   4   Year     Date of birth
-            250 int32   4   Month    Date of birth
-            254 int32   4   Day      Date of birth
-            270 int16   16  Height          Height
-            286 decimal 16  Money            Money
-            288 char    2   Gender          Gender
-         */
-
         /// <inheritdoc/>
         public IRecordValidator CreateValidator()
         {
@@ -105,7 +97,39 @@ namespace FileCabinetApp
         /// <inheritdoc/>
         public void EditRecord(string id, FileCabinetRecordData recordData)
         {
-            throw new NotImplementedException();
+            if (!int.TryParse(id, out int recordId))
+            {
+                Console.WriteLine("Record doesn't exist.");
+                return;
+            }
+            else if (recordId > RecordsCount)
+            {
+                Console.WriteLine("Records count lower than Id.");
+                return;
+            }
+
+            this.ValidateParameters(recordData);
+
+            var record = new FileCabinetRecord
+            {
+                Id = recordId,
+                FirstName = recordData?.FirstName,
+                LastName = recordData.LastName,
+                DateOfBirth = recordData.DateOfBirth,
+                Height = recordData.Height,
+                Money = recordData.Money,
+                Gender = recordData.Gender,
+            };
+
+            byte[] recordByteArray = RecordToByteConverter(record);
+
+            using (var binaryWriter = new BinaryWriter(this.fileStream, Encoding.Default, true))
+            {
+                this.fileStream.Position = (recordId - 1) * MaxRecordLength;
+                this.fileStream.Write(recordByteArray);
+            }
+
+            Console.WriteLine($"Record {recordId} successfull update.");
         }
 
         /// <inheritdoc/>
@@ -198,4 +222,17 @@ namespace FileCabinetApp
             this.fileStream.Close();
         }
     }
+
+    /*
+            0   short   2   Status  Reserved
+            2   int32   4   Id            Record ID
+            6   char[]  120 FirstName    First name
+            126 char[]  120 LastName     Last name
+            246 int32   4   Year     Date of birth
+            250 int32   4   Month    Date of birth
+            254 int32   4   Day      Date of birth
+            270 int16   16  Height          Height
+            286 decimal 16  Money            Money
+            288 char    2   Gender          Gender
+         */
 }
