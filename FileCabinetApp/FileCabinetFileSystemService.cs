@@ -135,7 +135,7 @@ namespace FileCabinetApp
         /// <inheritdoc/>
         public FileCabinetRecord[] FindByDayOfBirth(string dateOfBirth)
         {
-            throw new NotImplementedException();
+            
         }
 
         /// <inheritdoc/>
