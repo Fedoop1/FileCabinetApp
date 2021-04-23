@@ -139,7 +139,7 @@ namespace FileCabinetApp
                         }
                         else
                         {
-                            fileCabinetService = new FileCabinetFilesystemService(new FileStream("cabinet-records.db", FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite));
+                            fileCabinetService = new FileCabinetFilesystemService(new FileStream("cabinet-records.db", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite));
                         }
 
                         recordDataContainer = new FileCabinetRecordData("default");

@@ -129,13 +129,56 @@ namespace FileCabinetApp
         /// <inheritdoc/>
         public ReadOnlyCollection<FileCabinetRecord> GetRecords()
         {
-            throw new NotImplementedException();
+            List<FileCabinetRecord> recordList = new List<FileCabinetRecord>();
+            this.fileStream.Position = 0;
+
+            while (this.fileStream.Position != this.FileLength)
+            {
+                byte[] recordByteArray = new byte[MaxRecordLength];
+
+                using (var memoryStream = new MemoryStream(recordByteArray))
+                using (BinaryReader binaryReader = new BinaryReader(this.fileStream, Encoding.Default, true))
+                {
+                    int recordId = binaryReader.ReadInt32();
+                    var byteName = binaryReader.ReadBytes(MaxNameLength);
+                    string firstName = ASCIIToString(byteName);
+                    var byteLastName = binaryReader.ReadBytes(MaxNameLength);
+                    string lastName = ASCIIToString(byteLastName);
+                    int dateOfBirthDay = binaryReader.ReadInt32();
+                    int dateOfBirthMonth = binaryReader.ReadInt32();
+                    int dateOfBirthYear = binaryReader.ReadInt32();
+                    short height = binaryReader.ReadInt16();
+                    decimal money = binaryReader.ReadDecimal();
+                    char gender = binaryReader.ReadChar();
+
+                    var record = new FileCabinetRecord()
+                    {
+                        Id = recordId,
+                        FirstName = firstName,
+                        LastName = lastName,
+                        DateOfBirth = DateTime.Parse($"{dateOfBirthDay}.{dateOfBirthMonth}.{dateOfBirthYear}", System.Globalization.CultureInfo.InvariantCulture),
+                        Height = height,
+                        Money = money,
+                        Gender = gender,
+                    };
+
+                    recordList.Add(record);
+                }
+            }
+
+            return recordList.AsReadOnly();
+        }
+
+        private static string ASCIIToString(byte[] byteName)
+        {
+            var result = Encoding.ASCII.GetString(byteName);
+            return result.TrimEnd('\0');
         }
 
         /// <inheritdoc/>
         public int GetStat()
         {
-            throw new NotImplementedException();
+            return this.RecordsCount;
         }
 
         /// <inheritdoc/>
