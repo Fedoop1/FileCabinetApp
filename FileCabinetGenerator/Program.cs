@@ -10,13 +10,14 @@ namespace FileCabinetGenerator
     public static class Program
     {
         public static readonly CultureInfo Culture = CultureInfo.CurrentCulture;
+        private static FCGeneratorCommandLineArgs commandLineArgs;
 
-        private static void HandlingCommandLineArgs(string[] parameters)
+        private static FCGeneratorCommandLineArgs HandlingCommandLineArgs(string[] parameters)
         {
             string outputType = string.Empty;
             string filePath = string.Empty;
             int recordAmount = 0;
-            int startId;
+            int startId = 0;
 
             Console.Write("$FileCabinetGenerator.exe");
 
@@ -99,11 +100,13 @@ namespace FileCabinetGenerator
             }
 
             Console.WriteLine($"\n{recordAmount} records were written to {filePath}.");
+            return new FCGeneratorCommandLineArgs(outputType, filePath, recordAmount, startId);
         }
 
         private static void Main(string[] args)
         {
-            HandlingCommandLineArgs(args);
+            commandLineArgs = HandlingCommandLineArgs(args);
+            FileCabinetRecord[] recordGeneratedArray = FCRecordGenerator.GenerateRecord(commandLineArgs.StartId, commandLineArgs.RecordAmount);
             Console.ReadKey();
         }
     }
