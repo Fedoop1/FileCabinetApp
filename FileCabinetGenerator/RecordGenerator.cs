@@ -1,10 +1,14 @@
-﻿namespace FileCabinetGenerator
+﻿// <copyright file="RecordGenerator.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+namespace FileCabinetGenerator
 {
     using System;
-    using FileCabinetApp;
     using System.Linq;
+    using FileCabinetApp;
 
-    public static class FCRecordGenerator
+    public static class RecordGenerator
     {
         private static Random random = new Random();
 

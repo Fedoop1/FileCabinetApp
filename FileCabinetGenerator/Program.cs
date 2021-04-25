@@ -6,13 +6,15 @@ namespace FileCabinetGenerator
 {
     using System;
     using System.Globalization;
+    using System.IO;
+    using FileCabinetApp;
 
     public static class Program
     {
         public static readonly CultureInfo Culture = CultureInfo.CurrentCulture;
-        private static FCGeneratorCommandLineArgs commandLineArgs;
+        private static GeneratorCommandLineArgs commandLineArgs;
 
-        private static FCGeneratorCommandLineArgs HandlingCommandLineArgs(string[] parameters)
+        private static GeneratorCommandLineArgs HandlingCommandLineArgs(string[] parameters)
         {
             string outputType = string.Empty;
             string filePath = string.Empty;
@@ -99,15 +101,38 @@ namespace FileCabinetGenerator
                 }
             }
 
-            Console.WriteLine($"\n{recordAmount} records were written to {filePath}.");
-            return new FCGeneratorCommandLineArgs(outputType, filePath, recordAmount, startId);
+            return new GeneratorCommandLineArgs(outputType, filePath, recordAmount, startId);
+        }
+
+        private static void Export(GeneratorCommandLineArgs commandLineArgs, FileCabinetRecord[] fileCabinetRecords)
+        {
+            try
+            {
+                switch (commandLineArgs.OutputType)
+                {
+                    case "CSV":
+                        CSVRecordExport.Export(commandLineArgs.FilePath, fileCabinetRecords);
+                        break;
+                    case "XML":
+                        XMLRecordExport.Export(commandLineArgs.FilePath, fileCabinetRecords);
+                        break;
+                    default: throw new ArgumentException("Output type is doesn't exists.");
+                }
+
+                Console.WriteLine($"\n{commandLineArgs.RecordAmount} records were written to {commandLineArgs.FilePath}.");
+            }
+            catch (IOException)
+            {
+                Console.WriteLine($"\nCan't open file {commandLineArgs.FilePath}");
+                return;
+            }
         }
 
         private static void Main(string[] args)
         {
             commandLineArgs = HandlingCommandLineArgs(args);
-            FileCabinetRecord[] recordGeneratedArray = FCRecordGenerator.GenerateRecord(commandLineArgs.StartId, commandLineArgs.RecordAmount);
-            Console.ReadKey();
+            FileCabinetRecord[] recordGeneratedArray = RecordGenerator.GenerateRecord(commandLineArgs.StartId, commandLineArgs.RecordAmount);
+            Export(commandLineArgs, recordGeneratedArray);
         }
     }
 }

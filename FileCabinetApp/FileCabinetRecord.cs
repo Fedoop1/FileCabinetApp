@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Xml.Serialization;
 using FileCabinetApp;
 
 /// <summary>
 /// A class describing the fields and behavior of a unit such as a record.
 /// </summary>
+[Serializable]
+[XmlRoot]
 public class FileCabinetRecord
 {
     private short height;
@@ -19,6 +22,7 @@ public class FileCabinetRecord
     /// <value>
     /// Height property.
     /// </value>
+    [XmlElement]
     public short Height
     {
         get
@@ -45,6 +49,7 @@ public class FileCabinetRecord
     /// <value>
     /// Money property.
     /// </value>
+    [XmlElement]
     public decimal Money
     {
         get
@@ -71,6 +76,7 @@ public class FileCabinetRecord
     /// <value>
     /// Gender property.
     /// </value>
+    [XmlElement]
     public char Gender
     {
         get
@@ -97,6 +103,7 @@ public class FileCabinetRecord
     /// <value>
     /// Id property.
     /// </value>
+    [XmlAttribute]
     public int Id { get; set; }
 
     /// <summary>
@@ -105,6 +112,7 @@ public class FileCabinetRecord
     /// <value>
     /// First name property.
     /// </value>
+    [XmlElement]
     public string FirstName
     {
         get
@@ -131,6 +139,7 @@ public class FileCabinetRecord
     /// <value>
     /// Last name property.
     /// </value>
+    [XmlElement]
     public string LastName
     {
         get
@@ -157,6 +166,7 @@ public class FileCabinetRecord
     /// <value>
     /// Date of birth property.
     /// </value>
+    [XmlElement]
     public DateTime DateOfBirth
     {
         get

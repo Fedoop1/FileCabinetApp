@@ -1,15 +1,19 @@
-﻿using System;
+﻿// <copyright file="GeneratorCommandLineArgs.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+using System;
 
 namespace FileCabinetGenerator
 {
-    public class FCGeneratorCommandLineArgs
+    public class GeneratorCommandLineArgs
     {
         private string outputType;
         private string filePath;
         private int recordAmount;
         private int startId;
 
-        public FCGeneratorCommandLineArgs(string outputType, string filePath, int recordAmount, int startId)
+        public GeneratorCommandLineArgs(string outputType, string filePath, int recordAmount, int startId)
         {
             this.OutputType = outputType;
             this.FilePath = filePath;
