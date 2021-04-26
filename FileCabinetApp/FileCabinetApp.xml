@@ -169,10 +169,16 @@
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetStat">
-            <inheritdoc/>
+            <summary>
+            Returns the count of records.
+            </summary>
+            <returns>Records count.</returns>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.MakeSnapshot">
-            <inheritdoc/>
+            <summary>
+            Create a new instance of <see cref="T:FileCabinetApp.FileCabinetServiceShapshot"/> wich contain all information about exists records.
+            </summary>
+            <returns>Instance of <see cref="T:FileCabinetApp.FileCabinetServiceShapshot"/>.</returns>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
             <inheritdoc/>
@@ -181,6 +187,9 @@
             <summary>
             Releases resources from under the <see cref="T:FileCabinetApp.FileCabinetFilesystemService"/> and releases the flow of <see cref="T:System.IO.FileStream"/>.
             </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.Restore(FileCabinetApp.FileCabinetServiceShapshot)">
+            <inheritdoc/>
         </member>
         <member name="T:FileCabinetApp.FileCabinetRecordCSVWriter">
             <summary>
@@ -303,11 +312,7 @@
             <summary>
             Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetRecordXMLWriter"/> class and create <see cref="F:FileCabinetApp.FileCabinetRecordXMLWriter.xmlWriter"/> object based on <see cref="T:System.IO.StreamWriter"/> argument.
             </summary>
-<<<<<<< HEAD
             <param name="writer"><see cref="T:System.IO.StreamWriter"/> with file path and other additional settings.</param>
-=======
-            <param name="writer"><see cref="T:System.IO.StreamWriter"/> that contains file path and other settings.</param>
->>>>>>> 9419e234f50eb5c06935a8e2bd8cc24822617cd4
         </member>
         <member name="M:FileCabinetApp.FileCabinetRecordXMLWriter.Write(FileCabinetRecord[])">
             <summary>
@@ -315,7 +320,6 @@
             </summary>
             <param name="fileCabinetRecordsArray">Array of <see cref="T:FileCabinetRecord"/>.</param>
         </member>
-<<<<<<< HEAD
         <member name="T:FileCabinetApp.FileCabinetServiceShapshot">
             <summary>
             Snapshot class with private information about list of <see cref="T:FileCabinetRecord"/> required for secure serialization.
@@ -326,6 +330,20 @@
             Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetServiceShapshot"/> class and save information and assign inner field by reference to an array with records.
             </summary>
             <param name="fileCabinetRecords"><see cref="T:FileCabinetRecord"/> array with data about records.</param>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetServiceShapshot.Records">
+            <summary>
+            Gets <see cref="T:System.Collections.ObjectModel.ReadOnlyCollection`1"/> of <see cref="T:FileCabinetRecord"/> wich is stored into snapshot.
+            </summary>
+            <value>
+            Read only collection of <see cref="T:FileCabinetRecord"/>.
+            </value>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetServiceShapshot.LoadFromCSV(System.IO.StreamReader)">
+            <summary>
+            Load data from CSV file and deserialize it to <see cref="T:FileCabinetRecord"/> representation.
+            </summary>
+            <param name="streamReader">IO Flow with information about data storage file.</param>
         </member>
         <member name="M:FileCabinetApp.FileCabinetServiceShapshot.SaveToCSV(System.IO.StreamWriter)">
             <summary>
@@ -339,8 +357,29 @@
             </summary>
             <param name="writer"><see cref="T:System.IO.StreamWriter"/> with information about file path and addition settings.</param>
         </member>
-=======
->>>>>>> 9419e234f50eb5c06935a8e2bd8cc24822617cd4
+        <member name="M:FileCabinetApp.FileCabinetServiceShapshot.LoadFromXML(System.IO.FileStream)">
+            <summary>
+            Load data from XML file and deserialize it to <see cref="T:FileCabinetRecord"/> representation.
+            </summary>
+            <param name="fileStream">IO Flow with information about data storage file.</param>
+        </member>
+        <member name="T:FileCabinetApp.FileCabinetXMLReader">
+            <summary>
+            Class for working and deserializing information from an XML file.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetXMLReader.#ctor(System.IO.FileStream)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetXMLReader"/> class.
+            </summary>
+            <param name="fileStream"><see cref="T:System.IO.FileStream"/> with information about XML format file.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetXMLReader.ReadAll">
+            <summary>
+            Read and deserialize all information from file and return it <see cref="T:System.Collections.Generic.IList`1"/> representation.
+            </summary>
+            <returns><see cref="T:System.Collections.Generic.IList`1"/> representation of redords into XML file.</returns>
+        </member>
         <member name="T:FileCabinetApp.IFileCabinetService">
             <summary>
             The interface includes all the methods common to the classes inherited from FileCabinetService.
@@ -535,6 +574,9 @@
         <member name="M:FileCabinetMemoryService.GetStat">
             <inheritdoc/>
         </member>
+        <member name="M:FileCabinetMemoryService.Restore(FileCabinetApp.FileCabinetServiceShapshot)">
+            <inheritdoc/>
+        </member>
         <member name="M:FileCabinetMemoryService.DictionaryAdd(System.String,System.String,System.DateTime,FileCabinetRecord)">
             <summary>
             An internal method that calls data updates in dictionaries.
@@ -611,55 +653,5 @@
             </summary>
             <returns>Returns an overridden version of the ToString() method.</returns>
         </member>
-<<<<<<< HEAD
-=======
-        <member name="T:FileCabinetService">
-            <summary>
-            An abstract class that describes the general behavior for classes of descendants, which implements the main work with records.
-            </summary>
-        </member>
-        <member name="M:FileCabinetService.MakeSnapshot">
-            <summary>
-            Initialize a new <see cref="T:FileCabinetApp.FileCabinetServiceShapshot"/> which contains <see cref="T:FileCabinetRecord"/> array.
-            </summary>
-            <returns>Returns <see cref="T:FileCabinetApp.FileCabinetServiceShapshot"/> with data about existing records.</returns>
-        </member>
-        <member name="M:FileCabinetService.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetService.CreateValidator">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetService.CreateRecord(FileCabinetApp.FileCabinetRecordData)">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetService.FindByFirstName(System.String)">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetService.FindByLastName(System.String)">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetService.FindByDayOfBirth(System.String)">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetService.EditRecord(System.String,FileCabinetApp.FileCabinetRecordData)">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetService.GetRecords">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetService.GetStat">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetService.DictionaryAdd(System.String,System.String,System.DateTime,FileCabinetRecord)">
-            <summary>
-            An internal method that calls data updates in dictionaries.
-            </summary>
-            <param name="firstName">New name.</param>
-            <param name="lastName">New surname.</param>
-            <param name="dateOfBirth">New date of birth.</param>
-            <param name="record">A record corresponding to these parameters.</param>
-        </member>
->>>>>>> 9419e234f50eb5c06935a8e2bd8cc24822617cd4
     </members>
 </doc>

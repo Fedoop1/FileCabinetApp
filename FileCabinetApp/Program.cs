@@ -35,6 +35,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("edit", Edit),
             new Tuple<string, Action<string>>("find", Find),
             new Tuple<string, Action<string>>("export", Export),
+            new Tuple<string, Action<string>>("import", Import),
         };
 
         /// <summary>
@@ -50,6 +51,7 @@ namespace FileCabinetApp
             new string[] { "edit", "edits the record", "The 'edit' command edits the value of the record." },
             new string[] { "find", "finds a record", "The 'find' command find a record by the specified parameter. Example '>find [param] [data]." },
             new string[] { "export", "Make snapshot and save it to file.", "The export command make snapshot of you record list and save it to special file." },
+            new string[] { "import", "Import records from external storage.", "The import command imports records from a file in two possible formats XML and CSV." },
         };
 
         /// <summary>
@@ -78,6 +80,7 @@ namespace FileCabinetApp
             else if (string.IsNullOrWhiteSpace(parameterArray[filePathIndex]) || parameterArray[filePathIndex].Length == 0)
             {
                 Console.WriteLine("File path is empty or incorrect.");
+                return;
             }
 
             try
@@ -116,6 +119,46 @@ namespace FileCabinetApp
             }
 
             Console.WriteLine($"\nAll records are exported to file {parameterArray[filePathIndex]}.");
+        }
+
+        private static void Import(string parameters)
+        {
+            const int ImportTypeIndex = 0;
+            const int FilePathIndex = 1;
+            var parametersArray = parameters.Split(" ", 2);
+            if (parametersArray.Length < 2)
+            {
+                Console.WriteLine("Import parameters are incorrect.");
+                return;
+            }
+
+            try
+            {
+                using (var fileStream = new FileStream(parametersArray[FilePathIndex], FileMode.Open, FileAccess.Read))
+                {
+                    FileCabinetServiceShapshot snapshot = fileCabinetService.MakeSnapshot();
+                    switch (parametersArray[ImportTypeIndex].ToUpperInvariant())
+                    {
+                        case "CSV":
+                            snapshot.LoadFromCSV(new StreamReader(fileStream));
+                            break;
+                        case "XML":
+                            snapshot.LoadFromXML(fileStream);
+                            break;
+                        default:
+                            Console.WriteLine("Unknown import format.");
+                            break;
+                    }
+
+                    Console.WriteLine($"{snapshot.Records.Count} records were imported from {parametersArray[FilePathIndex]}");
+                    fileCabinetService.Restore(snapshot);
+                }
+            }
+            catch (IOException)
+            {
+                Console.WriteLine($"Can't open file {parametersArray[FilePathIndex]}");
+                return;
+            }
         }
 
         /// <summary>
