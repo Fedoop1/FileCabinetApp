@@ -35,7 +35,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("edit", Edit),
             new Tuple<string, Action<string>>("find", Find),
             new Tuple<string, Action<string>>("export", Export),
-            new Tuple<string, Action<string>>("import", Imort),
+            new Tuple<string, Action<string>>("import", Import),
         };
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace FileCabinetApp
             Console.WriteLine($"\nAll records are exported to file {parameterArray[filePathIndex]}.");
         }
 
-        private static void Imort(string parameters)
+        private static void Import(string parameters)
         {
             const int ImportTypeIndex = 0;
             const int FilePathIndex = 1;
@@ -141,15 +141,16 @@ namespace FileCabinetApp
                     {
                         case "CSV":
                             snapshot.LoadFromCSV(new StreamReader(fileStream));
-                            Console.WriteLine($"{snapshot.Records.Count} records were imported from {parametersArray[FilePathIndex]}");
                             break;
                         case "XML":
+                            snapshot.LoadFromXML(fileStream);
                             break;
                         default:
                             Console.WriteLine("Unknown import format.");
                             break;
                     }
 
+                    Console.WriteLine($"{snapshot.Records.Count} records were imported from {parametersArray[FilePathIndex]}");
                     fileCabinetService.Restore(snapshot);
                 }
             }

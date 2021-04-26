@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -48,6 +47,13 @@ namespace FileCabinetApp
         {
             var fileCabinetRecordXMLWriter = new FileCabinetRecordXMLWriter(writer);
             fileCabinetRecordXMLWriter.Write(this.records);
+        }
+
+        public void LoadFromXML(FileStream fileStream)
+        {
+            var fileCabinetXMLReader = new FileCabinetXMLReader(fileStream);
+            this.records = fileCabinetXMLReader.ReadAll().ToArray();
+
         }
     }
 }

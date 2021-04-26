@@ -9,22 +9,15 @@ namespace FileCabinetGenerator
 
     public static class XMLRecordExport
     {
-        public static void Export(string filePath, FileCabinetRecord[] recordArray)
+        public static void Export(FileStream fileStream, FileCabinetRecord[] recordArray)
         {
             if (recordArray is null)
             {
                 throw new ArgumentNullException(nameof(recordArray), "Array of records is null");
             }
 
-            using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-            {
-                XmlSerializer formatter = new XmlSerializer(typeof(FileCabinetRecord));
-
-                foreach (var record in recordArray)
-                {
-                    formatter.Serialize(fileStream, record);
-                }
-            }
+            XmlSerializer formatter = new XmlSerializer(typeof(FileCabinetRecord[]));
+            formatter.Serialize(fileStream, recordArray);
         }
     }
 }

@@ -108,15 +108,18 @@ namespace FileCabinetGenerator
         {
             try
             {
-                switch (commandLineArgs.OutputType)
+                using (var fileStream = new FileStream(commandLineArgs.FilePath, FileMode.Create))
                 {
-                    case "CSV":
-                        CSVRecordExport.Export(commandLineArgs.FilePath, fileCabinetRecords);
-                        break;
-                    case "XML":
-                        XMLRecordExport.Export(commandLineArgs.FilePath, fileCabinetRecords);
-                        break;
-                    default: throw new ArgumentException("Output type is doesn't exists.");
+                    switch (commandLineArgs.OutputType)
+                    {
+                        case "CSV":
+                            CSVRecordExport.Export(fileStream, fileCabinetRecords);
+                            break;
+                        case "XML":
+                            XMLRecordExport.Export(fileStream, fileCabinetRecords);
+                            break;
+                        default: throw new ArgumentException("Output type is doesn't exists.");
+                    }
                 }
 
                 Console.WriteLine($"\n{commandLineArgs.RecordAmount} records were written to {commandLineArgs.FilePath}.");

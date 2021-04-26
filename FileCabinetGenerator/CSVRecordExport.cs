@@ -6,14 +6,14 @@
 
     public static class CSVRecordExport
     {
-        public static void Export(string filePath, FileCabinetRecord[] recordArray)
+        public static void Export(FileStream fileStream, FileCabinetRecord[] recordArray)
         {
             if (recordArray is null)
             {
                 throw new ArgumentNullException(nameof(recordArray), "Array of records is null");
             }
 
-            using (StreamWriter textWriter = new StreamWriter(filePath, false, Encoding.Default))
+            using (StreamWriter textWriter = new StreamWriter(fileStream))
             {
                 foreach (var record in recordArray)
                 {
