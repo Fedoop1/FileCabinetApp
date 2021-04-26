@@ -61,6 +61,7 @@ namespace FileCabinetApp
         /// <returns>Count of records.</returns>
         public FileCabinetServiceShapshot MakeSnapshot();
 
+        public void Restore(FileCabinetServiceShapshot restoreSnapshot);
         public int GetStat();
     }
 }

@@ -119,10 +119,7 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
         }
 
         this.ValidateParameters(newData);
-
-        this.firstNameDictionary.TryGetValue(record.FirstName.ToLower(Program.Culture), out List<FileCabinetRecord> firstNameList);
-        this.lastNameDictionary.TryGetValue(record.LastName.ToLower(Program.Culture), out List<FileCabinetRecord> lastNameList);
-        this.dateOfBirthDictionary.TryGetValue(record.DateOfBirth, out List<FileCabinetRecord> dateOfBirthList);
+        this.DictionaryRemove(record);
 
         record.FirstName = newData?.FirstName;
         record.LastName = newData.LastName;
@@ -131,13 +128,22 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
         record.Money = newData.Money;
         record.Gender = newData.Gender;
 
-        firstNameList.Remove(record);
-        lastNameList.Remove(record);
-        dateOfBirthList.Remove(record);
-
         this.DictionaryAdd(newData.FirstName, newData.LastName, newData.DateOfBirth, record);
 
         Console.WriteLine($"Record #{id} is updated.");
+    }
+
+    private void DictionaryRemove(FileCabinetRecord record)
+    {
+        List<FileCabinetRecord> firstNameList, lastNameList, dateOfBirthList;
+
+        this.firstNameDictionary.TryGetValue(record.FirstName.ToLower(Program.Culture), out firstNameList);
+        this.lastNameDictionary.TryGetValue(record.LastName.ToLower(Program.Culture), out lastNameList);
+        this.dateOfBirthDictionary.TryGetValue(record.DateOfBirth, out dateOfBirthList);
+
+        firstNameList.Remove(record);
+        lastNameList.Remove(record);
+        dateOfBirthList.Remove(record);
     }
 
     /// <inheritdoc/>
@@ -150,6 +156,29 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
     public int GetStat()
     {
         return this.list.Count;
+    }
+
+    public void Restore(FileCabinetServiceShapshot restoreSnapshot)
+    {
+        if (restoreSnapshot is null)
+        {
+            throw new ArgumentNullException(nameof(restoreSnapshot), "Restore snapshot is null");
+        }
+
+        var restoreRecordList = restoreSnapshot.Records;
+        foreach (var restoreRecord in restoreRecordList)
+        {
+            if (this.list.Any(record => record.Id == restoreRecord.Id))
+            {
+                var oldRecord = this.list.First(record => record.Id == restoreRecord.Id);
+                this.list.Remove(oldRecord);
+                this.DictionaryRemove(oldRecord);
+                Console.WriteLine($"Record #{restoreRecord.Id} was updated!");
+            }
+
+            this.list.Add(restoreRecord);
+            this.DictionaryAdd(restoreRecord.FirstName, restoreRecord.LastName, restoreRecord.DateOfBirth, restoreRecord);
+        }
     }
 
     /// <summary>

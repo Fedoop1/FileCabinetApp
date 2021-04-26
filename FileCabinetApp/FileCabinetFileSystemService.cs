@@ -274,5 +274,10 @@ namespace FileCabinetApp
             var result = Encoding.ASCII.GetString(byteName);
             return result.TrimEnd('\0');
         }
+
+        public void Restore(FileCabinetServiceShapshot restoreSnapshot)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

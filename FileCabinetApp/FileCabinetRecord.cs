@@ -38,7 +38,7 @@ public class FileCabinetRecord
             }
             else
             {
-                throw new ArgumentException("Height is incorrect.");
+                throw new ArgumentException($"#{this.Id}: Height is incorrect.");
             }
         }
     }
@@ -65,7 +65,7 @@ public class FileCabinetRecord
             }
             else
             {
-                throw new ArgumentException("Money can't be lower than zero.");
+                throw new ArgumentException($"#{this.Id}: Money can't be lower than zero.");
             }
         }
     }
@@ -92,7 +92,7 @@ public class FileCabinetRecord
             }
             else
             {
-                throw new ArgumentException("Gender is incorrect.");
+                throw new ArgumentException($"#{this.Id}: Gender is incorrect.");
             }
         }
     }
@@ -128,7 +128,7 @@ public class FileCabinetRecord
             }
             else
             {
-                throw new ArgumentException("First name is incorrect.");
+                throw new ArgumentException($"#{this.Id}: First name is incorrect.");
             }
         }
     }
@@ -155,7 +155,7 @@ public class FileCabinetRecord
             }
             else
             {
-                throw new ArgumentException("Last name is incorrect.");
+                throw new ArgumentException($"#{this.Id}: Last name is incorrect.");
             }
         }
     }
@@ -182,7 +182,7 @@ public class FileCabinetRecord
             }
             else
             {
-                throw new ArgumentException("Date of birth is incorrect.");
+                throw new ArgumentException($"#{this.Id}: Date of birth is incorrect.");
             }
         }
     }

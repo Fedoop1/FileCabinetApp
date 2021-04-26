@@ -17,7 +17,7 @@
             {
                 foreach (var record in recordArray)
                 {
-                    textWriter.WriteLine(record);
+                    textWriter.WriteLine($"{record.Id},{record.FirstName},{record.LastName},{record.DateOfBirth},{record.Height},{record.Money},{record.Gender}");
                 }
             }
         }
