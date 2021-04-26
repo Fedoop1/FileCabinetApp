@@ -8,10 +8,19 @@ namespace FileCabinetGenerator
     using System.Linq;
     using FileCabinetApp;
 
+    /// <summary>
+    /// Generate <see cref="FileCabinetRecord"/> instances.
+    /// </summary>
     public static class RecordGenerator
     {
         private static Random random = new Random();
 
+        /// <summary>
+        /// Generate <see cref="FileCabinetRecord"/> instances by usind <see cref="Random"/> and <see cref="Guid"/> classes for generate data.
+        /// </summary>
+        /// <param name="startId">Start id for the first record in the iteration.</param>
+        /// <param name="recordAmount">Count of records to generate.</param>
+        /// <returns>Array of generated <see cref="FileCabinetRecord"/>'s.</returns>
         public static FileCabinetRecord[] GenerateRecord(int startId, int recordAmount)
         {
             var resultRecordArray = new FileCabinetRecord[recordAmount];

@@ -9,17 +9,28 @@ using System.Xml.Serialization;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Class for working and deserializing information from an XML file.
+    /// </summary>
     public class FileCabinetXMLReader
     {
         private XmlSerializer formatter;
         private XmlReader xmlReader;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileCabinetXMLReader"/> class.
+        /// </summary>
+        /// <param name="fileStream"><see cref="FileStream"/> with information about XML format file.</param>
         public FileCabinetXMLReader(FileStream fileStream)
         {
             this.formatter = new XmlSerializer(typeof(FileCabinetRecord[]));
             this.xmlReader = XmlReader.Create(fileStream);
         }
 
+        /// <summary>
+        /// Read and deserialize all information from file and return it <see cref="IList{FileCabinetRecord}"/> representation.
+        /// </summary>
+        /// <returns><see cref="IList{FileCabinetRecord}"/> representation of redords into XML file.</returns>
         public IList<FileCabinetRecord> ReadAll()
         {
             List<FileCabinetRecord> result = new List<FileCabinetRecord>();

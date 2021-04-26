@@ -61,7 +61,16 @@ namespace FileCabinetApp
         /// <returns>Count of records.</returns>
         public FileCabinetServiceShapshot MakeSnapshot();
 
+        /// <summary>
+        /// Restore information from <see cref="FileCabinetServiceShapshot"/> instance.
+        /// </summary>
+        /// <param name="restoreSnapshot">Snapshot with information about records.</param>
         public void Restore(FileCabinetServiceShapshot restoreSnapshot);
+
+        /// <summary>
+        /// Get the count of existing <see cref="FileCabinetRecord"/>'s.
+        /// </summary>
+        /// <returns>The count of the records.</returns>
         public int GetStat();
     }
 }

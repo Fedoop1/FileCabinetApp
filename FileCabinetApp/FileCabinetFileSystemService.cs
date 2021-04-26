@@ -85,7 +85,7 @@ namespace FileCabinetApp
                 Console.WriteLine("Record doesn't exist.");
                 return;
             }
-            else if (recordId > RecordsCount)
+            else if (recordId > this.RecordsCount)
             {
                 Console.WriteLine("Records count lower than Id.");
                 return;
@@ -234,6 +234,33 @@ namespace FileCabinetApp
             this.fileStream.Close();
         }
 
+        /// <inheritdoc/>
+        public void Restore(FileCabinetServiceShapshot restoreSnapshot)
+        {
+            if (restoreSnapshot is null)
+            {
+                throw new ArgumentNullException(nameof(restoreSnapshot), "Restore snapshot is null");
+            }
+
+            var restoreRecordsList = restoreSnapshot.Records;
+            var recordList = this.GetRecords();
+
+            foreach (var restoreRecord in restoreRecordsList)
+            {
+                byte[] recordByteArray = RecordToByteConverter(restoreRecord);
+
+                if (recordList.Any(record => record.Id == restoreRecord.Id))
+                {
+                    this.fileStream.Position = (restoreRecord.Id - 1) * MaxRecordLength;
+                    this.fileStream.Write(recordByteArray);
+                }
+                else
+                {
+                    this.fileStream.Write(recordByteArray, 0, MaxRecordLength);
+                }
+            }
+        }
+
         private static byte[] RecordToByteConverter(FileCabinetRecord record)
         {
             byte[] recordByteArray = new byte[MaxRecordLength];
@@ -278,32 +305,6 @@ namespace FileCabinetApp
         {
             var result = Encoding.ASCII.GetString(byteName);
             return result.TrimEnd('\0');
-        }
-
-        public void Restore(FileCabinetServiceShapshot restoreSnapshot)
-        {
-            if (restoreSnapshot is null)
-            {
-                throw new ArgumentNullException(nameof(restoreSnapshot), "Restore snapshot is null");
-            }
-
-            var restoreRecordsList = restoreSnapshot.Records;
-            var recordList = this.GetRecords();
-
-            foreach (var restoreRecord in restoreRecordsList)
-            {
-                byte[] recordByteArray = RecordToByteConverter(restoreRecord);
-
-                if (recordList.Any(record => record.Id == restoreRecord.Id))
-                {
-                    this.fileStream.Position = (restoreRecord.Id - 1) * MaxRecordLength;
-                    this.fileStream.Write(recordByteArray);
-                }
-                else
-                {
-                    this.fileStream.Write(recordByteArray, 0, MaxRecordLength);
-                }
-            }
         }
     }
 }

@@ -12,8 +12,6 @@ namespace FileCabinetApp
     {
         private FileCabinetRecord[] records;
 
-        public ReadOnlyCollection<FileCabinetRecord> Records => this.records.ToList().AsReadOnly();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetServiceShapshot"/> class and save information and assign inner field by reference to an array with records.
         /// </summary>
@@ -23,6 +21,18 @@ namespace FileCabinetApp
             this.records = fileCabinetRecords;
         }
 
+        /// <summary>
+        /// Gets <see cref="ReadOnlyCollection{T}"/> of <see cref="FileCabinetRecord"/> wich is stored into snapshot.
+        /// </summary>
+        /// <value>
+        /// Read only collection of <see cref="FileCabinetRecord"/>.
+        /// </value>
+        public ReadOnlyCollection<FileCabinetRecord> Records => this.records.ToList().AsReadOnly();
+
+        /// <summary>
+        /// Load data from CSV file and deserialize it to <see cref="FileCabinetRecord"/> representation.
+        /// </summary>
+        /// <param name="streamReader">IO Flow with information about data storage file.</param>
         public void LoadFromCSV(StreamReader streamReader)
         {
             FileCabinetCSVReader csvReader = new FileCabinetCSVReader(streamReader);
@@ -49,11 +59,14 @@ namespace FileCabinetApp
             fileCabinetRecordXMLWriter.Write(this.records);
         }
 
+        /// <summary>
+        /// Load data from XML file and deserialize it to <see cref="FileCabinetRecord"/> representation.
+        /// </summary>
+        /// <param name="fileStream">IO Flow with information about data storage file.</param>
         public void LoadFromXML(FileStream fileStream)
         {
             var fileCabinetXMLReader = new FileCabinetXMLReader(fileStream);
             this.records = fileCabinetXMLReader.ReadAll().ToArray();
-
         }
     }
 }

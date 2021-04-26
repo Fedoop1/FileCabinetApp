@@ -7,10 +7,15 @@ namespace FileCabinetGenerator
     using System;
     using System.Globalization;
     using System.IO;
-    using FileCabinetApp;
 
+    /// <summary>
+    /// The main root class of the application from where all processes are managed.
+    /// </summary>
     public static class Program
     {
+        /// <summary>
+        /// Fields containing the culture of the user, which is necessary for the correct operation of the application.
+        /// </summary>
         public static readonly CultureInfo Culture = CultureInfo.CurrentCulture;
         private static GeneratorCommandLineArgs commandLineArgs;
 

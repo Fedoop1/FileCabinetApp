@@ -133,19 +133,6 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
         Console.WriteLine($"Record #{id} is updated.");
     }
 
-    private void DictionaryRemove(FileCabinetRecord record)
-    {
-        List<FileCabinetRecord> firstNameList, lastNameList, dateOfBirthList;
-
-        this.firstNameDictionary.TryGetValue(record.FirstName.ToLower(Program.Culture), out firstNameList);
-        this.lastNameDictionary.TryGetValue(record.LastName.ToLower(Program.Culture), out lastNameList);
-        this.dateOfBirthDictionary.TryGetValue(record.DateOfBirth, out dateOfBirthList);
-
-        firstNameList.Remove(record);
-        lastNameList.Remove(record);
-        dateOfBirthList.Remove(record);
-    }
-
     /// <inheritdoc/>
     public ReadOnlyCollection<FileCabinetRecord> GetRecords()
     {
@@ -158,6 +145,7 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
         return this.list.Count;
     }
 
+    /// <inheritdoc/>
     public void Restore(FileCabinetServiceShapshot restoreSnapshot)
     {
         if (restoreSnapshot is null)
@@ -219,5 +207,18 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
         {
             this.dateOfBirthDictionary.Add(dateOfBirth, new List<FileCabinetRecord>() { record });
         }
+    }
+
+    private void DictionaryRemove(FileCabinetRecord record)
+    {
+        List<FileCabinetRecord> firstNameList, lastNameList, dateOfBirthList;
+
+        this.firstNameDictionary.TryGetValue(record.FirstName.ToLower(Program.Culture), out firstNameList);
+        this.lastNameDictionary.TryGetValue(record.LastName.ToLower(Program.Culture), out lastNameList);
+        this.dateOfBirthDictionary.TryGetValue(record.DateOfBirth, out dateOfBirthList);
+
+        firstNameList.Remove(record);
+        lastNameList.Remove(record);
+        dateOfBirthList.Remove(record);
     }
 }

@@ -2,10 +2,13 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
-using System;
-
 namespace FileCabinetGenerator
 {
+    using System;
+
+    /// <summary>
+    /// Class "container" wich storage and processing information for record generation and export.
+    /// </summary>
     public class GeneratorCommandLineArgs
     {
         private string outputType;
@@ -13,6 +16,13 @@ namespace FileCabinetGenerator
         private int recordAmount;
         private int startId;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GeneratorCommandLineArgs"/> class.
+        /// </summary>
+        /// <param name="outputType">The output type for future export.</param>
+        /// <param name="filePath">File path where export will locate.</param>
+        /// <param name="recordAmount">The count of <see cref="FileCabinetRecord"/> to generate.</param>
+        /// <param name="startId">The first index that the record wull have.</param>
         public GeneratorCommandLineArgs(string outputType, string filePath, int recordAmount, int startId)
         {
             this.OutputType = outputType;
@@ -21,6 +31,9 @@ namespace FileCabinetGenerator
             this.StartId = startId;
         }
 
+        /// <summary>
+        /// Gets and sets output type.
+        /// </summary>
         public string OutputType
         {
             get => this.outputType;
@@ -36,6 +49,9 @@ namespace FileCabinetGenerator
             }
         }
 
+        /// <summary>
+        /// Gets and sets filepath.
+        /// </summary>
         public string FilePath
         {
             get => this.filePath;
@@ -51,6 +67,9 @@ namespace FileCabinetGenerator
             }
         }
 
+        /// <summary>
+        /// Gets and sets record count.
+        /// </summary>
         public int RecordAmount
         {
             get => this.recordAmount;
@@ -66,6 +85,9 @@ namespace FileCabinetGenerator
             }
         }
 
+        /// <summary>
+        /// Gets and sets start id.
+        /// </summary>
         public int StartId
         {
             get => this.startId;

@@ -188,6 +188,9 @@
             Releases resources from under the <see cref="T:FileCabinetApp.FileCabinetFilesystemService"/> and releases the flow of <see cref="T:System.IO.FileStream"/>.
             </summary>
         </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.Restore(FileCabinetApp.FileCabinetServiceShapshot)">
+            <inheritdoc/>
+        </member>
         <member name="T:FileCabinetApp.FileCabinetRecordCSVWriter">
             <summary>
             Create CSV document based on records array data, serialize and save it to disk.
@@ -328,6 +331,20 @@
             </summary>
             <param name="fileCabinetRecords"><see cref="T:FileCabinetRecord"/> array with data about records.</param>
         </member>
+        <member name="P:FileCabinetApp.FileCabinetServiceShapshot.Records">
+            <summary>
+            Gets <see cref="T:System.Collections.ObjectModel.ReadOnlyCollection`1"/> of <see cref="T:FileCabinetRecord"/> wich is stored into snapshot.
+            </summary>
+            <value>
+            Read only collection of <see cref="T:FileCabinetRecord"/>.
+            </value>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetServiceShapshot.LoadFromCSV(System.IO.StreamReader)">
+            <summary>
+            Load data from CSV file and deserialize it to <see cref="T:FileCabinetRecord"/> representation.
+            </summary>
+            <param name="streamReader">IO Flow with information about data storage file.</param>
+        </member>
         <member name="M:FileCabinetApp.FileCabinetServiceShapshot.SaveToCSV(System.IO.StreamWriter)">
             <summary>
             Create a new instance of <see cref="T:FileCabinetApp.FileCabinetRecordCSVWriter"/> and invoke Write method.
@@ -339,6 +356,29 @@
             Create a new instance of <see cref="T:FileCabinetApp.FileCabinetRecordXMLWriter"/> and invoke Write method.
             </summary>
             <param name="writer"><see cref="T:System.IO.StreamWriter"/> with information about file path and addition settings.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetServiceShapshot.LoadFromXML(System.IO.FileStream)">
+            <summary>
+            Load data from XML file and deserialize it to <see cref="T:FileCabinetRecord"/> representation.
+            </summary>
+            <param name="fileStream">IO Flow with information about data storage file.</param>
+        </member>
+        <member name="T:FileCabinetApp.FileCabinetXMLReader">
+            <summary>
+            Class for working and deserializing information from an XML file.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetXMLReader.#ctor(System.IO.FileStream)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetXMLReader"/> class.
+            </summary>
+            <param name="fileStream"><see cref="T:System.IO.FileStream"/> with information about XML format file.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetXMLReader.ReadAll">
+            <summary>
+            Read and deserialize all information from file and return it <see cref="T:System.Collections.Generic.IList`1"/> representation.
+            </summary>
+            <returns><see cref="T:System.Collections.Generic.IList`1"/> representation of redords into XML file.</returns>
         </member>
         <member name="T:FileCabinetApp.IFileCabinetService">
             <summary>
@@ -532,6 +572,9 @@
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetMemoryService.GetStat">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetMemoryService.Restore(FileCabinetApp.FileCabinetServiceShapshot)">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetMemoryService.DictionaryAdd(System.String,System.String,System.DateTime,FileCabinetRecord)">
