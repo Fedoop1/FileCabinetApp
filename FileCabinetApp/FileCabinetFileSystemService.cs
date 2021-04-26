@@ -65,7 +65,7 @@ namespace FileCabinetApp
             };
 
             byte[] recordByteArray = RecordToByteConverter(record);
-            this.fileStream.Write(recordByteArray, 0, recordByteArray.Length);
+            this.fileStream.Write(recordByteArray, 0, MaxRecordLength);
 
             Console.WriteLine("File length is: " + this.FileLength);
             return record.Id;
@@ -178,13 +178,17 @@ namespace FileCabinetApp
                     short height = binaryReader.ReadInt16();
                     decimal money = binaryReader.ReadDecimal();
                     char gender = binaryReader.ReadChar();
+                    if (!DateTime.TryParse($"{dateOfBirthDay}.{dateOfBirthMonth}.{dateOfBirthYear}", out DateTime dateOfBirth))
+                    {
+                        throw new ArgumentException("Date of birth is incorrect.");
+                    }
 
                     var record = new FileCabinetRecord()
                     {
                         Id = recordId,
                         FirstName = firstName,
                         LastName = lastName,
-                        DateOfBirth = DateTime.Parse($"{dateOfBirthDay}.{dateOfBirthMonth}.{dateOfBirthYear}", System.Globalization.CultureInfo.InvariantCulture),
+                        DateOfBirth = dateOfBirth,
                         Height = height,
                         Money = money,
                         Gender = gender,
@@ -212,7 +216,8 @@ namespace FileCabinetApp
         /// <returns>Instance of <see cref="FileCabinetServiceShapshot"/>.</returns>
         public FileCabinetServiceShapshot MakeSnapshot()
         {
-            throw new NotImplementedException();
+            var recordsArray = this.GetRecords().ToArray();
+            return new FileCabinetServiceShapshot(recordsArray);
         }
 
         /// <inheritdoc/>
@@ -277,7 +282,28 @@ namespace FileCabinetApp
 
         public void Restore(FileCabinetServiceShapshot restoreSnapshot)
         {
-            throw new NotImplementedException();
+            if (restoreSnapshot is null)
+            {
+                throw new ArgumentNullException(nameof(restoreSnapshot), "Restore snapshot is null");
+            }
+
+            var restoreRecordsList = restoreSnapshot.Records;
+            var recordList = this.GetRecords();
+
+            foreach (var restoreRecord in restoreRecordsList)
+            {
+                byte[] recordByteArray = RecordToByteConverter(restoreRecord);
+
+                if (recordList.Any(record => record.Id == restoreRecord.Id))
+                {
+                    this.fileStream.Position = (restoreRecord.Id - 1) * MaxRecordLength;
+                    this.fileStream.Write(recordByteArray);
+                }
+                else
+                {
+                    this.fileStream.Write(recordByteArray, 0, MaxRecordLength);
+                }
+            }
         }
     }
 }
