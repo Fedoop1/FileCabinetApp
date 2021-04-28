@@ -102,33 +102,28 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
     }
 
     /// <inheritdoc/>
-    public void EditRecord(string id, FileCabinetRecordData newData)
+    public void EditRecord(int id, FileCabinetRecordData newData)
     {
-        if (!int.TryParse(id, out int recordId))
-        {
-            Console.WriteLine($"Id is incorrect.");
-            return;
-        }
-
-        FileCabinetRecord record = this.list.FirstOrDefault(x => x.Id == recordId);
-
-        if (record == null)
-        {
-            Console.WriteLine($"#{id} record is not found.");
-            return;
-        }
-
         this.ValidateParameters(newData);
-        this.DictionaryRemove(record);
 
-        record.FirstName = newData?.FirstName;
-        record.LastName = newData.LastName;
-        record.DateOfBirth = newData.DateOfBirth;
-        record.Height = newData.Height;
-        record.Money = newData.Money;
-        record.Gender = newData.Gender;
+        if (!this.RemoveRecord(id))
+        {
+            return;
+        }
 
-        this.DictionaryAdd(newData.FirstName, newData.LastName, newData.DateOfBirth, record);
+        var newRecord = new FileCabinetRecord()
+        {
+            Id = id,
+            FirstName = newData?.FirstName,
+            LastName = newData.LastName,
+            DateOfBirth = newData.DateOfBirth,
+            Height = newData.Height,
+            Money = newData.Money,
+            Gender = newData.Gender,
+        };
+
+        this.list.Add(newData);
+        this.DictionaryAdd(newData.FirstName, newData.LastName, newData.DateOfBirth, newRecord);
 
         Console.WriteLine($"Record #{id} is updated.");
     }
@@ -167,6 +162,22 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
             this.list.Add(restoreRecord);
             this.DictionaryAdd(restoreRecord.FirstName, restoreRecord.LastName, restoreRecord.DateOfBirth, restoreRecord);
         }
+    }
+
+    public bool RemoveRecord(int index)
+    {
+        var record = this.list.FirstOrDefault(rec => rec.Id == index);
+
+        if (record is null)
+        {
+            Console.WriteLine($"Record #{index} doesn't exist.");
+            return false;
+        }
+
+        this.list.Remove(record);
+        this.DictionaryRemove(record);
+        Console.WriteLine($"Record #{index} is removed.");
+        return true;
     }
 
     /// <summary>

@@ -36,6 +36,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("find", Find),
             new Tuple<string, Action<string>>("export", Export),
             new Tuple<string, Action<string>>("import", Import),
+            new Tuple<string, Action<string>>("remove", Remove),
         };
 
         /// <summary>
@@ -52,7 +53,24 @@ namespace FileCabinetApp
             new string[] { "find", "finds a record", "The 'find' command find a record by the specified parameter. Example '>find [param] [data]." },
             new string[] { "export", "Make snapshot and save it to file.", "The export command make snapshot of you record list and save it to special file." },
             new string[] { "import", "Import records from external storage.", "The import command imports records from a file in two possible formats XML and CSV." },
+            new string[] { "remove", "Remove selected record.", "The command remove record at the selected index." },
         };
+
+        private static void Remove(string parameters)
+        {
+            if (string.IsNullOrEmpty(parameters))
+            {
+                Console.WriteLine("Index is null or empty!");
+                return;
+            }
+
+            if (!int.TryParse(parameters, out int index))
+            {
+                throw new ArgumentException("Invalid index.");
+            }
+
+            fileCabinetService.RemoveRecord(index);
+        }
 
         /// <summary>
         /// Make snapshot and export record list in special format to disk. Supports XML and CSV serialization.
@@ -267,7 +285,14 @@ namespace FileCabinetApp
         private static void Edit(string parameters)
         {
             recordDataContainer.InputData();
-            fileCabinetService.EditRecord(parameters, recordDataContainer);
+
+            if (!int.TryParse(parameters, out int id))
+            {
+                Console.WriteLine($"Id is incorrect.");
+                return;
+            }
+
+            fileCabinetService.EditRecord(id, recordDataContainer);
         }
 
         /// <summary>

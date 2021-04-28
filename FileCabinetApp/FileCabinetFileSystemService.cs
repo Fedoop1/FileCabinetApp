@@ -78,14 +78,9 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public void EditRecord(string id, FileCabinetRecordData recordData)
+        public void EditRecord(int id, FileCabinetRecordData recordData)
         {
-            if (!int.TryParse(id, out int recordId))
-            {
-                Console.WriteLine("Record doesn't exist.");
-                return;
-            }
-            else if (recordId > this.RecordsCount)
+            if (id > this.RecordsCount)
             {
                 Console.WriteLine("Records count lower than Id.");
                 return;
@@ -95,7 +90,7 @@ namespace FileCabinetApp
 
             var record = new FileCabinetRecord
             {
-                Id = recordId,
+                Id = id,
                 FirstName = recordData?.FirstName,
                 LastName = recordData.LastName,
                 DateOfBirth = recordData.DateOfBirth,
@@ -108,11 +103,11 @@ namespace FileCabinetApp
 
             using (var binaryWriter = new BinaryWriter(this.fileStream, Encoding.Default, true))
             {
-                this.fileStream.Position = (recordId - 1) * MaxRecordLength;
+                this.fileStream.Position = (id - 1) * MaxRecordLength;
                 this.fileStream.Write(recordByteArray);
             }
 
-            Console.WriteLine($"Record {recordId} successfull update.");
+            Console.WriteLine($"Record {id} successfull update.");
         }
 
         /// <inheritdoc/>
@@ -259,6 +254,11 @@ namespace FileCabinetApp
                     this.fileStream.Write(recordByteArray, 0, MaxRecordLength);
                 }
             }
+        }
+
+        public bool RemoveRecord(int index)
+        {
+            throw new NotImplementedException();
         }
 
         private static byte[] RecordToByteConverter(FileCabinetRecord record)

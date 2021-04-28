@@ -47,7 +47,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="id">A unique identifier by which the editing will take place.</param>
         /// <param name="recordData">A container class with updated record information.</param>
-        public void EditRecord(string id, FileCabinetRecordData recordData);
+        public void EditRecord(int id, FileCabinetRecordData recordData);
 
         /// <summary>
         /// A method that returns a collection of records (read-only).
@@ -72,5 +72,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <returns>The count of the records.</returns>
         public int GetStat();
+
+        public bool RemoveRecord(int index);
     }
 }
