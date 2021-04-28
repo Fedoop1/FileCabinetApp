@@ -37,6 +37,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("export", Export),
             new Tuple<string, Action<string>>("import", Import),
             new Tuple<string, Action<string>>("remove", Remove),
+            new Tuple<string, Action<string>>("purge", Purge),
         };
 
         /// <summary>
@@ -54,7 +55,14 @@ namespace FileCabinetApp
             new string[] { "export", "Make snapshot and save it to file.", "The export command make snapshot of you record list and save it to special file." },
             new string[] { "import", "Import records from external storage.", "The import command imports records from a file in two possible formats XML and CSV." },
             new string[] { "remove", "Remove selected record.", "The command remove record at the selected index." },
+            new string[] { "purge", "Defragment the db file.", "The command invokes an algorithm that destroys deleted records from the file." },
         };
+
+        private static void Purge(string parameters)
+        {
+            string result = fileCabinetService.Purge();
+            Console.WriteLine(result);
+        }
 
         private static void Remove(string parameters)
         {

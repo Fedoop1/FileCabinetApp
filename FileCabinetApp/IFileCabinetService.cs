@@ -74,5 +74,7 @@ namespace FileCabinetApp
         public int GetStat();
 
         public bool RemoveRecord(int index);
+
+        public string Purge();
     }
 }

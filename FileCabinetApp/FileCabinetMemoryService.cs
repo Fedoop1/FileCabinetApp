@@ -164,6 +164,11 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
         }
     }
 
+    public string Purge()
+    {
+        return "The operation is not supported for the application memory mode.";
+    }
+
     public bool RemoveRecord(int index)
     {
         var record = this.list.FirstOrDefault(rec => rec.Id == index);

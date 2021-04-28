@@ -289,6 +289,54 @@ namespace FileCabinetApp
             return true;
         }
 
+        public string Purge()
+        {
+            const int NotDeleted = 0;
+            const int Deleted = 1;
+            int deletedRecordCount = 0;
+            int beforePurgeRecordCount = this.FileLength / MaxRecordLength;
+
+            byte[][] recordArray = new byte[this.FileLength / MaxRecordLength][];
+
+            using (var binaryReader = new BinaryReader(this.fileStream, Encoding.Default, true))
+            {
+                for (int recordCount = 0; this.fileStream.Position < this.FileLength; recordCount++)
+                {
+                    this.SetPositionOnRecord(recordCount + 1);
+                    byte[] record = binaryReader.ReadBytes(MaxRecordLength);
+                    recordArray[recordCount] = record;
+                }
+            }
+
+            for (int firstRecordIndex = 0; firstRecordIndex < recordArray.Length; firstRecordIndex++)
+            {
+                for (int secondRecordIndex = firstRecordIndex + 1; secondRecordIndex < recordArray.Length; secondRecordIndex++)
+                {
+                    if (recordArray[firstRecordIndex][MaxRecordLength - 1] == Deleted && recordArray[secondRecordIndex][MaxRecordLength - 1] == NotDeleted)
+                    {
+                        Swap(recordArray[firstRecordIndex], recordArray[secondRecordIndex]);
+                        deletedRecordCount++;
+                        continue;
+                    }
+                }
+            }
+
+            void Swap(byte[] firstArray, byte[] secondArray)
+            {
+                var temp = firstArray;
+                firstArray = secondArray;
+                secondArray = temp;
+            }
+
+            this.fileStream.Position = 0;
+            for (int recordIndex = 0; recordIndex < this.RecordsCount; recordIndex++)
+            {
+                this.fileStream.Write(recordArray[recordIndex]);
+            }
+
+            return $"Data file processing is completed: {deletedRecordCount} of {beforePurgeRecordCount} records were purged.";
+        }
+
         private static byte[] RecordToByteConverter(FileCabinetRecord record)
         {
             byte[] recordByteArray = new byte[MaxRecordLength];
