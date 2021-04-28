@@ -170,13 +170,11 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
 
         if (record is null)
         {
-            Console.WriteLine($"Record #{index} doesn't exist.");
             return false;
         }
 
         this.list.Remove(record);
         this.DictionaryRemove(record);
-        Console.WriteLine($"Record #{index} is removed.");
         return true;
     }
 

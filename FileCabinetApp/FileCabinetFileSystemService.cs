@@ -16,7 +16,7 @@ namespace FileCabinetApp
         /// <summary>
         /// Max record length of 1 record. Include all fields from <see cref="FileCabinetRecord"/> and reserved bytes.
         /// </summary>
-        public const int MaxRecordLength = 255 + sizeof(short) + sizeof(decimal) + sizeof(char);
+        public const int MaxRecordLength = 255 + sizeof(short) + sizeof(decimal) + sizeof(char) + sizeof(bool);
 
         /// <summary>
         /// Accepted constant to describe the maximum length of a string field in byte format.
@@ -46,7 +46,7 @@ namespace FileCabinetApp
         /// Gets count of records into <see cref="FileStream"/>.
         /// </summary>
         /// <value>Actual records count.</value>
-        public int RecordsCount => (int)this.fileStream.Length / MaxRecordLength;
+        public int RecordsCount => this.GetRecords().Count;
 
         /// <inheritdoc/>
         public int CreateRecord(FileCabinetRecordData recordData)
@@ -80,10 +80,22 @@ namespace FileCabinetApp
         /// <inheritdoc/>
         public void EditRecord(int id, FileCabinetRecordData recordData)
         {
+            var editedRecord = new byte[MaxRecordLength];
+
             if (id > this.RecordsCount)
             {
                 Console.WriteLine("Records count lower than Id.");
                 return;
+            }
+
+            using (var binaryReader = new BinaryReader(this.fileStream, Encoding.Default, true))
+            {
+                this.SetPositionOnRecord(id);
+                if (binaryReader.ReadBoolean() == true)
+                {
+                    Console.WriteLine("Record is removed!");
+                    return;
+                }
             }
 
             this.ValidateParameters(recordData);
@@ -101,11 +113,8 @@ namespace FileCabinetApp
 
             byte[] recordByteArray = RecordToByteConverter(record);
 
-            using (var binaryWriter = new BinaryWriter(this.fileStream, Encoding.Default, true))
-            {
-                this.fileStream.Position = (id - 1) * MaxRecordLength;
-                this.fileStream.Write(recordByteArray);
-            }
+            this.SetPositionOnRecord(id);
+            this.fileStream.Write(recordByteArray);
 
             Console.WriteLine($"Record {id} successfull update.");
         }
@@ -173,6 +182,8 @@ namespace FileCabinetApp
                     short height = binaryReader.ReadInt16();
                     decimal money = binaryReader.ReadDecimal();
                     char gender = binaryReader.ReadChar();
+                    bool isDeleted = binaryReader.ReadBoolean();
+
                     if (!DateTime.TryParse($"{dateOfBirthDay}.{dateOfBirthMonth}.{dateOfBirthYear}", out DateTime dateOfBirth))
                     {
                         throw new ArgumentException("Date of birth is incorrect.");
@@ -189,7 +200,10 @@ namespace FileCabinetApp
                         Gender = gender,
                     };
 
-                    recordList.Add(record);
+                    if (!isDeleted)
+                    {
+                        recordList.Add(record);
+                    }
                 }
             }
 
@@ -246,7 +260,7 @@ namespace FileCabinetApp
 
                 if (recordList.Any(record => record.Id == restoreRecord.Id))
                 {
-                    this.fileStream.Position = (restoreRecord.Id - 1) * MaxRecordLength;
+                    this.SetPositionOnRecord(restoreRecord.Id);
                     this.fileStream.Write(recordByteArray);
                 }
                 else
@@ -258,7 +272,21 @@ namespace FileCabinetApp
 
         public bool RemoveRecord(int index)
         {
-            throw new NotImplementedException();
+            const byte Deleted = 1;
+            byte[] record = new byte[MaxRecordLength];
+
+            if (index > this.RecordsCount)
+            {
+                return false;
+            }
+
+            this.SetPositionOnRecord(index);
+            this.fileStream.Read(record);
+            record[MaxRecordLength - 1] = Deleted;
+            this.SetPositionOnRecord(index);
+            this.fileStream.Write(record);
+
+            return true;
         }
 
         private static byte[] RecordToByteConverter(FileCabinetRecord record)
@@ -269,6 +297,7 @@ namespace FileCabinetApp
             using (BinaryWriter binaryWriter = new BinaryWriter(memoryStream))
             {
                 binaryWriter.Write(record.Id);
+                bool isDeleted = false;
 
                 var byteName = StringToASCII(record.FirstName);
                 var byteLastName = StringToASCII(record.LastName);
@@ -281,6 +310,7 @@ namespace FileCabinetApp
                 binaryWriter.Write(record.Height);
                 binaryWriter.Write(record.Money);
                 binaryWriter.Write(record.Gender);
+                binaryWriter.Write(isDeleted);
 
                 return recordByteArray;
             }
@@ -305,6 +335,11 @@ namespace FileCabinetApp
         {
             var result = Encoding.ASCII.GetString(byteName);
             return result.TrimEnd('\0');
+        }
+
+        private void SetPositionOnRecord(int index)
+        {
+            this.fileStream.Position = (index - 1) * MaxRecordLength;
         }
     }
 }

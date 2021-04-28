@@ -69,7 +69,13 @@ namespace FileCabinetApp
                 throw new ArgumentException("Invalid index.");
             }
 
-            fileCabinetService.RemoveRecord(index);
+            if (fileCabinetService.RemoveRecord(index))
+            {
+                Console.WriteLine($"Record #{index} is removed.");
+                return;
+            }
+
+            Console.WriteLine($"Record #{index} doesn't exist.");
         }
 
         /// <summary>
