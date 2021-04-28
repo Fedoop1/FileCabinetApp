@@ -135,9 +135,9 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
     }
 
     /// <inheritdoc/>
-    public int GetStat()
+    public (int actualRecords, int deletedRecords) GetStat()
     {
-        return this.list.Count;
+        return (this.list.Count, 0);
     }
 
     /// <inheritdoc/>

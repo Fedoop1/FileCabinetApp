@@ -68,13 +68,14 @@ namespace FileCabinetApp
         public void Restore(FileCabinetServiceShapshot restoreSnapshot);
 
         /// <summary>
-        /// Get the count of existing <see cref="FileCabinetRecord"/>'s.
+        /// Get the count of existing and deleted <see cref="FileCabinetRecord"/>'s.
         /// </summary>
         /// <returns>The count of the records.</returns>
-        public int GetStat();
+        public (int actualRecords, int deletedRecords) GetStat();
 
         public bool RemoveRecord(int index);
 
         public string Purge();
+
     }
 }

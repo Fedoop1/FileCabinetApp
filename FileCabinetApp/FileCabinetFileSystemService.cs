@@ -24,6 +24,7 @@ namespace FileCabinetApp
         public const int MaxNameLength = 120;
 
         private readonly FileStream fileStream;
+        private int deletedRecordsCount;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetFilesystemService"/> class and set the file stream instance.
@@ -46,7 +47,7 @@ namespace FileCabinetApp
         /// Gets count of records into <see cref="FileStream"/>.
         /// </summary>
         /// <value>Actual records count.</value>
-        public int RecordsCount => this.GetRecords().Count;
+        public int RecordsCount => this.GetCountOfRecords();
 
         /// <inheritdoc/>
         public int CreateRecord(FileCabinetRecordData recordData)
@@ -55,7 +56,7 @@ namespace FileCabinetApp
 
             var record = new FileCabinetRecord
             {
-                Id = this.RecordsCount + 1,
+                Id = FindFreeIndex(),
                 FirstName = recordData?.FirstName,
                 LastName = recordData.LastName,
                 DateOfBirth = recordData.DateOfBirth,
@@ -69,6 +70,25 @@ namespace FileCabinetApp
 
             Console.WriteLine("File length is: " + this.FileLength);
             return record.Id;
+
+            int FindFreeIndex()
+            {
+                const int Deleted = 1;
+                const int IdIndex = 0;
+                this.fileStream.Position = 0;
+                var record = new byte[MaxRecordLength];
+
+                while (this.fileStream.Position != this.FileLength)
+                {
+                    this.fileStream.Read(record);
+                    if (record[MaxRecordLength - 1] == Deleted && !this.FindRecord(record[IdIndex]).isExist)
+                    {
+                        return record[IdIndex];
+                    }
+                }
+
+                return this.RecordsCount + 1;
+            }
         }
 
         /// <inheritdoc/>
@@ -80,22 +100,12 @@ namespace FileCabinetApp
         /// <inheritdoc/>
         public void EditRecord(int id, FileCabinetRecordData recordData)
         {
-            var editedRecord = new byte[MaxRecordLength];
+            var recordIndex = this.FindRecord(id);
 
-            if (id > this.RecordsCount)
+            if (!recordIndex.isExist)
             {
-                Console.WriteLine("Records count lower than Id.");
+                Console.WriteLine("Record doesn't exist.");
                 return;
-            }
-
-            using (var binaryReader = new BinaryReader(this.fileStream, Encoding.Default, true))
-            {
-                this.SetPositionOnRecord(id);
-                if (binaryReader.ReadBoolean() == true)
-                {
-                    Console.WriteLine("Record is removed!");
-                    return;
-                }
             }
 
             this.ValidateParameters(recordData);
@@ -113,10 +123,41 @@ namespace FileCabinetApp
 
             byte[] recordByteArray = RecordToByteConverter(record);
 
-            this.SetPositionOnRecord(id);
+            this.SetPositionOnRecord(recordIndex.fileRecordIndex);
             this.fileStream.Write(recordByteArray);
 
             Console.WriteLine($"Record {id} successfull update.");
+        }
+
+        private (bool isExist, int fileRecordIndex) FindRecord(int id)
+        {
+            const int NotDeleted = 0;
+            int fileIndex = 1;
+            var record = new byte[MaxRecordLength];
+
+            this.fileStream.Position = 0;
+            while (this.fileStream.Position < this.fileStream.Length)
+            {
+                this.fileStream.Read(record);
+
+                if (id == ByteToIntConvert(record[0..4]) && record[MaxRecordLength - 1] == NotDeleted)
+                {
+                    return (true, fileIndex);
+                }
+
+                fileIndex++;
+            }
+
+            return (false, -1);
+
+            int ByteToIntConvert(byte[] bytesArray)
+            {
+                using (var memoryStream = new MemoryStream(bytesArray))
+                using (BinaryReader binaryReader = new BinaryReader(memoryStream, Encoding.Default, true))
+                {
+                    return binaryReader.ReadInt32();
+                }
+            }
         }
 
         /// <inheritdoc/>
@@ -210,13 +251,10 @@ namespace FileCabinetApp
             return recordList.AsReadOnly();
         }
 
-        /// <summary>
-        /// Returns the count of records.
-        /// </summary>
-        /// <returns>Records count.</returns>
-        public int GetStat()
+        /// <inheritdoc/>
+        public (int actualRecords, int deletedRecords) GetStat()
         {
-            return this.RecordsCount;
+            return (this.RecordsCount, this.deletedRecordsCount);
         }
 
         /// <summary>
@@ -275,66 +313,73 @@ namespace FileCabinetApp
             const byte Deleted = 1;
             byte[] record = new byte[MaxRecordLength];
 
-            if (index > this.RecordsCount)
+            var recordIndex = this.FindRecord(index);
+
+            if (!recordIndex.isExist)
             {
                 return false;
             }
 
-            this.SetPositionOnRecord(index);
+            this.SetPositionOnRecord(recordIndex.fileRecordIndex);
             this.fileStream.Read(record);
             record[MaxRecordLength - 1] = Deleted;
-            this.SetPositionOnRecord(index);
+            this.SetPositionOnRecord(recordIndex.fileRecordIndex);
             this.fileStream.Write(record);
-
+            this.deletedRecordsCount += 1;
             return true;
         }
 
         public string Purge()
         {
-            const int NotDeleted = 0;
-            const int Deleted = 1;
-            int deletedRecordCount = 0;
-            int beforePurgeRecordCount = this.FileLength / MaxRecordLength;
-
+            int allRecords = this.FileLength / MaxRecordLength;
             byte[][] recordArray = new byte[this.FileLength / MaxRecordLength][];
 
-            using (var binaryReader = new BinaryReader(this.fileStream, Encoding.Default, true))
-            {
-                for (int recordCount = 0; this.fileStream.Position < this.FileLength; recordCount++)
-                {
-                    this.SetPositionOnRecord(recordCount + 1);
-                    byte[] record = binaryReader.ReadBytes(MaxRecordLength);
-                    recordArray[recordCount] = record;
-                }
-            }
+            this.fileStream.Position = 0;
+            RecordsToJaggedArray(ref recordArray);
+            SortJaggedArray(recordArray);
 
-            for (int firstRecordIndex = 0; firstRecordIndex < recordArray.Length; firstRecordIndex++)
+            return $"Data file processing is completed: {allRecords - this.RecordsCount} of {allRecords} records were purged.";
+
+            void RecordsToJaggedArray(ref byte[][] recordArray)
             {
-                for (int secondRecordIndex = firstRecordIndex + 1; secondRecordIndex < recordArray.Length; secondRecordIndex++)
+                using (var binaryReader = new BinaryReader(this.fileStream, Encoding.Default, true))
                 {
-                    if (recordArray[firstRecordIndex][MaxRecordLength - 1] == Deleted && recordArray[secondRecordIndex][MaxRecordLength - 1] == NotDeleted)
+                    for (int recordCount = 0; this.fileStream.Position < this.FileLength; recordCount++)
                     {
-                        Swap(recordArray[firstRecordIndex], recordArray[secondRecordIndex]);
-                        deletedRecordCount++;
-                        continue;
+                        this.SetPositionOnRecord(recordCount + 1);
+                        byte[] record = binaryReader.ReadBytes(MaxRecordLength);
+                        recordArray[recordCount] = record;
                     }
                 }
             }
 
-            void Swap(byte[] firstArray, byte[] secondArray)
+            void SortJaggedArray(byte[][] recordArray)
             {
-                var temp = firstArray;
-                firstArray = secondArray;
-                secondArray = temp;
-            }
+                const int NotDeleted = 0;
+                const int Deleted = 1;
 
-            this.fileStream.Position = 0;
-            for (int recordIndex = 0; recordIndex < this.RecordsCount; recordIndex++)
-            {
-                this.fileStream.Write(recordArray[recordIndex]);
-            }
+                for (int firstRecordIndex = 0; firstRecordIndex < recordArray.Length; firstRecordIndex++)
+                {
+                    if (recordArray[firstRecordIndex][MaxRecordLength - 1] == Deleted)
+                    {
+                        for (int secondRecordIndex = firstRecordIndex + 1; secondRecordIndex < recordArray.Length; secondRecordIndex++)
+                        {
+                            if (recordArray[secondRecordIndex][MaxRecordLength - 1] == NotDeleted)
+                            {
+                                Swap(ref recordArray[firstRecordIndex], ref recordArray[secondRecordIndex]);
+                                break;
+                            }
+                        }
+                    }
+                }
 
-            return $"Data file processing is completed: {deletedRecordCount} of {beforePurgeRecordCount} records were purged.";
+                void Swap(ref byte[] firstArray, ref byte[] secondArray)
+                {
+                    var temp = firstArray;
+                    firstArray = secondArray;
+                    secondArray = temp;
+                }
+            }
         }
 
         private static byte[] RecordToByteConverter(FileCabinetRecord record)
@@ -383,6 +428,27 @@ namespace FileCabinetApp
         {
             var result = Encoding.ASCII.GetString(byteName);
             return result.TrimEnd('\0');
+        }
+
+        private int GetCountOfRecords()
+        {
+            int result = 0;
+            const int Deleted = 1;
+            this.fileStream.Position = 0;
+            var record = new byte[MaxRecordLength];
+
+            while (this.fileStream.Position != this.FileLength)
+            {
+                this.fileStream.Read(record);
+                if (record[MaxRecordLength - 1] == Deleted)
+                {
+                    continue;
+                }
+
+                result++;
+            }
+
+            return result;
         }
 
         private void SetPositionOnRecord(int index)

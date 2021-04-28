@@ -316,7 +316,7 @@ namespace FileCabinetApp
         private static void Stat(string parameters)
         {
             var recordsCount = fileCabinetService.GetStat();
-            Console.WriteLine($"{recordsCount} record(s).");
+            Console.WriteLine($"{recordsCount.actualRecords} existing record(s). {recordsCount.deletedRecords} deleted record(s).");
         }
 
         /// <summary>
