@@ -129,36 +129,7 @@ namespace FileCabinetApp
             Console.WriteLine($"Record {id} successfull update.");
         }
 
-        private (bool isExist, int fileRecordIndex) FindRecord(int id)
-        {
-            const int NotDeleted = 0;
-            int fileIndex = 1;
-            var record = new byte[MaxRecordLength];
-
-            this.fileStream.Position = 0;
-            while (this.fileStream.Position < this.fileStream.Length)
-            {
-                this.fileStream.Read(record);
-
-                if (id == ByteToIntConvert(record[0..4]) && record[MaxRecordLength - 1] == NotDeleted)
-                {
-                    return (true, fileIndex);
-                }
-
-                fileIndex++;
-            }
-
-            return (false, -1);
-
-            int ByteToIntConvert(byte[] bytesArray)
-            {
-                using (var memoryStream = new MemoryStream(bytesArray))
-                using (BinaryReader binaryReader = new BinaryReader(memoryStream, Encoding.Default, true))
-                {
-                    return binaryReader.ReadInt32();
-                }
-            }
-        }
+        
 
         /// <inheritdoc/>
         public FileCabinetRecord[] FindByDayOfBirth(string dateOfBirth)
@@ -308,6 +279,7 @@ namespace FileCabinetApp
             }
         }
 
+        /// <inheritdoc/>
         public bool RemoveRecord(int index)
         {
             const byte Deleted = 1;
@@ -329,6 +301,7 @@ namespace FileCabinetApp
             return true;
         }
 
+        /// <inheritdoc/>
         public string Purge()
         {
             int allRecords = this.FileLength / MaxRecordLength;
@@ -382,6 +355,11 @@ namespace FileCabinetApp
             }
         }
 
+        /// <summary>
+        /// Convert <see cref="FileCabinetRecord"/> to byte representation.
+        /// </summary>
+        /// <param name="record">Record for conversion.</param>
+        /// <returns>The byte array with byte representaion of record.</returns>
         private static byte[] RecordToByteConverter(FileCabinetRecord record)
         {
             byte[] recordByteArray = new byte[MaxRecordLength];
@@ -409,6 +387,11 @@ namespace FileCabinetApp
             }
         }
 
+        /// <summary>
+        /// Convert send text to ASCII representation.
+        /// </summary>
+        /// <param name="text">Text to convert.</param>
+        /// <returns>Byte array with text converted to ACKII.</returns>
         private static byte[] StringToASCII(string text)
         {
             var result = new byte[MaxNameLength];
@@ -424,12 +407,21 @@ namespace FileCabinetApp
             return result;
         }
 
+        /// <summary>
+        /// Convert ASCII byte array to string representation.
+        /// </summary>
+        /// <param name="byteName">Byte array of ASCII to convert.</param>
+        /// <returns>String result.</returns>
         private static string ASCIIToString(byte[] byteName)
         {
             var result = Encoding.ASCII.GetString(byteName);
             return result.TrimEnd('\0');
         }
 
+        /// <summary>
+        /// Return the actual count of records.
+        /// </summary>
+        /// <returns>Count of records.</returns>
         private int GetCountOfRecords()
         {
             int result = 0;
@@ -451,9 +443,49 @@ namespace FileCabinetApp
             return result;
         }
 
+        /// <summary>
+        /// Set position in <see cref="FileStream"/> at selected record.
+        /// </summary>
+        /// <param name="index">The record to set position.</param>
         private void SetPositionOnRecord(int index)
         {
             this.fileStream.Position = (index - 1) * MaxRecordLength;
+        }
+
+        /// <summary>
+        /// Try to find record with selected Id in <see cref="FileStream"/>.
+        /// </summary>
+        /// <param name="id">Id of record to search.</param>
+        /// <returns>The tuple of searching result and record position in file.</returns>
+        private (bool isExist, int fileRecordIndex) FindRecord(int id)
+        {
+            const int NotDeleted = 0;
+            int fileIndex = 1;
+            var record = new byte[MaxRecordLength];
+
+            this.fileStream.Position = 0;
+            while (this.fileStream.Position < this.fileStream.Length)
+            {
+                this.fileStream.Read(record);
+
+                if (id == ByteToIntConvert(record[0..4]) && record[MaxRecordLength - 1] == NotDeleted)
+                {
+                    return (true, fileIndex);
+                }
+
+                fileIndex++;
+            }
+
+            return (false, -1);
+
+            int ByteToIntConvert(byte[] bytesArray)
+            {
+                using (var memoryStream = new MemoryStream(bytesArray))
+                using (BinaryReader binaryReader = new BinaryReader(memoryStream, Encoding.Default, true))
+                {
+                    return binaryReader.ReadInt32();
+                }
+            }
         }
     }
 }

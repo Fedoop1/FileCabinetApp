@@ -164,11 +164,13 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
         }
     }
 
+    /// <inheritdoc/>
     public string Purge()
     {
         return "The operation is not supported for the application memory mode.";
     }
 
+    /// <inheritdoc/>
     public bool RemoveRecord(int index)
     {
         var record = this.list.FirstOrDefault(rec => rec.Id == index);
@@ -223,6 +225,10 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
         }
     }
 
+    /// <summary>
+    /// An internal method that calls data deletion in dictionaries.
+    /// </summary>
+    /// <param name="record">The record to be removed from the dictionaries.</param>
     private void DictionaryRemove(FileCabinetRecord record)
     {
         List<FileCabinetRecord> firstNameList, lastNameList, dateOfBirthList;

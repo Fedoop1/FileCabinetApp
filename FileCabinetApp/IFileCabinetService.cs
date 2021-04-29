@@ -73,8 +73,18 @@ namespace FileCabinetApp
         /// <returns>The count of the records.</returns>
         public (int actualRecords, int deletedRecords) GetStat();
 
+        /// <summary>
+        /// Removes a record from a data source.
+        /// </summary>
+        /// <param name="index">The identifier of the record to be deleted.</param>
+        /// <returns>Removal result.</returns>
         public bool RemoveRecord(int index);
 
+        /// <summary>
+        /// Find and remove record from data source file by index.
+        /// </summary>
+        /// <param name="index">The index of the record to be deleted.</param>
+        /// <returns>Removal result.</returns>
         public string Purge();
 
     }

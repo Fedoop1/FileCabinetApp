@@ -58,12 +58,20 @@ namespace FileCabinetApp
             new string[] { "purge", "Defragment the db file.", "The command invokes an algorithm that destroys deleted records from the file." },
         };
 
+        /// <summary>
+        /// Compresses and clean up deleted data.
+        /// </summary>
+        /// <param name="parameters">The parameter does not affect the execution of the method.</param>
         private static void Purge(string parameters)
         {
             string result = fileCabinetService.Purge();
             Console.WriteLine(result);
         }
 
+        /// <summary>
+        /// Removes a record from a data source.
+        /// </summary>
+        /// <param name="parameters">The identifier of the record to be deleted.</param>
         private static void Remove(string parameters)
         {
             if (string.IsNullOrEmpty(parameters))
@@ -153,6 +161,10 @@ namespace FileCabinetApp
             Console.WriteLine($"\nAll records are exported to file {parameterArray[filePathIndex]}.");
         }
 
+        /// <summary>
+        /// Imports data from a external file.
+        /// </summary>
+        /// <param name="parameters">Includes the data type of the imported file and its path.</param>
         private static void Import(string parameters)
         {
             const int ImportTypeIndex = 0;
@@ -284,6 +296,10 @@ namespace FileCabinetApp
             }
         }
 
+        /// <summary>
+        /// Create a new <see cref="FileCabinetRecord"/>.
+        /// </summary>
+        /// <param name="parameters">The parameter does not affect the execution of the method.</param>
         private static void Create(string parameters)
         {
             recordDataContainer.InputData();
