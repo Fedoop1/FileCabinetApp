@@ -10,12 +10,50 @@ namespace FileCabinetApp.CommandHandlers
     {
         public override void Handle(AppCommandRequest commandRequest)
         {
-            throw new NotImplementedException();
+            if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "find")
+            {
+                Find(commandRequest.Parameters);
+                return;
+            }
+
+            if (this.nextHandle != null)
+            {
+                this.nextHandle.Handle(commandRequest);
+            }
         }
 
-        public override void SetNext(ICommandHandler commandHandler)
+        /// <summary>
+        /// A method that searches for records by a specific parameter with output to the console.
+        /// </summary>
+        /// <param name="parameters">Parameter line including 1.search criterion 2.unique information.</param>
+        private static void Find(string parameters)
         {
-            throw new NotImplementedException();
+            const int FindParam = 0;
+            const int FindData = 1;
+
+            FileCabinetRecord[] records = null;
+            string[] arrayParameters = parameters.Split(" ", 2);
+
+            records = arrayParameters[FindParam] switch
+            {
+                "firstname" => Program.FileCabinetService.FindByFirstName(arrayParameters[FindData]),
+                "lastname" => Program.FileCabinetService.FindByLastName(arrayParameters[FindData]),
+                "dateofbirth" => Program.FileCabinetService.FindByDayOfBirth(arrayParameters[FindData]),
+                _ => Array.Empty<FileCabinetRecord>()
+            };
+
+            if (records.Length == 0)
+            {
+                Console.WriteLine("There are no records with this parameters.");
+                return;
+            }
+
+            foreach (var record in records)
+            {
+                Console.WriteLine(record);
+            }
+
+            return;
         }
     }
 }

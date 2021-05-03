@@ -10,12 +10,33 @@ namespace FileCabinetApp.CommandHandlers
     {
         public override void Handle(AppCommandRequest commandRequest)
         {
-            throw new NotImplementedException();
+            if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "edit")
+            {
+                Edit(commandRequest.Parameters);
+                return;
+            }
+
+            if (this.nextHandle != null)
+            {
+                this.nextHandle.Handle(commandRequest);
+            }
         }
 
-        public override void SetNext(ICommandHandler commandHandler)
+        /// <summary>
+        /// A method that edits information about a specific record.
+        /// </summary>
+        /// <param name="parameters">A parameter consisting of a unique identifier required to search for a record.</param>
+        private static void Edit(string parameters)
         {
-            throw new NotImplementedException();
+            Program.RecordDataContainer.InputData();
+
+            if (!int.TryParse(parameters, out int id))
+            {
+                Console.WriteLine($"Id is incorrect.");
+                return;
+            }
+
+            Program.FileCabinetService.EditRecord(id, Program.RecordDataContainer);
         }
     }
 }

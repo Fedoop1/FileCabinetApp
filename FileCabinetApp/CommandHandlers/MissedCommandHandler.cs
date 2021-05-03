@@ -10,12 +10,23 @@ namespace FileCabinetApp.CommandHandlers
     {
         public override void Handle(AppCommandRequest commandRequest)
         {
-            throw new NotImplementedException();
+            if (this.nextHandle != null)
+            {
+                this.nextHandle.Handle(commandRequest);
+                return;
+            }
+
+            PrintMissedCommandInfo(commandRequest?.Command);
         }
 
-        public override void SetNext(ICommandHandler commandHandler)
+        /// <summary>
+        /// A method that is executed if a non-existent command is selected.
+        /// </summary>
+        /// <param name="command">User invoked command.</param>
+        private static void PrintMissedCommandInfo(string command)
         {
-            throw new NotImplementedException();
+            Console.WriteLine($"There is no '{command}' command.");
+            Console.WriteLine();
         }
     }
 }

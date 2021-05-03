@@ -12,6 +12,9 @@ namespace FileCabinetApp.CommandHandlers
 
         public abstract void Handle(AppCommandRequest commandRequest);
 
-        public abstract void SetNext(ICommandHandler commandHandler);
+        public void SetNext(ICommandHandler commandHandler)
+        {
+            this.nextHandle = commandHandler;
+        }
     }
 }

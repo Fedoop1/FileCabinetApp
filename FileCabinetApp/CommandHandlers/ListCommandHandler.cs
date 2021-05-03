@@ -10,12 +10,29 @@ namespace FileCabinetApp.CommandHandlers
     {
         public override void Handle(AppCommandRequest commandRequest)
         {
-            throw new NotImplementedException();
+            if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "list")
+            {
+                List();
+                return;
+            }
+
+            if (this.nextHandle != null)
+            {
+                this.nextHandle.Handle(commandRequest);
+            }
         }
 
-        public override void SetNext(ICommandHandler commandHandler)
+        /// <summary>
+        /// A method that returns all available records in the application, outputting from the console.
+        /// </summary>
+        private static void List()
         {
-            throw new NotImplementedException();
+            var recordsArray = Program.FileCabinetService.GetRecords();
+
+            foreach (var record in recordsArray)
+            {
+                Console.WriteLine(record);
+            }
         }
     }
 }

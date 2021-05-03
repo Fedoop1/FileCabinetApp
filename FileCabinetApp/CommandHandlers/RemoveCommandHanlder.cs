@@ -10,12 +10,42 @@ namespace FileCabinetApp.CommandHandlers
     {
         public override void Handle(AppCommandRequest commandRequest)
         {
-            throw new NotImplementedException();
+            if (!string.IsNullOrEmpty(commandRequest.Command) && commandRequest.Command == "remove")
+            {
+                Remove(commandRequest.Parameters);
+                return;
+            }
+
+            if (this.nextHandle != null)
+            {
+                this.nextHandle.Handle(commandRequest);
+            }
         }
 
-        public override void SetNext(ICommandHandler commandHandler)
+        /// <summary>
+        /// Removes a record from a data source.
+        /// </summary>
+        /// <param name="parameters">The identifier of the record to be deleted.</param>
+        private static void Remove(string parameters)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(parameters))
+            {
+                Console.WriteLine("Index is null or empty!");
+                return;
+            }
+
+            if (!int.TryParse(parameters, out int index))
+            {
+                throw new ArgumentException("Invalid index.");
+            }
+
+            if (Program.FileCabinetService.RemoveRecord(index))
+            {
+                Console.WriteLine($"Record #{index} is removed.");
+                return;
+            }
+
+            Console.WriteLine($"Record #{index} doesn't exist.");
         }
     }
 }

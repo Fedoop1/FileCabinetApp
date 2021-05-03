@@ -4,6 +4,80 @@
         <name>FileCabinetApp</name>
     </assembly>
     <members>
+        <member name="M:FileCabinetApp.CommandHandlers.CreateCommandHandler.Create(System.String)">
+            <summary>
+            Create a new <see cref="T:FileCabinetRecord"/>.
+            </summary>
+            <param name="parameters">The parameter does not affect the execution of the method.</param>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.EditCommandHandler.Edit(System.String)">
+            <summary>
+            A method that edits information about a specific record.
+            </summary>
+            <param name="parameters">A parameter consisting of a unique identifier required to search for a record.</param>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ExitCommandHandler.Exit">
+            <summary>
+            A method that produces a safe exit from the application.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ExportCommandHandler.Export(System.String)">
+            <summary>
+            Make snapshot and export record list in special format to disk. Supports XML and CSV serialization.
+            </summary>
+            <param name="parameters">Contain type of export document and filename to save document.</param>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.FindCommandHandler.Find(System.String)">
+            <summary>
+            A method that searches for records by a specific parameter with output to the console.
+            </summary>
+            <param name="parameters">Parameter line including 1.search criterion 2.unique information.</param>
+        </member>
+        <member name="F:FileCabinetApp.CommandHandlers.HelpCommandHandler.helpMessages">
+            <summary>
+            The jagged array needed to get help with all the available commands consists of the command name, a short description, and an extended description.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.HelpCommandHandler.PrintHelp(System.String)">
+            <summary>
+            Method displays all auxiliary information about existing methods, or additional information about a specific method.
+            </summary>
+            <param name="parameters">Parameter with the choice of a specific command to display help about it.</param>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ImportCommandHandler.Import(System.String)">
+            <summary>
+            Imports data from a external file.
+            </summary>
+            <param name="parameters">Includes the data type of the imported file and its path.</param>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ListCommandHandler.List">
+            <summary>
+            A method that returns all available records in the application, outputting from the console.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.MissedCommandHandler.PrintMissedCommandInfo(System.String)">
+            <summary>
+            A method that is executed if a non-existent command is selected.
+            </summary>
+            <param name="command">User invoked command.</param>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.PurgeCommandHandler.Purge">
+            <summary>
+            Compresses and clean up deleted data.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.RemoveCommandHanlder.Remove(System.String)">
+            <summary>
+            Removes a record from a data source.
+            </summary>
+            <param name="parameters">The identifier of the record to be deleted.</param>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.StatCommandHandler.Stat">
+            <summary>
+            A method that displays the number of records in the application.
+            </summary>
+            <param name="parameters">Typically an empty parameter that does not affect method execution.</param>
+        </member>
         <member name="T:FileCabinetApp.CustomValidator">
             <summary>
             The class contains custom rules for records.
@@ -545,99 +619,17 @@
             Fields containing the culture of the user, which is necessary for the correct operation of the application.
             </summary>
         </member>
-        <member name="F:FileCabinetApp.Program.commands">
-            <summary>
-            A tuple that includes the name of the command and the Action delegate to call the function.
-            </summary>
-        </member>
-        <member name="F:FileCabinetApp.Program.helpMessages">
-            <summary>
-            The jagged array needed to get help with all the available commands consists of the command name, a short description, and an extended description.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Program.Purge(System.String)">
-            <summary>
-            Compresses and clean up deleted data.
-            </summary>
-            <param name="parameters">The parameter does not affect the execution of the method.</param>
-        </member>
-        <member name="M:FileCabinetApp.Program.Remove(System.String)">
-            <summary>
-            Removes a record from a data source.
-            </summary>
-            <param name="parameters">The identifier of the record to be deleted.</param>
-        </member>
-        <member name="M:FileCabinetApp.Program.Export(System.String)">
-            <summary>
-            Make snapshot and export record list in special format to disk. Supports XML and CSV serialization.
-            </summary>
-            <param name="parameters">Contain type of export document and filename to save document.</param>
-        </member>
-        <member name="M:FileCabinetApp.Program.Import(System.String)">
-            <summary>
-            Imports data from a external file.
-            </summary>
-            <param name="parameters">Includes the data type of the imported file and its path.</param>
-        </member>
         <member name="M:FileCabinetApp.Program.HandlingCommandLineArgs(System.String[])">
             <summary>
             A method that accepts command line parameters to control the check rules depending on the passed argument.
             </summary>
             <param name="parameters">An array of arguments passed to the Main method.</param>
         </member>
-        <member name="M:FileCabinetApp.Program.Find(System.String)">
-            <summary>
-            A method that searches for records by a specific parameter with output to the console.
-            </summary>
-            <param name="parameters">Parameter line including 1.search criterion 2.unique information.</param>
-        </member>
-        <member name="M:FileCabinetApp.Program.Create(System.String)">
-            <summary>
-            Create a new <see cref="T:FileCabinetRecord"/>.
-            </summary>
-            <param name="parameters">The parameter does not affect the execution of the method.</param>
-        </member>
-        <member name="M:FileCabinetApp.Program.Edit(System.String)">
-            <summary>
-            A method that edits information about a specific record.
-            </summary>
-            <param name="parameters">A parameter consisting of a unique identifier required to search for a record.</param>
-        </member>
-        <member name="M:FileCabinetApp.Program.Stat(System.String)">
-            <summary>
-            A method that displays the number of records in the application.
-            </summary>
-            <param name="parameters">Typically an empty parameter that does not affect method execution.</param>
-        </member>
-        <member name="M:FileCabinetApp.Program.List(System.String)">
-            <summary>
-            A method that returns all available records in the application, outputting from the console.
-            </summary>
-            <param name="parameters">Typically an empty parameter that does not affect method execution.</param>
-        </member>
         <member name="M:FileCabinetApp.Program.Main(System.String[])">
             <summary>
             The main application method from which the user interacts with all available methods.
             </summary>
             <param name="args">Command line arguments required to control check parameters.</param>
-        </member>
-        <member name="M:FileCabinetApp.Program.PrintMissedCommandInfo(System.String)">
-            <summary>
-            A method that is executed if a non-existent command is selected.
-            </summary>
-            <param name="command">User invoked command.</param>
-        </member>
-        <member name="M:FileCabinetApp.Program.PrintHelp(System.String)">
-            <summary>
-            Method displays all auxiliary information about existing methods, or additional information about a specific method.
-            </summary>
-            <param name="parameters">Parameter with the choice of a specific command to display help about it.</param>
-        </member>
-        <member name="M:FileCabinetApp.Program.Exit(System.String)">
-            <summary>
-            A method that produces a safe exit from the application.
-            </summary>
-            <param name="parameters">Typically an empty parameter that does not affect method execution.</param>
         </member>
         <member name="T:FileCabinetMemoryService">
             <summary>

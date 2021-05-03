@@ -10,6 +10,23 @@ namespace FileCabinetApp.CommandHandlers
     {
         public override void Handle(AppCommandRequest commandRequest)
         {
+            if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "exit")
+            {
+                Exit();
+                return;
+            }
+
+            if (this.nextHandle != null)
+            {
+                this.nextHandle.Handle(commandRequest);
+            }
+        }
+
+        /// <summary>
+        /// A method that produces a safe exit from the application.
+        /// </summary>
+        private static void Exit()
+        {
             Console.WriteLine("Exiting an application...");
             if (Program.FileCabinetService is FileCabinetFilesystemService service)
             {
@@ -17,11 +34,6 @@ namespace FileCabinetApp.CommandHandlers
             }
 
             Program.IsRunning = false;
-        }
-
-        public override void SetNext(ICommandHandler commandHandler)
-        {
-            throw new NotImplementedException();
         }
     }
 }

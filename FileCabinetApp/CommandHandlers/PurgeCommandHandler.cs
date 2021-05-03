@@ -10,12 +10,25 @@ namespace FileCabinetApp.CommandHandlers
     {
         public override void Handle(AppCommandRequest commandRequest)
         {
-            throw new NotImplementedException();
+            if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "purge")
+            {
+                Purge();
+                return;
+            }
+
+            if (this.nextHandle != null)
+            {
+                this.nextHandle.Handle(commandRequest);
+            }
         }
 
-        public override void SetNext(ICommandHandler commandHandler)
+        /// <summary>
+        /// Compresses and clean up deleted data.
+        /// </summary>
+        private static void Purge()
         {
-            throw new NotImplementedException();
+            string result = Program.FileCabinetService.Purge();
+            Console.WriteLine(result);
         }
     }
 }

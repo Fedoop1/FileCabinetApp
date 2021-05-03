@@ -10,12 +10,26 @@ namespace FileCabinetApp.CommandHandlers
     {
         public override void Handle(AppCommandRequest commandRequest)
         {
-            throw new NotImplementedException();
+            if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "stat")
+            {
+                Stat();
+                return;
+            }
+
+            if (this.nextHandle != null)
+            {
+                this.nextHandle.Handle(commandRequest);
+            }
         }
 
-        public override void SetNext(ICommandHandler commandHandler)
+        /// <summary>
+        /// A method that displays the number of records in the application.
+        /// </summary>
+        /// <param name="parameters">Typically an empty parameter that does not affect method execution.</param>
+        private static void Stat()
         {
-            throw new NotImplementedException();
+            var recordsCount = Program.FileCabinetService.GetStat();
+            Console.WriteLine($"{recordsCount.actualRecords} existing record(s). {recordsCount.deletedRecords} deleted record(s).");
         }
     }
 }
