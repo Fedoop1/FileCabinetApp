@@ -6,13 +6,20 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
-    public class StatCommandHandler : CommandHadlerBase
+    public class StatCommandHandler : ServiceCommandHandlerBase
     {
+        /// <inheritdoc/>
+        public StatCommandHandler(IFileCabinetService service)
+            : base(service)
+        {
+        }
+
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "stat")
             {
-                Stat();
+                this.Stat();
                 return;
             }
 
@@ -26,9 +33,9 @@ namespace FileCabinetApp.CommandHandlers
         /// A method that displays the number of records in the application.
         /// </summary>
         /// <param name="parameters">Typically an empty parameter that does not affect method execution.</param>
-        private static void Stat()
+        private void Stat()
         {
-            var recordsCount = Program.FileCabinetService.GetStat();
+            var recordsCount = this.service.GetStat();
             Console.WriteLine($"{recordsCount.actualRecords} existing record(s). {recordsCount.deletedRecords} deleted record(s).");
         }
     }

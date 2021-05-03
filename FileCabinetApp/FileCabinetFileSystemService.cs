@@ -50,8 +50,10 @@ namespace FileCabinetApp
         public int RecordsCount => this.GetCountOfRecords();
 
         /// <inheritdoc/>
-        public int CreateRecord(FileCabinetRecordData recordData)
+        public int CreateRecord()
         {
+            var recordData = new FileCabinetRecordData("default");
+            recordData.InputData();
             this.ValidateParameters(recordData);
 
             var record = new FileCabinetRecord
@@ -98,7 +100,7 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public void EditRecord(int id, FileCabinetRecordData recordData)
+        public void EditRecord(int id)
         {
             var recordIndex = this.FindRecord(id);
 
@@ -108,6 +110,8 @@ namespace FileCabinetApp
                 return;
             }
 
+            var recordData = new FileCabinetRecordData("default");
+            recordData.InputData();
             this.ValidateParameters(recordData);
 
             var record = new FileCabinetRecord

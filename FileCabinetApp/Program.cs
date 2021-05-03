@@ -16,24 +16,23 @@ namespace FileCabinetApp
         public static readonly CultureInfo Culture = CultureInfo.CurrentCulture;
         private const string DeveloperName = "Nikita Malukov";
         private const string HintMessage = "Enter your command, or enter 'help' to get help.";
-        public static IFileCabinetService FileCabinetService = new FileCabinetDefaultService();
-        public static FileCabinetRecordData RecordDataContainer = new FileCabinetRecordData("default");
-        public static bool IsRunning = true;
+        private static IFileCabinetService fileCabinetService = new FileCabinetDefaultService();
+        private static bool isRunning = true;
 
-        private static ICommandHandler CreateCommandHandler()
+        private static ICommandHandler CreateCommandHandler(IFileCabinetService fileCabinetService)
         {
-            var createHandler = new CreateCommandHandler();
-            var editHandler = new EditCommandHandler();
-            var exitHandler = new ExitCommandHandler();
-            var exportHandler = new ExportCommandHandler();
-            var findHandler = new FindCommandHandler();
+            var createHandler = new CreateCommandHandler(fileCabinetService);
+            var editHandler = new EditCommandHandler(fileCabinetService);
+            var exitHandler = new ExitCommandHandler(fileCabinetService, UpdateApplicationStatus);
+            var exportHandler = new ExportCommandHandler(fileCabinetService);
+            var findHandler = new FindCommandHandler(fileCabinetService);
             var helpHandler = new HelpCommandHandler();
-            var importHandler = new ImportCommandHandler();
-            var listHandler = new ListCommandHandler();
+            var importHandler = new ImportCommandHandler(fileCabinetService);
+            var listHandler = new ListCommandHandler(fileCabinetService);
             var missedHandler = new MissedCommandHandler();
-            var purgeHandler = new PurgeCommandHandler();
-            var removeHandler = new RemoveCommandHanlder();
-            var statHandler = new StatCommandHandler();
+            var purgeHandler = new PurgeCommandHandler(fileCabinetService);
+            var removeHandler = new RemoveCommandHanlder(fileCabinetService);
+            var statHandler = new StatCommandHandler(fileCabinetService);
 
             createHandler.SetNext(editHandler);
             editHandler.SetNext(exitHandler);
@@ -48,6 +47,11 @@ namespace FileCabinetApp
             statHandler.SetNext(missedHandler);
 
             return createHandler;
+        }
+
+        private static void UpdateApplicationStatus(bool status)
+        {
+            isRunning = status;
         }
 
         /// <summary>
@@ -67,25 +71,22 @@ namespace FileCabinetApp
                     case "-s":
                         if (parameterIndex + 1 != parameters.Length && parameters[parameterIndex + 1].ToLower(Culture) == "memory")
                         {
-                            FileCabinetService = new FileCabinetDefaultService();
+                            fileCabinetService = new FileCabinetDefaultService();
                         }
                         else
                         {
-                            FileCabinetService = new FileCabinetFilesystemService(new FileStream("cabinet-records.db", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite));
+                            fileCabinetService = new FileCabinetFilesystemService(new FileStream("cabinet-records.db", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite));
                         }
 
-                        RecordDataContainer = new FileCabinetRecordData("default");
                         break;
                     case "-v":
                         if (parameterIndex + 1 != parameters.Length && parameters[parameterIndex + 1] == "custom")
                         {
-                            FileCabinetService = new FileCabinetCustomService();
-                            RecordDataContainer = new FileCabinetRecordData("custom");
+                            fileCabinetService = new FileCabinetCustomService();
                         }
                         else
                         {
-                            FileCabinetService = new FileCabinetDefaultService();
-                            RecordDataContainer = new FileCabinetRecordData("default");
+                            fileCabinetService = new FileCabinetDefaultService();
                         }
 
                         break;
@@ -93,13 +94,11 @@ namespace FileCabinetApp
                         attribute = attribute.Substring(attribute.LastIndexOf("=", StringComparison.InvariantCultureIgnoreCase) + 1);
                         if (attribute.ToLower(Culture) == "custom")
                         {
-                            FileCabinetService = new FileCabinetCustomService();
-                            RecordDataContainer = new FileCabinetRecordData("custom");
+                            fileCabinetService = new FileCabinetCustomService();
                         }
                         else
                         {
-                            FileCabinetService = new FileCabinetDefaultService();
-                            RecordDataContainer = new FileCabinetRecordData("default");
+                            fileCabinetService = new FileCabinetDefaultService();
                         }
 
                         break;
@@ -116,7 +115,7 @@ namespace FileCabinetApp
         private static void Main(string[] args)
         {
             HandlingCommandLineArgs(args);
-            var commandHandler = CreateCommandHandler();
+            var commandHandler = CreateCommandHandler(fileCabinetService);
             Console.WriteLine($"\nFile Cabinet Application, developed by {Program.DeveloperName}");
             Console.WriteLine(Program.HintMessage);
             Console.WriteLine();
@@ -131,7 +130,7 @@ namespace FileCabinetApp
                 string parameters = inputs.Length > parametersIndex ? inputs[parametersIndex] : string.Empty;
                 commandHandler.Handle(new AppCommandRequest(inputs[commandIndex], parameters));
             }
-            while (IsRunning);
+            while (isRunning);
         }
     }
 }

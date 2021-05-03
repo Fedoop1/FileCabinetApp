@@ -9,8 +9,10 @@ namespace FileCabinetApp
     /// <summary>
     /// A class that implements custom rules for data validation.
     /// </summary>
-    public class FileCabinetCustomService : FileCabinetMemoryService, IFileCabinetService
+    public class FileCabinetCustomService : FileCabinetMemoryService
     {
+        private readonly FileCabinetRecordData dataContainer = new FileCabinetRecordData("custom");
+
         /// <inheritdoc/>
         public override IRecordValidator CreateValidator()
         {

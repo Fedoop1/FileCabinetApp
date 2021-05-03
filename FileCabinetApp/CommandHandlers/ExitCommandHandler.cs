@@ -6,13 +6,26 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
-    public class ExitCommandHandler : CommandHadlerBase
+    public class ExitCommandHandler : ServiceCommandHandlerBase
     {
+        private Action<bool> exitDelegate;
+
+        public ExitCommandHandler(IFileCabinetService service)
+            : base(service)
+        {
+        }
+
+        public ExitCommandHandler(IFileCabinetService service, Action<bool> exitDelegate)
+            : base(service)
+        {
+            this.exitDelegate = exitDelegate;
+        }
+
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "exit")
             {
-                Exit();
+                this.Exit();
                 return;
             }
 
@@ -25,15 +38,14 @@ namespace FileCabinetApp.CommandHandlers
         /// <summary>
         /// A method that produces a safe exit from the application.
         /// </summary>
-        private static void Exit()
+        private void Exit()
         {
             Console.WriteLine("Exiting an application...");
-            if (Program.FileCabinetService is FileCabinetFilesystemService service)
+            this.exitDelegate.Invoke(false);
+            if (this.service is FileCabinetFilesystemService service)
             {
                 service.Dispose();
             }
-
-            Program.IsRunning = false;
         }
     }
 }

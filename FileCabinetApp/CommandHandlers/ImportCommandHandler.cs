@@ -7,13 +7,20 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
-    public class ImportCommandHandler : CommandHadlerBase
+    public class ImportCommandHandler : ServiceCommandHandlerBase
     {
+        /// <inheritdoc/>
+        public ImportCommandHandler(IFileCabinetService service)
+            : base(service)
+        {
+        }
+
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "import")
             {
-                Import(commandRequest.Parameters);
+                this.Import(commandRequest.Parameters);
             }
 
             if (this.nextHandle != null)
@@ -26,7 +33,7 @@ namespace FileCabinetApp.CommandHandlers
         /// Imports data from a external file.
         /// </summary>
         /// <param name="parameters">Includes the data type of the imported file and its path.</param>
-        private static void Import(string parameters)
+        private void Import(string parameters)
         {
             const int ImportTypeIndex = 0;
             const int FilePathIndex = 1;
@@ -41,7 +48,7 @@ namespace FileCabinetApp.CommandHandlers
             {
                 using (var fileStream = new FileStream(parametersArray[FilePathIndex], FileMode.Open, FileAccess.Read))
                 {
-                    FileCabinetServiceShapshot snapshot = Program.FileCabinetService.MakeSnapshot();
+                    FileCabinetServiceShapshot snapshot = this.service.MakeSnapshot();
                     switch (parametersArray[ImportTypeIndex].ToUpperInvariant())
                     {
                         case "CSV":
@@ -56,7 +63,7 @@ namespace FileCabinetApp.CommandHandlers
                     }
 
                     Console.WriteLine($"{snapshot.Records.Count} records were imported from {parametersArray[FilePathIndex]}");
-                    Program.FileCabinetService.Restore(snapshot);
+                    this.service.Restore(snapshot);
                     return;
                 }
             }

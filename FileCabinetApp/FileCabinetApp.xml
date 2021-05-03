@@ -27,6 +27,12 @@
             </summary>
             <param name="parameters">Contain type of export document and filename to save document.</param>
         </member>
+        <member name="M:FileCabinetApp.CommandHandlers.FindCommandHandler.#ctor(FileCabinetApp.IFileCabinetService)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.FindCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <inheritdoc/>
+        </member>
         <member name="M:FileCabinetApp.CommandHandlers.FindCommandHandler.Find(System.String)">
             <summary>
             A method that searches for records by a specific parameter with output to the console.
@@ -44,11 +50,23 @@
             </summary>
             <param name="parameters">Parameter with the choice of a specific command to display help about it.</param>
         </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ImportCommandHandler.#ctor(FileCabinetApp.IFileCabinetService)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ImportCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <inheritdoc/>
+        </member>
         <member name="M:FileCabinetApp.CommandHandlers.ImportCommandHandler.Import(System.String)">
             <summary>
             Imports data from a external file.
             </summary>
             <param name="parameters">Includes the data type of the imported file and its path.</param>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ListCommandHandler.#ctor(FileCabinetApp.IFileCabinetService)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ListCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.CommandHandlers.ListCommandHandler.List">
             <summary>
@@ -66,11 +84,23 @@
             Compresses and clean up deleted data.
             </summary>
         </member>
+        <member name="M:FileCabinetApp.CommandHandlers.RemoveCommandHanlder.#ctor(FileCabinetApp.IFileCabinetService)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.RemoveCommandHanlder.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <inheritdoc/>
+        </member>
         <member name="M:FileCabinetApp.CommandHandlers.RemoveCommandHanlder.Remove(System.String)">
             <summary>
             Removes a record from a data source.
             </summary>
             <param name="parameters">The identifier of the record to be deleted.</param>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.StatCommandHandler.#ctor(FileCabinetApp.IFileCabinetService)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.StatCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.CommandHandlers.StatCommandHandler.Stat">
             <summary>
@@ -238,13 +268,13 @@
             </summary>
             <value>Actual records count.</value>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.CreateRecord(FileCabinetApp.FileCabinetRecordData)">
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.CreateRecord">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.CreateValidator">
             <inheritdoc/>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.EditRecord(System.Int32,FileCabinetApp.FileCabinetRecordData)">
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.EditRecord(System.Int32)">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.FindByDayOfBirth(System.String)">
@@ -525,7 +555,7 @@
             </summary>
             <returns>Returns an instance of the IRecordValidator interface.</returns>
         </member>
-        <member name="M:FileCabinetApp.IFileCabinetService.CreateRecord(FileCabinetApp.FileCabinetRecordData)">
+        <member name="M:FileCabinetApp.IFileCabinetService.CreateRecord">
             <summary>
             The method that creates a new FileCabinetRecord.
             </summary>
@@ -553,7 +583,7 @@
             <param name="dateOfBirth">A parameter consisting of the date of birth.</param>
             <returns>Returns an array of all records matching the search term.</returns>
         </member>
-        <member name="M:FileCabinetApp.IFileCabinetService.EditRecord(System.Int32,FileCabinetApp.FileCabinetRecordData)">
+        <member name="M:FileCabinetApp.IFileCabinetService.EditRecord(System.Int32)">
             <summary>
             A method for editing data in a particular record.
             </summary>
@@ -651,7 +681,7 @@
             </summary>
             <returns>Class wich realize <see cref="T:FileCabinetApp.IRecordValidator"/> for calling .ValidateParameters() method.</returns>
         </member>
-        <member name="M:FileCabinetMemoryService.CreateRecord(FileCabinetApp.FileCabinetRecordData)">
+        <member name="M:FileCabinetMemoryService.CreateRecord">
             <summary>
             Create a new instance of <see cref="T:FileCabinetRecord"/> and save it to storage.
             </summary>
@@ -667,7 +697,7 @@
         <member name="M:FileCabinetMemoryService.FindByDayOfBirth(System.String)">
             <inheritdoc/>
         </member>
-        <member name="M:FileCabinetMemoryService.EditRecord(System.Int32,FileCabinetApp.FileCabinetRecordData)">
+        <member name="M:FileCabinetMemoryService.EditRecord(System.Int32)">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetMemoryService.GetRecords">

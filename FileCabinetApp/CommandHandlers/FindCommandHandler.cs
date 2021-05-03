@@ -6,13 +6,20 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
-    public class FindCommandHandler : CommandHadlerBase
+    public class FindCommandHandler : ServiceCommandHandlerBase
     {
+        /// <inheritdoc/>
+        public FindCommandHandler(IFileCabinetService service)
+            : base(service)
+        {
+        }
+
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "find")
             {
-                Find(commandRequest.Parameters);
+                this.Find(commandRequest.Parameters);
                 return;
             }
 
@@ -26,7 +33,7 @@ namespace FileCabinetApp.CommandHandlers
         /// A method that searches for records by a specific parameter with output to the console.
         /// </summary>
         /// <param name="parameters">Parameter line including 1.search criterion 2.unique information.</param>
-        private static void Find(string parameters)
+        private void Find(string parameters)
         {
             const int FindParam = 0;
             const int FindData = 1;
@@ -36,9 +43,9 @@ namespace FileCabinetApp.CommandHandlers
 
             records = arrayParameters[FindParam] switch
             {
-                "firstname" => Program.FileCabinetService.FindByFirstName(arrayParameters[FindData]),
-                "lastname" => Program.FileCabinetService.FindByLastName(arrayParameters[FindData]),
-                "dateofbirth" => Program.FileCabinetService.FindByDayOfBirth(arrayParameters[FindData]),
+                "firstname" => this.service.FindByFirstName(arrayParameters[FindData]),
+                "lastname" => this.service.FindByLastName(arrayParameters[FindData]),
+                "dateofbirth" => this.service.FindByDayOfBirth(arrayParameters[FindData]),
                 _ => Array.Empty<FileCabinetRecord>()
             };
 

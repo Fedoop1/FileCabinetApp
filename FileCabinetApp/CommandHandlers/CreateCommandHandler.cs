@@ -6,13 +6,18 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
-    public class CreateCommandHandler : CommandHadlerBase
+    public class CreateCommandHandler : ServiceCommandHandlerBase
     {
+        public CreateCommandHandler(IFileCabinetService service)
+            : base(service)
+        {
+        }
+
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "create")
             {
-                Create(commandRequest.Parameters);
+                this.Create(commandRequest.Parameters);
                 return;
             }
 
@@ -26,10 +31,9 @@ namespace FileCabinetApp.CommandHandlers
         /// Create a new <see cref="FileCabinetRecord"/>.
         /// </summary>
         /// <param name="parameters">The parameter does not affect the execution of the method.</param>
-        private static void Create(string parameters)
+        private void Create(string parameters)
         {
-            Program.RecordDataContainer.InputData();
-            int result = Program.FileCabinetService.CreateRecord(Program.RecordDataContainer);
+            int result = this.service.CreateRecord();
 
             Console.WriteLine($"Record #{result} is created.");
         }

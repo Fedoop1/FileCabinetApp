@@ -6,13 +6,19 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
-    public class EditCommandHandler : CommandHadlerBase
+    public class EditCommandHandler : ServiceCommandHandlerBase
     {
+        public EditCommandHandler(IFileCabinetService service)
+            : base(service)
+        {
+
+        }
+
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "edit")
             {
-                Edit(commandRequest.Parameters);
+                this.Edit(commandRequest.Parameters);
                 return;
             }
 
@@ -26,17 +32,15 @@ namespace FileCabinetApp.CommandHandlers
         /// A method that edits information about a specific record.
         /// </summary>
         /// <param name="parameters">A parameter consisting of a unique identifier required to search for a record.</param>
-        private static void Edit(string parameters)
+        private void Edit(string parameters)
         {
-            Program.RecordDataContainer.InputData();
-
             if (!int.TryParse(parameters, out int id))
             {
                 Console.WriteLine($"Id is incorrect.");
                 return;
             }
 
-            Program.FileCabinetService.EditRecord(id, Program.RecordDataContainer);
+            this.service.EditRecord(id);
         }
     }
 }

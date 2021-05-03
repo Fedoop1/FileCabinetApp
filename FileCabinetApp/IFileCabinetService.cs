@@ -8,6 +8,7 @@ namespace FileCabinetApp
     /// </summary>
     public interface IFileCabinetService
     {
+
         /// <summary>
         /// A method that creates an instance of the IRecordValidator interface required for data validation.
         /// </summary>
@@ -19,7 +20,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="recordData">The "container" class with all the information about the record.</param>
         /// <returns>Returns the unique identifier of the record.</returns>
-        public int CreateRecord(FileCabinetRecordData recordData);
+        public int CreateRecord();
 
         /// <summary>
         /// A method that searches for a record by name.
@@ -47,7 +48,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="id">A unique identifier by which the editing will take place.</param>
         /// <param name="recordData">A container class with updated record information.</param>
-        public void EditRecord(int id, FileCabinetRecordData recordData);
+        public void EditRecord(int id);
 
         /// <summary>
         /// A method that returns a collection of records (read-only).

@@ -7,13 +7,18 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
-    public class ExportCommandHandler : CommandHadlerBase
+    public class ExportCommandHandler : ServiceCommandHandlerBase
     {
+        public ExportCommandHandler(IFileCabinetService service)
+            : base(service)
+        {
+        }
+
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "export")
             {
-                Export(commandRequest.Parameters);
+                this.Export(commandRequest.Parameters);
                 return;
             }
 
@@ -27,7 +32,7 @@ namespace FileCabinetApp.CommandHandlers
         /// Make snapshot and export record list in special format to disk. Supports XML and CSV serialization.
         /// </summary>
         /// <param name="parameters">Contain type of export document and filename to save document.</param>
-        private static void Export(string parameters)
+        private void Export(string parameters)
         {
             string[] parameterArray = parameters.Split(" ", 2);
 
@@ -65,7 +70,7 @@ namespace FileCabinetApp.CommandHandlers
 
                 using (var streamWriter = new StreamWriter(parameterArray[filePathIndex], append))
                 {
-                    snapshot = Program.FileCabinetService.MakeSnapshot();
+                    snapshot = this.service.MakeSnapshot();
 
                     switch (parameterArray[fileTypeIndex].ToLower(Program.Culture))
                     {
