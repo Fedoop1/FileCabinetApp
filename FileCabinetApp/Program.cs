@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using FileCabinetApp.CommandHandlers;
 
 namespace FileCabinetApp
 {
@@ -18,9 +19,9 @@ namespace FileCabinetApp
         private const int CommandHelpIndex = 0;
         private const int DescriptionHelpIndex = 1;
         private const int ExplanationHelpIndex = 2;
-        private static IFileCabinetService fileCabinetService = new FileCabinetDefaultService();
-        private static FileCabinetRecordData recordDataContainer = new FileCabinetRecordData("default");
-        private static bool isRunning = true;
+        public static IFileCabinetService FileCabinetService = new FileCabinetDefaultService();
+        public static FileCabinetRecordData RecordDataContainer = new FileCabinetRecordData("default");
+        public static bool IsRunning = true;
 
         /// <summary>
         /// A tuple that includes the name of the command and the Action delegate to call the function.
@@ -58,13 +59,43 @@ namespace FileCabinetApp
             new string[] { "purge", "Defragment the db file.", "The command invokes an algorithm that destroys deleted records from the file." },
         };
 
+        private static ICommandHandler CreateCommandHandler()
+        {
+            var createHandler = new CreateCommandHandler();
+            var editHandler = new EditCommandHandler();
+            var exitHandler = new ExitCommandHandler();
+            var exportHandler = new ExportCommandHandler();
+            var findHandler = new FindCommandHandler();
+            var helpHandler = new HelpCommandHandler();
+            var importHandler = new ImportCommandHandler();
+            var listHandler = new ListCommandHandler();
+            var missedHandler = new MissedCommandHandler();
+            var purgeHandler = new PurgeCommandHandler();
+            var removeHandler = new RemoveCommandHanlder();
+            var statHandler = new StatCommandHandler();
+
+            createHandler.SetNext(editHandler);
+            editHandler.SetNext(exitHandler);
+            exitHandler.SetNext(exportHandler);
+            exportHandler.SetNext(findHandler);
+            findHandler.SetNext(helpHandler);
+            helpHandler.SetNext(importHandler);
+            importHandler.SetNext(listHandler);
+            listHandler.SetNext(missedHandler);
+            missedHandler.SetNext(purgeHandler);
+            purgeHandler.SetNext(removeHandler);
+            removeHandler.SetNext(statHandler);
+
+            return createHandler;
+        }
+
         /// <summary>
         /// Compresses and clean up deleted data.
         /// </summary>
         /// <param name="parameters">The parameter does not affect the execution of the method.</param>
         private static void Purge(string parameters)
         {
-            string result = fileCabinetService.Purge();
+            string result = FileCabinetService.Purge();
             Console.WriteLine(result);
         }
 
@@ -85,7 +116,7 @@ namespace FileCabinetApp
                 throw new ArgumentException("Invalid index.");
             }
 
-            if (fileCabinetService.RemoveRecord(index))
+            if (FileCabinetService.RemoveRecord(index))
             {
                 Console.WriteLine($"Record #{index} is removed.");
                 return;
@@ -136,7 +167,7 @@ namespace FileCabinetApp
 
                 using (var streamWriter = new StreamWriter(parameterArray[filePathIndex], append))
                 {
-                    snapshot = fileCabinetService.MakeSnapshot();
+                    snapshot = FileCabinetService.MakeSnapshot();
 
                     switch (parameterArray[fileTypeIndex].ToLower(Culture))
                     {
@@ -180,7 +211,7 @@ namespace FileCabinetApp
             {
                 using (var fileStream = new FileStream(parametersArray[FilePathIndex], FileMode.Open, FileAccess.Read))
                 {
-                    FileCabinetServiceShapshot snapshot = fileCabinetService.MakeSnapshot();
+                    FileCabinetServiceShapshot snapshot = FileCabinetService.MakeSnapshot();
                     switch (parametersArray[ImportTypeIndex].ToUpperInvariant())
                     {
                         case "CSV":
@@ -195,7 +226,7 @@ namespace FileCabinetApp
                     }
 
                     Console.WriteLine($"{snapshot.Records.Count} records were imported from {parametersArray[FilePathIndex]}");
-                    fileCabinetService.Restore(snapshot);
+                    FileCabinetService.Restore(snapshot);
                 }
             }
             catch (IOException)
@@ -222,25 +253,25 @@ namespace FileCabinetApp
                     case "-s":
                         if (parameterIndex + 1 != parameters.Length && parameters[parameterIndex + 1].ToLower(Culture) == "memory")
                         {
-                            fileCabinetService = new FileCabinetDefaultService();
+                            FileCabinetService = new FileCabinetDefaultService();
                         }
                         else
                         {
-                            fileCabinetService = new FileCabinetFilesystemService(new FileStream("cabinet-records.db", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite));
+                            FileCabinetService = new FileCabinetFilesystemService(new FileStream("cabinet-records.db", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite));
                         }
 
-                        recordDataContainer = new FileCabinetRecordData("default");
+                        RecordDataContainer = new FileCabinetRecordData("default");
                         break;
                     case "-v":
                         if (parameterIndex + 1 != parameters.Length && parameters[parameterIndex + 1] == "custom")
                         {
-                            fileCabinetService = new FileCabinetCustomService();
-                            recordDataContainer = new FileCabinetRecordData("custom");
+                            FileCabinetService = new FileCabinetCustomService();
+                            RecordDataContainer = new FileCabinetRecordData("custom");
                         }
                         else
                         {
-                            fileCabinetService = new FileCabinetDefaultService();
-                            recordDataContainer = new FileCabinetRecordData("default");
+                            FileCabinetService = new FileCabinetDefaultService();
+                            RecordDataContainer = new FileCabinetRecordData("default");
                         }
 
                         break;
@@ -248,13 +279,13 @@ namespace FileCabinetApp
                         attribute = attribute.Substring(attribute.LastIndexOf("=", StringComparison.InvariantCultureIgnoreCase) + 1);
                         if (attribute.ToLower(Culture) == "custom")
                         {
-                            fileCabinetService = new FileCabinetCustomService();
-                            recordDataContainer = new FileCabinetRecordData("custom");
+                            FileCabinetService = new FileCabinetCustomService();
+                            RecordDataContainer = new FileCabinetRecordData("custom");
                         }
                         else
                         {
-                            fileCabinetService = new FileCabinetDefaultService();
-                            recordDataContainer = new FileCabinetRecordData("default");
+                            FileCabinetService = new FileCabinetDefaultService();
+                            RecordDataContainer = new FileCabinetRecordData("default");
                         }
 
                         break;
@@ -278,9 +309,9 @@ namespace FileCabinetApp
 
             records = arrayParameters[FindParam] switch
             {
-                "firstname" => fileCabinetService.FindByFirstName(arrayParameters[FindData]),
-                "lastname" => fileCabinetService.FindByLastName(arrayParameters[FindData]),
-                "dateofbirth" =>fileCabinetService.FindByDayOfBirth(arrayParameters[FindData]),
+                "firstname" => FileCabinetService.FindByFirstName(arrayParameters[FindData]),
+                "lastname" => FileCabinetService.FindByLastName(arrayParameters[FindData]),
+                "dateofbirth" =>FileCabinetService.FindByDayOfBirth(arrayParameters[FindData]),
                 _ => Array.Empty<FileCabinetRecord>()
             };
 
@@ -302,8 +333,8 @@ namespace FileCabinetApp
         /// <param name="parameters">The parameter does not affect the execution of the method.</param>
         private static void Create(string parameters)
         {
-            recordDataContainer.InputData();
-            int result = fileCabinetService.CreateRecord(recordDataContainer);
+            RecordDataContainer.InputData();
+            int result = FileCabinetService.CreateRecord(RecordDataContainer);
 
             Console.WriteLine($"Record #{result} is created.");
         }
@@ -314,7 +345,7 @@ namespace FileCabinetApp
         /// <param name="parameters">A parameter consisting of a unique identifier required to search for a record.</param>
         private static void Edit(string parameters)
         {
-            recordDataContainer.InputData();
+            RecordDataContainer.InputData();
 
             if (!int.TryParse(parameters, out int id))
             {
@@ -322,7 +353,7 @@ namespace FileCabinetApp
                 return;
             }
 
-            fileCabinetService.EditRecord(id, recordDataContainer);
+            FileCabinetService.EditRecord(id, RecordDataContainer);
         }
 
         /// <summary>
@@ -331,7 +362,7 @@ namespace FileCabinetApp
         /// <param name="parameters">Typically an empty parameter that does not affect method execution.</param>
         private static void Stat(string parameters)
         {
-            var recordsCount = fileCabinetService.GetStat();
+            var recordsCount = FileCabinetService.GetStat();
             Console.WriteLine($"{recordsCount.actualRecords} existing record(s). {recordsCount.deletedRecords} deleted record(s).");
         }
 
@@ -341,7 +372,7 @@ namespace FileCabinetApp
         /// <param name="parameters">Typically an empty parameter that does not affect method execution.</param>
         private static void List(string parameters)
         {
-            var recordsArray = fileCabinetService.GetRecords();
+            var recordsArray = FileCabinetService.GetRecords();
 
             foreach (var record in recordsArray)
             {
@@ -356,6 +387,7 @@ namespace FileCabinetApp
         private static void Main(string[] args)
         {
             HandlingCommandLineArgs(args);
+            var commandHandler = CreateCommandHandler();
             Console.WriteLine($"\nFile Cabinet Application, developed by {Program.DeveloperName}");
             Console.WriteLine(Program.HintMessage);
             Console.WriteLine();
@@ -366,27 +398,30 @@ namespace FileCabinetApp
                 var inputs = Console.ReadLine().Split(" ", 2);
 
                 const int commandIndex = 0;
-                var command = inputs[commandIndex];
+                const int parametersIndex = 1;
+                commandHandler.Handle(new AppCommandRequest(inputs[commandIndex], inputs[parametersIndex]));
 
-                if (string.IsNullOrEmpty(command))
-                {
-                    Console.WriteLine(Program.HintMessage);
-                    continue;
-                }
+                //var command = inputs[commandIndex];
 
-                var index = Array.FindIndex(commands, 0, commands.Length, i => i.Item1.Equals(command, StringComparison.InvariantCultureIgnoreCase));
-                if (index >= 0)
-                {
-                    const int parametersIndex = 1;
-                    var parameters = inputs.Length > 1 ? inputs[parametersIndex] : string.Empty;
-                    commands[index].Item2(parameters);
-                }
-                else
-                {
-                    PrintMissedCommandInfo(command);
-                }
+                //if (string.IsNullOrEmpty(command))
+                //{
+                //    Console.WriteLine(Program.HintMessage);
+                //    continue;
+                //}
+
+                //var index = Array.FindIndex(commands, 0, commands.Length, i => i.Item1.Equals(command, StringComparison.InvariantCultureIgnoreCase));
+                //if (index >= 0)
+                //{
+                //    
+                //    var parameters = inputs.Length > 1 ? inputs[parametersIndex] : string.Empty;
+                //    commands[index].Item2(parameters);
+                //}
+                //else
+                //{
+                //    PrintMissedCommandInfo(command);
+                //}
             }
-            while (isRunning);
+            while (IsRunning);
         }
 
         /// <summary>
@@ -437,12 +472,12 @@ namespace FileCabinetApp
         private static void Exit(string parameters)
         {
             Console.WriteLine("Exiting an application...");
-            if (fileCabinetService is FileCabinetFilesystemService service)
+            if (FileCabinetService is FileCabinetFilesystemService service)
             {
                 service.Dispose();
             }
 
-            isRunning = false;
+            IsRunning = false;
         }
     }
 }

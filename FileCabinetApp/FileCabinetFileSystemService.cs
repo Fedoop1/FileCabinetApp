@@ -129,8 +129,6 @@ namespace FileCabinetApp
             Console.WriteLine($"Record {id} successfull update.");
         }
 
-        
-
         /// <inheritdoc/>
         public FileCabinetRecord[] FindByDayOfBirth(string dateOfBirth)
         {

@@ -96,6 +96,23 @@
             </summary>
             <param name="recordData">The class "container" with information about the record.</param>
         </member>
+        <member name="T:FileCabinetApp.FileCabinetCSVReader">
+            <summary>
+            Reads records from a CSV file.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetCSVReader.#ctor(System.IO.StreamReader)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetCSVReader"/> class and assign <see cref="T:System.IO.StreamReader"/>.
+            </summary>
+            <param name="streamReader"><see cref="T:System.IO.StreamReader"/> passed in the class.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetCSVReader.ReadAll">
+            <summary>
+            Read all <see cref="T:FileCabinetRecord"/> from the CSV file and add it to <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+            <returns><see cref="T:System.Collections.Generic.IList`1"/> representation of records in the CSV file.</returns>
+        </member>
         <member name="T:FileCabinetApp.FileCabinetCustomService">
             <summary>
             A class that implements custom rules for data validation.
@@ -153,7 +170,7 @@
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.CreateValidator">
             <inheritdoc/>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.EditRecord(System.String,FileCabinetApp.FileCabinetRecordData)">
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.EditRecord(System.Int32,FileCabinetApp.FileCabinetRecordData)">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.FindByDayOfBirth(System.String)">
@@ -169,10 +186,7 @@
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetStat">
-            <summary>
-            Returns the count of records.
-            </summary>
-            <returns>Records count.</returns>
+            <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.MakeSnapshot">
             <summary>
@@ -190,6 +204,52 @@
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.Restore(FileCabinetApp.FileCabinetServiceShapshot)">
             <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.RemoveRecord(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.Purge">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.RecordToByteConverter(FileCabinetRecord)">
+            <summary>
+            Convert <see cref="T:FileCabinetRecord"/> to byte representation.
+            </summary>
+            <param name="record">Record for conversion.</param>
+            <returns>The byte array with byte representaion of record.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.StringToASCII(System.String)">
+            <summary>
+            Convert send text to ASCII representation.
+            </summary>
+            <param name="text">Text to convert.</param>
+            <returns>Byte array with text converted to ACKII.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.ASCIIToString(System.Byte[])">
+            <summary>
+            Convert ASCII byte array to string representation.
+            </summary>
+            <param name="byteName">Byte array of ASCII to convert.</param>
+            <returns>String result.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetCountOfRecords">
+            <summary>
+            Return the actual count of records.
+            </summary>
+            <returns>Count of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.SetPositionOnRecord(System.Int32)">
+            <summary>
+            Set position in <see cref="T:System.IO.FileStream"/> at selected record.
+            </summary>
+            <param name="index">The record to set position.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.FindRecord(System.Int32)">
+            <summary>
+            Try to find record with selected Id in <see cref="T:System.IO.FileStream"/>.
+            </summary>
+            <param name="id">Id of record to search.</param>
+            <returns>The tuple of searching result and record position in file.</returns>
         </member>
         <member name="T:FileCabinetApp.FileCabinetRecordCSVWriter">
             <summary>
@@ -419,7 +479,7 @@
             <param name="dateOfBirth">A parameter consisting of the date of birth.</param>
             <returns>Returns an array of all records matching the search term.</returns>
         </member>
-        <member name="M:FileCabinetApp.IFileCabinetService.EditRecord(System.String,FileCabinetApp.FileCabinetRecordData)">
+        <member name="M:FileCabinetApp.IFileCabinetService.EditRecord(System.Int32,FileCabinetApp.FileCabinetRecordData)">
             <summary>
             A method for editing data in a particular record.
             </summary>
@@ -437,6 +497,32 @@
             A method that returns the count of records.
             </summary>
             <returns>Count of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.Restore(FileCabinetApp.FileCabinetServiceShapshot)">
+            <summary>
+            Restore information from <see cref="T:FileCabinetApp.FileCabinetServiceShapshot"/> instance.
+            </summary>
+            <param name="restoreSnapshot">Snapshot with information about records.</param>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.GetStat">
+            <summary>
+            Get the count of existing and deleted <see cref="T:FileCabinetRecord"/>'s.
+            </summary>
+            <returns>The count of the records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.RemoveRecord(System.Int32)">
+            <summary>
+            Removes a record from a data source.
+            </summary>
+            <param name="index">The identifier of the record to be deleted.</param>
+            <returns>Removal result.</returns>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.Purge">
+            <summary>
+            Find and remove record from data source file by index.
+            </summary>
+            <param name="index">The index of the record to be deleted.</param>
+            <returns>Removal result.</returns>
         </member>
         <member name="T:FileCabinetApp.IRecordValidator">
             <summary>
@@ -469,11 +555,29 @@
             The jagged array needed to get help with all the available commands consists of the command name, a short description, and an extended description.
             </summary>
         </member>
+        <member name="M:FileCabinetApp.Program.Purge(System.String)">
+            <summary>
+            Compresses and clean up deleted data.
+            </summary>
+            <param name="parameters">The parameter does not affect the execution of the method.</param>
+        </member>
+        <member name="M:FileCabinetApp.Program.Remove(System.String)">
+            <summary>
+            Removes a record from a data source.
+            </summary>
+            <param name="parameters">The identifier of the record to be deleted.</param>
+        </member>
         <member name="M:FileCabinetApp.Program.Export(System.String)">
             <summary>
             Make snapshot and export record list in special format to disk. Supports XML and CSV serialization.
             </summary>
             <param name="parameters">Contain type of export document and filename to save document.</param>
+        </member>
+        <member name="M:FileCabinetApp.Program.Import(System.String)">
+            <summary>
+            Imports data from a external file.
+            </summary>
+            <param name="parameters">Includes the data type of the imported file and its path.</param>
         </member>
         <member name="M:FileCabinetApp.Program.HandlingCommandLineArgs(System.String[])">
             <summary>
@@ -486,6 +590,12 @@
             A method that searches for records by a specific parameter with output to the console.
             </summary>
             <param name="parameters">Parameter line including 1.search criterion 2.unique information.</param>
+        </member>
+        <member name="M:FileCabinetApp.Program.Create(System.String)">
+            <summary>
+            Create a new <see cref="T:FileCabinetRecord"/>.
+            </summary>
+            <param name="parameters">The parameter does not affect the execution of the method.</param>
         </member>
         <member name="M:FileCabinetApp.Program.Edit(System.String)">
             <summary>
@@ -565,7 +675,7 @@
         <member name="M:FileCabinetMemoryService.FindByDayOfBirth(System.String)">
             <inheritdoc/>
         </member>
-        <member name="M:FileCabinetMemoryService.EditRecord(System.String,FileCabinetApp.FileCabinetRecordData)">
+        <member name="M:FileCabinetMemoryService.EditRecord(System.Int32,FileCabinetApp.FileCabinetRecordData)">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetMemoryService.GetRecords">
@@ -577,6 +687,12 @@
         <member name="M:FileCabinetMemoryService.Restore(FileCabinetApp.FileCabinetServiceShapshot)">
             <inheritdoc/>
         </member>
+        <member name="M:FileCabinetMemoryService.Purge">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetMemoryService.RemoveRecord(System.Int32)">
+            <inheritdoc/>
+        </member>
         <member name="M:FileCabinetMemoryService.DictionaryAdd(System.String,System.String,System.DateTime,FileCabinetRecord)">
             <summary>
             An internal method that calls data updates in dictionaries.
@@ -585,6 +701,12 @@
             <param name="lastName">New surname.</param>
             <param name="dateOfBirth">New date of birth.</param>
             <param name="record">A record corresponding to these parameters.</param>
+        </member>
+        <member name="M:FileCabinetMemoryService.DictionaryRemove(FileCabinetRecord)">
+            <summary>
+            An internal method that calls data deletion in dictionaries.
+            </summary>
+            <param name="record">The record to be removed from the dictionaries.</param>
         </member>
         <member name="T:FileCabinetRecord">
             <summary>
