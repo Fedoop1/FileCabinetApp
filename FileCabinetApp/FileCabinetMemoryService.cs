@@ -9,15 +9,10 @@ using FileCabinetApp;
 /// </summary>
 public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetService
 {
-#pragma warning disable SA1401 // Fields should be private
-    private protected readonly FileCabinetRecordData dataContainer = new FileCabinetRecordData("default");
-#pragma warning restore SA1401 // Fields should be private
     private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
     private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
     private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
     private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
-
-    public FileCabinetRecordData DataContainer => this.dataContainer;
 
     /// <summary>
     /// Initialize a new <see cref="FileCabinetServiceShapshot"/> which contains <see cref="FileCabinetRecord"/> array.
@@ -47,22 +42,23 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
     /// <returns>Returns the unique identifier of the record.</returns>
     public int CreateRecord()
     {
-        this.DataContainer.InputData();
-        this.ValidateParameters(this.DataContainer);
+        var dataContainer = new FileCabinetRecordData(this);
+        dataContainer.InputData();
+        this.ValidateParameters(dataContainer);
 
         var record = new FileCabinetRecord
         {
             Id = this.list.Count + 1,
-            FirstName = this.DataContainer.FirstName,
-            LastName = this.DataContainer.LastName,
-            DateOfBirth = this.DataContainer.DateOfBirth,
-            Height = this.DataContainer.Height,
-            Money = this.DataContainer.Money,
-            Gender = this.DataContainer.Gender,
+            FirstName = dataContainer.FirstName,
+            LastName = dataContainer.LastName,
+            DateOfBirth = dataContainer.DateOfBirth,
+            Height = dataContainer.Height,
+            Money = dataContainer.Money,
+            Gender = dataContainer.Gender,
         };
 
         this.list.Add(record);
-        this.DictionaryAdd(this.DataContainer.FirstName, this.DataContainer.LastName, this.DataContainer.DateOfBirth, record);
+        this.DictionaryAdd(dataContainer.FirstName, dataContainer.LastName, dataContainer.DateOfBirth, record);
 
         return record.Id;
     }
@@ -110,8 +106,9 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
     /// <inheritdoc/>
     public void EditRecord(int id)
     {
-        this.DataContainer.InputData();
-        this.ValidateParameters(this.DataContainer);
+        var dataContainer = new FileCabinetRecordData(this);
+        dataContainer.InputData();
+        this.ValidateParameters(dataContainer);
 
         if (!this.RemoveRecord(id))
         {
@@ -121,16 +118,16 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
         var newRecord = new FileCabinetRecord()
         {
             Id = id,
-            FirstName = this.DataContainer.FirstName,
-            LastName = this.DataContainer.LastName,
-            DateOfBirth = this.DataContainer.DateOfBirth,
-            Height = this.DataContainer.Height,
-            Money = this.DataContainer.Money,
-            Gender = this.DataContainer.Gender,
+            FirstName = dataContainer.FirstName,
+            LastName = dataContainer.LastName,
+            DateOfBirth = dataContainer.DateOfBirth,
+            Height = dataContainer.Height,
+            Money = dataContainer.Money,
+            Gender = dataContainer.Gender,
         };
 
         this.list.Add(newRecord);
-        this.DictionaryAdd(this.DataContainer.FirstName, this.DataContainer.LastName, this.DataContainer.DateOfBirth, newRecord);
+        this.DictionaryAdd(dataContainer.FirstName, dataContainer.LastName, dataContainer.DateOfBirth, newRecord);
 
         Console.WriteLine($"Record #{id} is updated.");
     }

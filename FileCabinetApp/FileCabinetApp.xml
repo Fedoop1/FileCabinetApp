@@ -108,98 +108,6 @@
             </summary>
             <param name="parameters">Typically an empty parameter that does not affect method execution.</param>
         </member>
-        <member name="T:FileCabinetApp.CustomValidator">
-            <summary>
-            The class contains custom rules for records.
-            </summary>
-        </member>
-        <member name="F:FileCabinetApp.CustomValidator.MaxHeight">
-            <summary>
-            Максимальное значения высота роста.
-            </summary>
-        </member>
-        <member name="F:FileCabinetApp.CustomValidator.MinHeight">
-            <summary>
-            The maximum value is the height of growth.
-            </summary>
-        </member>
-        <member name="F:FileCabinetApp.CustomValidator.MinMoney">
-            <summary>
-            The minimum amount of money.
-            </summary>
-        </member>
-        <member name="F:FileCabinetApp.CustomValidator.MinNameLength">
-            <summary>
-            The minimum length of the first or last name.
-            </summary>
-        </member>
-        <member name="F:FileCabinetApp.CustomValidator.MaxNameLength">
-            <summary>
-            The maximum length of a given name or surname.
-            </summary>
-        </member>
-        <member name="F:FileCabinetApp.CustomValidator.ValidGenderValue">
-            <summary>
-            An array of valid values for gender.
-            </summary>
-        </member>
-        <member name="F:FileCabinetApp.CustomValidator.MinDateOfBirth">
-            <summary>
-            The minimum allowed date of birth.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.CustomValidator.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
-            <summary>
-            A method that checks values according to established rules.
-            </summary>
-            <param name="recordData">The class "container" with information about the record.</param>
-        </member>
-        <member name="T:FileCabinetApp.DefaultValidator">
-            <summary>
-            The class contains the standard rules for records.
-            </summary>
-        </member>
-        <member name="F:FileCabinetApp.DefaultValidator.MaxHeight">
-            <summary>
-            The maximum value is the height of growth.
-            </summary>
-        </member>
-        <member name="F:FileCabinetApp.DefaultValidator.MinHeight">
-            <summary>
-            The minimum value is the height of the growth.
-            </summary>
-        </member>
-        <member name="F:FileCabinetApp.DefaultValidator.MinMoney">
-            <summary>
-            The minimum amount of money.
-            </summary>
-        </member>
-        <member name="F:FileCabinetApp.DefaultValidator.MinNameLength">
-            <summary>
-            The minimum length of the first or last name.
-            </summary>
-        </member>
-        <member name="F:FileCabinetApp.DefaultValidator.MaxNameLength">
-            <summary>
-            The maximum length of a given name or surname.
-            </summary>
-        </member>
-        <member name="F:FileCabinetApp.DefaultValidator.ValidGenderValue">
-            <summary>
-            An array of valid values for gender.
-            </summary>
-        </member>
-        <member name="F:FileCabinetApp.DefaultValidator.MinDateOfBirth">
-            <summary>
-            The minimum allowed date of birth.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.DefaultValidator.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
-            <summary>
-            A method that checks values according to established rules.
-            </summary>
-            <param name="recordData">The class "container" with information about the record.</param>
-        </member>
         <member name="T:FileCabinetApp.FileCabinetCSVReader">
             <summary>
             Reads records from a CSV file.
@@ -377,11 +285,11 @@
             A container class for receiving and storing new information about a record.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetRecordData.#ctor(System.String)">
+        <member name="M:FileCabinetApp.FileCabinetRecordData.#ctor(FileCabinetApp.IFileCabinetService)">
             <summary>
             Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetRecordData"/> class.
             </summary>
-            <param name="parameters">The parameter corresponding to the selected check rules.</param>
+            <param name="service">Validation rules.</param>
         </member>
         <member name="M:FileCabinetApp.FileCabinetRecordData.InputData">
             /// <summary>
@@ -628,17 +536,6 @@
             <param name="index">The index of the record to be deleted.</param>
             <returns>Removal result.</returns>
         </member>
-        <member name="T:FileCabinetApp.IRecordValidator">
-            <summary>
-            The interface required to validate the parameters in accordance with the selected rules.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.IRecordValidator.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
-            <summary>
-            A method that invokes parameter validation through the class that implements this interface.
-            </summary>
-            <param name="recordData">The container class includes all the information about the record.</param>
-        </member>
         <member name="T:FileCabinetApp.Program">
             <summary>
             The main class from where all available functions are called.
@@ -660,6 +557,109 @@
             The main application method from which the user interacts with all available methods.
             </summary>
             <param name="args">Command line arguments required to control check parameters.</param>
+        </member>
+        <member name="F:FileCabinetApp.Validators.DateOfBirthValidator.minDateOfBirth">
+            <summary>
+            The minimum allowed date of birth.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.Validators.DateOfBirthValidator.#ctor(System.DateTime)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.Validators.DateOfBirthValidator"/> class.
+            </summary>
+            <param name="minDateOfBirth">The minimum allowed date of birth.</param>
+        </member>
+        <member name="M:FileCabinetApp.Validators.DateOfBirthValidator.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
+            <inheritdoc/>
+        </member>
+        <member name="F:FileCabinetApp.Validators.FirstNameValidator.minNameLength">
+            <summary>
+            The minimum length of the first or last name.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.Validators.FirstNameValidator.maxNameLength">
+            <summary>
+            The maximum length of a given name or surname.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.Validators.GenderValidator.validGenderArray">
+            <summary>
+            An array of valid values for gender.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.Validators.GenderValidator.#ctor(System.Char[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.Validators.GenderValidator"/> class.
+            </summary>
+            <param name="validGenderArray">An array of valid values for gender.</param>
+        </member>
+        <member name="M:FileCabinetApp.Validators.GenderValidator.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
+            <inheritdoc/>
+        </member>
+        <member name="F:FileCabinetApp.Validators.HeightValidator.maxHeight">
+            <summary>
+            The maximum value is the height of growth.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.Validators.HeightValidator.minHeight">
+            <summary>
+            The minimum value is the height of the growth.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.Validators.HeightValidator.#ctor(System.Int16,System.Int16)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.Validators.HeightValidator"/> class.
+            </summary>
+            <param name="minHeight">The minimum value is the height of the growth.</param>
+            <param name="maxHeight">The maximum value is the height of growth.</param>
+        </member>
+        <member name="M:FileCabinetApp.Validators.HeightValidator.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
+            <inheritdoc/>
+        </member>
+        <member name="F:FileCabinetApp.Validators.LastNameValidator.minNameLength">
+            <summary>
+            The minimum length of the last name.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.Validators.LastNameValidator.maxNameLength">
+            <summary>
+            The maximum length of the last name.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.Validators.LastNameValidator.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.Validators.LastNameValidator"/> class.
+            </summary>
+            <param name="minNameLength">The minimum length of the last name.</param>
+            <param name="maxNameLength">The maximum length of the last name.</param>
+        </member>
+        <member name="M:FileCabinetApp.Validators.LastNameValidator.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
+            <inheritdoc/>
+        </member>
+        <member name="F:FileCabinetApp.Validators.MoneyValidator.minMoney">
+            <summary>
+            The minimum amount of money.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.Validators.MoneyValidator.#ctor(System.Decimal)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.Validators.MoneyValidator"/> class.
+            </summary>
+            <param name="minMoney">The mininal amount of money.</param>
+        </member>
+        <member name="M:FileCabinetApp.Validators.MoneyValidator.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
+            <inheritdoc/>
+        </member>
+        <member name="T:FileCabinetApp.IRecordValidator">
+            <summary>
+            The interface required to validate the parameters in accordance with the selected rules.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.IRecordValidator.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
+            <summary>
+            A method that invokes parameter validation through the class that implements this interface.
+            </summary>
+            <param name="recordData">The container class includes all the information about the record.</param>
         </member>
         <member name="T:FileCabinetMemoryService">
             <summary>

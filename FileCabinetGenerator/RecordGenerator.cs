@@ -24,6 +24,7 @@ namespace FileCabinetGenerator
         public static FileCabinetRecord[] GenerateRecord(int startId, int recordAmount)
         {
             var resultRecordArray = new FileCabinetRecord[recordAmount];
+            char[] validGenderValue = new char[] { 'f', 'F', 'M', 'm' };
 
             for (int recordCount = 0; recordCount < recordAmount; recordCount++)
             {
@@ -31,9 +32,9 @@ namespace FileCabinetGenerator
                 string firstName = new string(Guid.NewGuid().ToString().Where(symb => !char.IsDigit(symb) && !char.IsPunctuation(symb)).ToArray());
                 string lastName = new string(Guid.NewGuid().ToString().Where(symb => !char.IsDigit(symb) && !char.IsPunctuation(symb)).ToArray());
                 DateTime dateOfBirth = DateTime.Parse($"{random.Next(1, 28)}.{random.Next(1, 12)}.{random.Next(1951, DateTime.Now.Year)}", Program.Culture);
-                short height = (short)random.Next(DefaultValidator.MinHeight, DefaultValidator.MaxHeight);
+                short height = (short)random.Next(0);
                 decimal money = random.Next(0, int.MaxValue);
-                char gender = DefaultValidator.ValidGenderValue[random.Next(0, DefaultValidator.ValidGenderValue.Length)];
+                char gender = validGenderValue[random.Next(0, validGenderValue.Length)];
 
                 resultRecordArray[recordCount] = new FileCabinetRecord() { Id = id, FirstName = firstName, LastName = lastName, DateOfBirth = dateOfBirth, Height = height, Money = money, Gender = gender };
             }

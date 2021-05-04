@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FileCabinetApp.Validators;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -52,7 +53,7 @@ namespace FileCabinetApp
         /// <inheritdoc/>
         public int CreateRecord()
         {
-            var recordData = new FileCabinetRecordData("default");
+            var recordData = new FileCabinetRecordData(this);
             recordData.InputData();
             this.ValidateParameters(recordData);
 
@@ -96,7 +97,7 @@ namespace FileCabinetApp
         /// <inheritdoc/>
         public IRecordValidator CreateValidator()
         {
-            return new DefaultValidator();
+            return ValidatorBuilder.CreateDefault();
         }
 
         /// <inheritdoc/>
@@ -110,7 +111,7 @@ namespace FileCabinetApp
                 return;
             }
 
-            var recordData = new FileCabinetRecordData("default");
+            var recordData = new FileCabinetRecordData(this);
             recordData.InputData();
             this.ValidateParameters(recordData);
 

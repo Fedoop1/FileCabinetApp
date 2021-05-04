@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FileCabinetApp.Validators;
 
 namespace FileCabinetApp
 {
@@ -11,41 +9,20 @@ namespace FileCabinetApp
     /// </summary>
     public class FileCabinetRecordData : FileCabinetRecord
     {
-        private short maxHeight;
-        private short minHeight;
-        private decimal minMoney;
-        private int minNameLength;
-        private int maxNameLength = 60;
-        private char[] validGenderValue;
-        private DateTime minDateOfBirth;
+        private IInputValidator validator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetRecordData"/> class.
         /// </summary>
-        /// <param name="parameters">The parameter corresponding to the selected check rules.</param>
-        public FileCabinetRecordData(string parameters)
+        /// <param name="service">Validation rules.</param>
+        public FileCabinetRecordData(IFileCabinetService service)
         {
-            switch (parameters)
+            this.validator = service?.GetType().Name switch
             {
-                case "custom":
-                    this.maxHeight = CustomValidator.MaxHeight;
-                    this.minHeight = CustomValidator.MinHeight;
-                    this.minMoney = CustomValidator.MinMoney;
-                    this.minNameLength = CustomValidator.MinNameLength;
-                    this.maxNameLength = CustomValidator.MaxNameLength;
-                    this.validGenderValue = CustomValidator.ValidGenderValue;
-                    this.minDateOfBirth = CustomValidator.MinDateOfBirth;
-                    break;
-                case "default":
-                    this.maxHeight = DefaultValidator.MaxHeight;
-                    this.minHeight = DefaultValidator.MinHeight;
-                    this.minMoney = DefaultValidator.MinMoney;
-                    this.minNameLength = DefaultValidator.MinNameLength;
-                    this.maxNameLength = DefaultValidator.MaxNameLength;
-                    this.validGenderValue = DefaultValidator.ValidGenderValue;
-                    this.minDateOfBirth = DefaultValidator.MinDateOfBirth;
-                    break;
-            }
+                "FileCabinetDefaultService" => new DefaultInputValidator(),
+                "FileCabinetCustomService" => new CustomInputValidator(),
+                _ => new DefaultInputValidator(),
+            };
         }
 
         /// /// <summary>
@@ -121,12 +98,12 @@ namespace FileCabinetApp
         /// <returns>A tuple with the result of the check and a string representation of the entered information.</returns>
         private Tuple<bool, string> DataTimeValidator(DateTime dateOfBirth)
         {
-            if (dateOfBirth < this.minDateOfBirth || dateOfBirth > DateTime.Now)
+            if (this.validator.ValidateDateOfBirth(dateOfBirth))
             {
-                return new Tuple<bool, string>(false, dateOfBirth.ToString(Program.Culture));
+                return new Tuple<bool, string>(true, dateOfBirth.ToString(Program.Culture));
             }
 
-            return new Tuple<bool, string>(true, dateOfBirth.ToString(Program.Culture));
+            return new Tuple<bool, string>(false, dateOfBirth.ToString(Program.Culture));
         }
 
         /// <summary>
@@ -136,12 +113,12 @@ namespace FileCabinetApp
         /// <returns>A tuple with the result of validation and a string representation of the entered information.</returns>
         private Tuple<bool, string> ShortValidator(short height)
         {
-            if (height < this.minHeight || height > this.maxHeight)
+            if (this.validator.ValidateHeight(height))
             {
-                return new Tuple<bool, string>(false, height.ToString(Program.Culture));
+                return new Tuple<bool, string>(true, height.ToString(Program.Culture));
             }
 
-            return new Tuple<bool, string>(true, height.ToString(Program.Culture));
+            return new Tuple<bool, string>(false, height.ToString(Program.Culture));
         }
 
         /// <summary>
@@ -151,12 +128,12 @@ namespace FileCabinetApp
         /// <returns>A tuple with the result of the check and a string representation of the entered information.</returns>
         private Tuple<bool, string> DecimalValidator(decimal money)
         {
-            if (money < this.minMoney)
+            if (this.validator.ValidateMoney(money))
             {
-                return new Tuple<bool, string>(false, money.ToString(Program.Culture));
+                return new Tuple<bool, string>(true, money.ToString(Program.Culture));
             }
 
-            return new Tuple<bool, string>(true, money.ToString(Program.Culture));
+            return new Tuple<bool, string>(false, money.ToString(Program.Culture));
         }
 
         /// <summary>
@@ -166,12 +143,12 @@ namespace FileCabinetApp
         /// <returns>A tuple with the result of the check and a string representation of the entered information.</returns>
         private Tuple<bool, string> CharValidator(char gender)
         {
-            if (!this.validGenderValue.Contains(gender))
+            if (this.validator.ValidateGender(gender))
             {
-                return new Tuple<bool, string>(false, gender.ToString(Program.Culture));
+                return new Tuple<bool, string>(true, gender.ToString(Program.Culture));
             }
 
-            return new Tuple<bool, string>(true, gender.ToString(Program.Culture));
+            return new Tuple<bool, string>(false, gender.ToString(Program.Culture));
         }
 
         /// <summary>
@@ -241,12 +218,12 @@ namespace FileCabinetApp
         /// <returns>A tuple with the result of the check and a string representation of the entered information.</returns>
         private Tuple<bool, string> StringValidator(string name)
         {
-            if (name.Length < this.minNameLength || name.Length > this.maxNameLength || name.Any(symbol => char.IsNumber(symbol)))
+            if (this.validator.ValidateLastName(name))
             {
-                return new Tuple<bool, string>(false, name);
+                return new Tuple<bool, string>(true, name);
             }
 
-            return new Tuple<bool, string>(true, name);
+            return new Tuple<bool, string>(false, name);
         }
 
         /// <summary>

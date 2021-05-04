@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FileCabinetApp.Validators;
 
 namespace FileCabinetApp
 {
@@ -14,7 +11,7 @@ namespace FileCabinetApp
         /// <inheritdoc/>
         public override IRecordValidator CreateValidator()
         {
-            return new DefaultValidator();
+            return ValidatorBuilder.CreateDefault();
         }
     }
 }
