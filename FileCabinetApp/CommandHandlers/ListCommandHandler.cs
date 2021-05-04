@@ -8,10 +8,13 @@ namespace FileCabinetApp.CommandHandlers
 {
     public class ListCommandHandler : ServiceCommandHandlerBase
     {
+        private IRecordPrinter printer;
+
         ///<inheritdoc/>
-        public ListCommandHandler(IFileCabinetService service)
+        public ListCommandHandler(IFileCabinetService service, IRecordPrinter printer)
             : base(service)
         {
+            this.printer = printer;
         }
 
         ///<inheritdoc/>
@@ -19,7 +22,8 @@ namespace FileCabinetApp.CommandHandlers
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "list")
             {
-                this.List();
+                var records = this.List();
+                this.printer.Print(records);
                 return;
             }
 
@@ -32,14 +36,16 @@ namespace FileCabinetApp.CommandHandlers
         /// <summary>
         /// A method that returns all available records in the application, outputting from the console.
         /// </summary>
-        private void List()
+        private IEnumerable<FileCabinetRecord> List()
         {
             var recordsArray = this.service.GetRecords();
 
-            foreach (var record in recordsArray)
+            if (recordsArray.Count == 0)
             {
-                Console.WriteLine(record);
+                Console.WriteLine("Records list is empty.");
             }
+
+            return recordsArray;
         }
     }
 }

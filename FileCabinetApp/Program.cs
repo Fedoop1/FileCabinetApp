@@ -21,14 +21,16 @@ namespace FileCabinetApp
 
         private static ICommandHandler CreateCommandHandler(IFileCabinetService fileCabinetService)
         {
+            var recordPrinter = new DefaultRecordPrinter();
+
             var createHandler = new CreateCommandHandler(fileCabinetService);
             var editHandler = new EditCommandHandler(fileCabinetService);
             var exitHandler = new ExitCommandHandler(fileCabinetService, UpdateApplicationStatus);
             var exportHandler = new ExportCommandHandler(fileCabinetService);
-            var findHandler = new FindCommandHandler(fileCabinetService);
+            var findHandler = new FindCommandHandler(fileCabinetService, recordPrinter);
             var helpHandler = new HelpCommandHandler();
             var importHandler = new ImportCommandHandler(fileCabinetService);
-            var listHandler = new ListCommandHandler(fileCabinetService);
+            var listHandler = new ListCommandHandler(fileCabinetService, recordPrinter);
             var missedHandler = new MissedCommandHandler();
             var purgeHandler = new PurgeCommandHandler(fileCabinetService);
             var removeHandler = new RemoveCommandHanlder(fileCabinetService);

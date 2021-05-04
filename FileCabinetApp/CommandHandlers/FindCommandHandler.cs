@@ -8,10 +8,13 @@ namespace FileCabinetApp.CommandHandlers
 {
     public class FindCommandHandler : ServiceCommandHandlerBase
     {
+        private IRecordPrinter printer;
+
         /// <inheritdoc/>
-        public FindCommandHandler(IFileCabinetService service)
+        public FindCommandHandler(IFileCabinetService service, IRecordPrinter printer)
             : base(service)
         {
+            this.printer = printer;
         }
 
         /// <inheritdoc/>
@@ -19,7 +22,8 @@ namespace FileCabinetApp.CommandHandlers
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "find")
             {
-                this.Find(commandRequest.Parameters);
+                var records = this.Find(commandRequest.Parameters);
+                this.printer.Print(records);
                 return;
             }
 
@@ -33,7 +37,7 @@ namespace FileCabinetApp.CommandHandlers
         /// A method that searches for records by a specific parameter with output to the console.
         /// </summary>
         /// <param name="parameters">Parameter line including 1.search criterion 2.unique information.</param>
-        private void Find(string parameters)
+        private IEnumerable<FileCabinetRecord> Find(string parameters)
         {
             const int FindParam = 0;
             const int FindData = 1;
@@ -52,15 +56,9 @@ namespace FileCabinetApp.CommandHandlers
             if (records.Length == 0)
             {
                 Console.WriteLine("There are no records with this parameters.");
-                return;
             }
 
-            foreach (var record in records)
-            {
-                Console.WriteLine(record);
-            }
-
-            return;
+            return records;
         }
     }
 }
