@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using FileCabinetApp.CommandHandlers;
@@ -19,18 +20,24 @@ namespace FileCabinetApp
         private static IFileCabinetService fileCabinetService = new FileCabinetDefaultService();
         private static bool isRunning = true;
 
+        private static void DefaultRecordPrint(IEnumerable<FileCabinetRecord> records)
+        {
+            foreach (var item in records ?? Array.Empty<FileCabinetRecord>())
+            {
+                Console.WriteLine(item);
+            }
+        }
+
         private static ICommandHandler CreateCommandHandler(IFileCabinetService fileCabinetService)
         {
-            var recordPrinter = new DefaultRecordPrinter();
-
             var createHandler = new CreateCommandHandler(fileCabinetService);
             var editHandler = new EditCommandHandler(fileCabinetService);
             var exitHandler = new ExitCommandHandler(fileCabinetService, UpdateApplicationStatus);
             var exportHandler = new ExportCommandHandler(fileCabinetService);
-            var findHandler = new FindCommandHandler(fileCabinetService, recordPrinter);
+            var findHandler = new FindCommandHandler(fileCabinetService, DefaultRecordPrint);
             var helpHandler = new HelpCommandHandler();
             var importHandler = new ImportCommandHandler(fileCabinetService);
-            var listHandler = new ListCommandHandler(fileCabinetService, recordPrinter);
+            var listHandler = new ListCommandHandler(fileCabinetService, DefaultRecordPrint);
             var missedHandler = new MissedCommandHandler();
             var purgeHandler = new PurgeCommandHandler(fileCabinetService);
             var removeHandler = new RemoveCommandHanlder(fileCabinetService);

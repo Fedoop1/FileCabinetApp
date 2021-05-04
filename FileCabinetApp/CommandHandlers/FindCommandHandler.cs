@@ -8,10 +8,10 @@ namespace FileCabinetApp.CommandHandlers
 {
     public class FindCommandHandler : ServiceCommandHandlerBase
     {
-        private IRecordPrinter printer;
+        private Action<IEnumerable<FileCabinetRecord>> printer;
 
         /// <inheritdoc/>
-        public FindCommandHandler(IFileCabinetService service, IRecordPrinter printer)
+        public FindCommandHandler(IFileCabinetService service, Action<IEnumerable<FileCabinetRecord>> printer)
             : base(service)
         {
             this.printer = printer;
@@ -23,7 +23,7 @@ namespace FileCabinetApp.CommandHandlers
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "find")
             {
                 var records = this.Find(commandRequest.Parameters);
-                this.printer.Print(records);
+                this.printer.Invoke(records);
                 return;
             }
 

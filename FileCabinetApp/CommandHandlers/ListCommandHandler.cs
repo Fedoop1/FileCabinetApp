@@ -8,10 +8,10 @@ namespace FileCabinetApp.CommandHandlers
 {
     public class ListCommandHandler : ServiceCommandHandlerBase
     {
-        private IRecordPrinter printer;
+        private Action<IEnumerable<FileCabinetRecord>> printer;
 
         ///<inheritdoc/>
-        public ListCommandHandler(IFileCabinetService service, IRecordPrinter printer)
+        public ListCommandHandler(IFileCabinetService service, Action<IEnumerable<FileCabinetRecord>> printer)
             : base(service)
         {
             this.printer = printer;
@@ -23,7 +23,7 @@ namespace FileCabinetApp.CommandHandlers
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "list")
             {
                 var records = this.List();
-                this.printer.Print(records);
+                this.printer.Invoke(records);
                 return;
             }
 

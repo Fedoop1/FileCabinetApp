@@ -27,7 +27,7 @@
             </summary>
             <param name="parameters">Contain type of export document and filename to save document.</param>
         </member>
-        <member name="M:FileCabinetApp.CommandHandlers.FindCommandHandler.#ctor(FileCabinetApp.IFileCabinetService,FileCabinetApp.CommandHandlers.IRecordPrinter)">
+        <member name="M:FileCabinetApp.CommandHandlers.FindCommandHandler.#ctor(FileCabinetApp.IFileCabinetService,System.Action{System.Collections.Generic.IEnumerable{FileCabinetRecord}})">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.CommandHandlers.FindCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
@@ -62,7 +62,7 @@
             </summary>
             <param name="parameters">Includes the data type of the imported file and its path.</param>
         </member>
-        <member name="M:FileCabinetApp.CommandHandlers.ListCommandHandler.#ctor(FileCabinetApp.IFileCabinetService,FileCabinetApp.CommandHandlers.IRecordPrinter)">
+        <member name="M:FileCabinetApp.CommandHandlers.ListCommandHandler.#ctor(FileCabinetApp.IFileCabinetService,System.Action{System.Collections.Generic.IEnumerable{FileCabinetRecord}})">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.CommandHandlers.ListCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
