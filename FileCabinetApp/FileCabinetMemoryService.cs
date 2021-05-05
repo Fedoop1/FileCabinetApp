@@ -9,10 +9,10 @@ using FileCabinetApp;
 /// </summary>
 public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetService
 {
-    private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
-    private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-    private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-    private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
+    private readonly List<FileCabinetRecord> list = new ();
+    private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new ();
+    private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new ();
+    private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new ();
 
     /// <summary>
     /// Initialize a new <see cref="FileCabinetServiceShapshot"/> which contains <see cref="FileCabinetRecord"/> array.
@@ -32,31 +32,32 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
     /// <summary>
     /// Create an instance of <see cref="IRecordValidator"/> and return it.
     /// </summary>
-    /// <returns>Class wich realize <see cref="IRecordValidator"/> for calling .ValidateParameters() method.</returns>
+    /// <returns>Class which realize <see cref="IRecordValidator"/> for calling .ValidateParameters() method.</returns>
     public abstract IRecordValidator CreateValidator();
 
     /// <summary>
     /// Create a new instance of <see cref="FileCabinetRecord"/> and save it to storage.
     /// </summary>
-    /// <param name="recordData">Class "container" with data for new record.</param>
     /// <returns>Returns the unique identifier of the record.</returns>
-    public int CreateRecord(FileCabinetRecordData recordData)
+    public int CreateRecord()
     {
-        this.ValidateParameters(recordData);
+        var dataContainer = new FileCabinetRecordData(this);
+        dataContainer.InputData();
+        this.ValidateParameters(dataContainer);
 
         var record = new FileCabinetRecord
         {
             Id = this.list.Count + 1,
-            FirstName = recordData?.FirstName,
-            LastName = recordData.LastName,
-            DateOfBirth = recordData.DateOfBirth,
-            Height = recordData.Height,
-            Money = recordData.Money,
-            Gender = recordData.Gender,
+            FirstName = dataContainer.FirstName,
+            LastName = dataContainer.LastName,
+            DateOfBirth = dataContainer.DateOfBirth,
+            Height = dataContainer.Height,
+            Money = dataContainer.Money,
+            Gender = dataContainer.Gender,
         };
 
         this.list.Add(record);
-        this.DictionaryAdd(recordData.FirstName, recordData.LastName, recordData.DateOfBirth, record);
+        this.DictionaryAdd(dataContainer.FirstName, dataContainer.LastName, dataContainer.DateOfBirth, record);
 
         return record.Id;
     }
@@ -102,9 +103,11 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
     }
 
     /// <inheritdoc/>
-    public void EditRecord(int id, FileCabinetRecordData newData)
+    public void EditRecord(int id)
     {
-        this.ValidateParameters(newData);
+        var dataContainer = new FileCabinetRecordData(this);
+        dataContainer.InputData();
+        this.ValidateParameters(dataContainer);
 
         if (!this.RemoveRecord(id))
         {
@@ -114,16 +117,16 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
         var newRecord = new FileCabinetRecord()
         {
             Id = id,
-            FirstName = newData?.FirstName,
-            LastName = newData.LastName,
-            DateOfBirth = newData.DateOfBirth,
-            Height = newData.Height,
-            Money = newData.Money,
-            Gender = newData.Gender,
+            FirstName = dataContainer.FirstName,
+            LastName = dataContainer.LastName,
+            DateOfBirth = dataContainer.DateOfBirth,
+            Height = dataContainer.Height,
+            Money = dataContainer.Money,
+            Gender = dataContainer.Gender,
         };
 
-        this.list.Add(newData);
-        this.DictionaryAdd(newData.FirstName, newData.LastName, newData.DateOfBirth, newRecord);
+        this.list.Add(newRecord);
+        this.DictionaryAdd(dataContainer.FirstName, dataContainer.LastName, dataContainer.DateOfBirth, newRecord);
 
         Console.WriteLine($"Record #{id} is updated.");
     }
@@ -231,11 +234,9 @@ public abstract class FileCabinetMemoryService : IRecordValidator, IFileCabinetS
     /// <param name="record">The record to be removed from the dictionaries.</param>
     private void DictionaryRemove(FileCabinetRecord record)
     {
-        List<FileCabinetRecord> firstNameList, lastNameList, dateOfBirthList;
-
-        this.firstNameDictionary.TryGetValue(record.FirstName.ToLower(Program.Culture), out firstNameList);
-        this.lastNameDictionary.TryGetValue(record.LastName.ToLower(Program.Culture), out lastNameList);
-        this.dateOfBirthDictionary.TryGetValue(record.DateOfBirth, out dateOfBirthList);
+        this.firstNameDictionary.TryGetValue(record.FirstName.ToLower(Program.Culture), out List<FileCabinetRecord> firstNameList);
+        this.lastNameDictionary.TryGetValue(record.LastName.ToLower(Program.Culture), out List<FileCabinetRecord> lastNameList);
+        this.dateOfBirthDictionary.TryGetValue(record.DateOfBirth, out List<FileCabinetRecord> dateOfBirthList);
 
         firstNameList.Remove(record);
         lastNameList.Remove(record);

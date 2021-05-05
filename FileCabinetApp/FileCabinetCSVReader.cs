@@ -12,7 +12,7 @@ namespace FileCabinetApp
     /// </summary>
     public class FileCabinetCSVReader
     {
-        private StreamReader reader;
+        private readonly StreamReader reader;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetCSVReader"/> class and assign <see cref="StreamReader"/>.

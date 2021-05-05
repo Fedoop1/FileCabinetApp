@@ -17,9 +17,8 @@ namespace FileCabinetApp
         /// <summary>
         /// The method that creates a new FileCabinetRecord.
         /// </summary>
-        /// <param name="recordData">The "container" class with all the information about the record.</param>
         /// <returns>Returns the unique identifier of the record.</returns>
-        public int CreateRecord(FileCabinetRecordData recordData);
+        public int CreateRecord();
 
         /// <summary>
         /// A method that searches for a record by name.
@@ -46,8 +45,7 @@ namespace FileCabinetApp
         /// A method for editing data in a particular record.
         /// </summary>
         /// <param name="id">A unique identifier by which the editing will take place.</param>
-        /// <param name="recordData">A container class with updated record information.</param>
-        public void EditRecord(int id, FileCabinetRecordData recordData);
+        public void EditRecord(int id);
 
         /// <summary>
         /// A method that returns a collection of records (read-only).
@@ -83,9 +81,7 @@ namespace FileCabinetApp
         /// <summary>
         /// Find and remove record from data source file by index.
         /// </summary>
-        /// <param name="index">The index of the record to be deleted.</param>
         /// <returns>Removal result.</returns>
         public string Purge();
-
     }
 }

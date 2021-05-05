@@ -7,7 +7,7 @@ namespace FileCabinetGenerator
     using System;
 
     /// <summary>
-    /// Class "container" wich storage and processing information for record generation and export.
+    /// Class "container" which storage and processing information for record generation and export.
     /// </summary>
     public class GeneratorCommandLineArgs
     {
