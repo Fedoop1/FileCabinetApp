@@ -8,7 +8,7 @@ namespace FileCabinetGenerator
     using System.IO;
 
     /// <summary>
-    /// Static class wich export data array into CSV file.
+    /// Static class which export data array into CSV file.
     /// </summary>
     public static class CSVRecordExport
     {
@@ -24,12 +24,11 @@ namespace FileCabinetGenerator
                 throw new ArgumentNullException(nameof(recordArray), "Array of records is null");
             }
 
-            using (StreamWriter textWriter = new StreamWriter(fileStream))
+            using var textWriter = new StreamWriter(fileStream);
+
+            foreach (var record in recordArray)
             {
-                foreach (var record in recordArray)
-                {
-                    textWriter.WriteLine($"{record.Id},{record.FirstName},{record.LastName},{record.DateOfBirth},{record.Height},{record.Money},{record.Gender}");
-                }
+                textWriter.WriteLine($"{record.Id},{record.FirstName},{record.LastName},{record.DateOfBirth},{record.Height},{record.Money},{record.Gender}");
             }
         }
     }

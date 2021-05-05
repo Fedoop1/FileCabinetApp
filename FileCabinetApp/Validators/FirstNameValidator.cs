@@ -6,24 +6,33 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.Validators
 {
+    /// <summary>
+    /// Class which validate incoming first name value.
+    /// </summary>
     public class FirstNameValidator : IRecordValidator
     {
         /// <summary>
-        /// The minimum length of the first or last name.
+        /// The minimum length of the first name.
         /// </summary>
         private readonly int minNameLength;
 
         /// <summary>
-        /// The maximum length of a given name or surname.
+        /// The maximum length of a the first name.
         /// </summary>
         private readonly int maxNameLength;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FirstNameValidator"/> class.
+        /// </summary>
+        /// <param name="minNameLength">Minimum name length value.</param>
+        /// <param name="maxNameLength">Maximum name length value.</param>
         public FirstNameValidator(int minNameLength, int maxNameLength)
         {
             this.minNameLength = minNameLength;
             this.maxNameLength = maxNameLength;
         }
 
+        /// <inheritdoc/>
         public void ValidateParameters(FileCabinetRecordData recordData)
         {
             if (recordData is null)

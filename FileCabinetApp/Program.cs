@@ -100,7 +100,7 @@ namespace FileCabinetApp
 
                         break;
                     case string attribute when attribute.Contains("--validation-rule"):
-                        attribute = attribute.Substring(attribute.LastIndexOf("=", StringComparison.InvariantCultureIgnoreCase) + 1);
+                        attribute = attribute[(attribute.LastIndexOf("=", StringComparison.InvariantCultureIgnoreCase) + 1) ..];
                         if (attribute.ToLower(Culture) == "custom")
                         {
                             fileCabinetService = new FileCabinetCustomService();

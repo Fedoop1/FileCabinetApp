@@ -6,18 +6,26 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
+    /// <summary>
+    /// Handle "create" command from user input.
+    /// </summary>
     public class CreateCommandHandler : ServiceCommandHandlerBase
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CreateCommandHandler"/> class.
+        /// </summary>
+        /// <param name="service"><see cref="IFileCabinetService"/> context required for the correct operation of the methods.</param>
         public CreateCommandHandler(IFileCabinetService service)
             : base(service)
         {
         }
 
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "create")
             {
-                this.Create(commandRequest.Parameters);
+                this.Create();
                 return;
             }
 
@@ -30,8 +38,7 @@ namespace FileCabinetApp.CommandHandlers
         /// <summary>
         /// Create a new <see cref="FileCabinetRecord"/>.
         /// </summary>
-        /// <param name="parameters">The parameter does not affect the execution of the method.</param>
-        private void Create(string parameters)
+        private void Create()
         {
             int result = this.service.CreateRecord();
 

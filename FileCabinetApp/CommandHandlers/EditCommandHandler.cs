@@ -6,14 +6,21 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
+    /// <summary>
+    /// Handle "edit" command from user input.
+    /// </summary>
     public class EditCommandHandler : ServiceCommandHandlerBase
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EditCommandHandler"/> class.
+        /// </summary>
+        /// <param name="service"><see cref="IFileCabinetService"/> context required for the correct operation of the methods.</param>
         public EditCommandHandler(IFileCabinetService service)
             : base(service)
         {
-
         }
 
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "edit")

@@ -34,7 +34,7 @@ namespace FileCabinetGenerator
                 switch (parameters[parameterIndex])
                 {
                     case string atribute when atribute.Contains("output-type"):
-                        atribute = atribute.Substring(atribute.LastIndexOf("=", StringComparison.InvariantCulture) + 1);
+                        atribute = atribute[(atribute.LastIndexOf("=", StringComparison.InvariantCulture) + 1) ..];
                         if (atribute.ToUpperInvariant() == "CSV")
                         {
                             outputType = "CSV";
@@ -64,10 +64,10 @@ namespace FileCabinetGenerator
 
                         throw new ArgumentException("Output file name is incorrect.");
                     case string atribute when atribute.Contains("output"):
-                        filePath = atribute.Substring(atribute.LastIndexOf("=", StringComparison.InvariantCulture) + 1);
+                        filePath = atribute[(atribute.LastIndexOf("=", StringComparison.InvariantCulture) + 1) ..];
                         break;
                     case string atribute when atribute.Contains("records-amount"):
-                        atribute = atribute.Substring(atribute.LastIndexOf("=", StringComparison.InvariantCulture) + 1);
+                        atribute = atribute[(atribute.LastIndexOf("=", StringComparison.InvariantCulture) + 1) ..];
                         if (!int.TryParse(atribute, out recordAmount))
                         {
                             throw new ArgumentException("Records amout is incorrect.");
@@ -85,7 +85,7 @@ namespace FileCabinetGenerator
 
                         throw new ArgumentException("Records amout is incorrect.");
                     case string atribute when atribute.Contains("start-id"):
-                        atribute = atribute.Substring(atribute.LastIndexOf("=", StringComparison.InvariantCulture) + 1);
+                        atribute = atribute[(atribute.LastIndexOf("=", StringComparison.InvariantCulture) + 1) ..];
                         if (!int.TryParse(atribute, out startId))
                         {
                             throw new ArgumentException("Start id is incorrect.");

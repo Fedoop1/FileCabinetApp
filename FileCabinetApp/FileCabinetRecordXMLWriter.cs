@@ -8,7 +8,7 @@ namespace FileCabinetApp
     /// </summary>
     public class FileCabinetRecordXMLWriter
     {
-        private XmlWriter xmlWriter;
+        private readonly XmlWriter xmlWriter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetRecordXMLWriter"/> class and create <see cref="xmlWriter"/> object based on <see cref="StreamWriter"/> argument.
@@ -30,7 +30,7 @@ namespace FileCabinetApp
                 return;
             }
 
-            XmlDocument document = new XmlDocument();
+            var document = new XmlDocument();
             document.CreateXmlDeclaration("1.0", "utf-8", null);
             XmlElement root = document.CreateElement("records");
             document.AppendChild(root);

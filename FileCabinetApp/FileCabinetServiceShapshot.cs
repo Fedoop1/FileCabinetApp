@@ -22,7 +22,7 @@ namespace FileCabinetApp
         }
 
         /// <summary>
-        /// Gets <see cref="ReadOnlyCollection{T}"/> of <see cref="FileCabinetRecord"/> wich is stored into snapshot.
+        /// Gets <see cref="ReadOnlyCollection{T}"/> of <see cref="FileCabinetRecord"/> which is stored into snapshot.
         /// </summary>
         /// <value>
         /// Read only collection of <see cref="FileCabinetRecord"/>.
@@ -35,7 +35,7 @@ namespace FileCabinetApp
         /// <param name="streamReader">IO Flow with information about data storage file.</param>
         public void LoadFromCSV(StreamReader streamReader)
         {
-            FileCabinetCSVReader csvReader = new FileCabinetCSVReader(streamReader);
+            var csvReader = new FileCabinetCSVReader(streamReader);
             this.records = csvReader.ReadAll().ToArray();
         }
 

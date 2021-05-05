@@ -7,13 +7,21 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
+    /// <summary>
+    /// Handle "export" command from user input.
+    /// </summary>
     public class ExportCommandHandler : ServiceCommandHandlerBase
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExportCommandHandler"/> class.
+        /// </summary>
+        /// <param name="service"><see cref="IFileCabinetService"/> context required for the correct operation of the methods.</param>
         public ExportCommandHandler(IFileCabinetService service)
             : base(service)
         {
         }
 
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "export")
@@ -39,8 +47,6 @@ namespace FileCabinetApp.CommandHandlers
             const int fileTypeIndex = 0;
             const int filePathIndex = 1;
             bool append = true;
-            FileCabinetServiceShapshot snapshot = null;
-
             if (parameters?.Length == 0)
             {
                 Console.WriteLine("Empty parameters");
@@ -68,22 +74,19 @@ namespace FileCabinetApp.CommandHandlers
                     }
                 }
 
-                using (var streamWriter = new StreamWriter(parameterArray[filePathIndex], append))
+                using var streamWriter = new StreamWriter(parameterArray[filePathIndex], append);
+                FileCabinetServiceShapshot snapshot = this.service.MakeSnapshot();
+                switch (parameterArray[fileTypeIndex].ToLower(Program.Culture))
                 {
-                    snapshot = this.service.MakeSnapshot();
-
-                    switch (parameterArray[fileTypeIndex].ToLower(Program.Culture))
-                    {
-                        case "csv":
-                            snapshot.SaveToCSV(streamWriter);
-                            break;
-                        case "xml":
-                            snapshot.SaveToXML(streamWriter);
-                            break;
-                        default:
-                            Console.WriteLine("Unknown export type format.");
-                            return;
-                    }
+                    case "csv":
+                        snapshot.SaveToCSV(streamWriter);
+                        break;
+                    case "xml":
+                        snapshot.SaveToXML(streamWriter);
+                        break;
+                    default:
+                        Console.WriteLine("Unknown export type format.");
+                        return;
                 }
             }
             catch (IOException)

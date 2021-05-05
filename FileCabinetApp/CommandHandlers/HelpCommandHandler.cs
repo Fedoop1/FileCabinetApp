@@ -6,12 +6,15 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
+    /// <summary>
+    /// Handle "help" command from user input.
+    /// </summary>
     public class HelpCommandHandler : CommandHadlerBase
     {
         /// <summary>
         /// The jagged array needed to get help with all the available commands consists of the command name, a short description, and an extended description.
         /// </summary>
-        private static string[][] helpMessages = new string[][]
+        private static readonly string[][] HelpMessages = new string[][]
         {
             new string[] { "help", "prints the help screen", "The 'help' command prints the help screen." },
             new string[] { "exit", "exits the application", "The 'exit' command exits the application." },
@@ -26,6 +29,7 @@ namespace FileCabinetApp.CommandHandlers
             new string[] { "purge", "Defragment the db file.", "The command invokes an algorithm that destroys deleted records from the file." },
         };
 
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "help")
@@ -52,10 +56,10 @@ namespace FileCabinetApp.CommandHandlers
 
             if (!string.IsNullOrEmpty(parameters))
             {
-                var index = Array.FindIndex(helpMessages, 0, helpMessages.Length, i => string.Equals(i[CommandHelpIndex], parameters, StringComparison.InvariantCultureIgnoreCase));
+                var index = Array.FindIndex(HelpMessages, 0, HelpMessages.Length, i => string.Equals(i[CommandHelpIndex], parameters, StringComparison.InvariantCultureIgnoreCase));
                 if (index >= 0)
                 {
-                    Console.WriteLine(helpMessages[index][ExplanationHelpIndex]);
+                    Console.WriteLine(HelpMessages[index][ExplanationHelpIndex]);
                 }
                 else
                 {
@@ -66,7 +70,7 @@ namespace FileCabinetApp.CommandHandlers
             {
                 Console.WriteLine("Available commands:");
 
-                foreach (var helpMessage in helpMessages)
+                foreach (var helpMessage in HelpMessages)
                 {
                     Console.WriteLine("\t{0}\t- {1}", helpMessage[CommandHelpIndex], helpMessage[DescriptionHelpIndex]);
                 }

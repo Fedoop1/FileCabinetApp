@@ -6,21 +6,25 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
+    /// <summary>
+    /// Handle "exit" command from user input.
+    /// </summary>
     public class ExitCommandHandler : ServiceCommandHandlerBase
     {
-        private Action<bool> exitDelegate;
+        private readonly Action<bool> exitDelegate;
 
-        public ExitCommandHandler(IFileCabinetService service)
-            : base(service)
-        {
-        }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExitCommandHandler"/> class.
+        /// </summary>
+        /// <param name="service"><see cref="IFileCabinetService"/> context required for the correct operation of the methods.</param>
+        /// <param name="exitDelegate">Delegate method to remotely control application running status.</param>
         public ExitCommandHandler(IFileCabinetService service, Action<bool> exitDelegate)
             : base(service)
         {
             this.exitDelegate = exitDelegate;
         }
 
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "exit")

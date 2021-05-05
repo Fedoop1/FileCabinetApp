@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileCabinetApp.Validators
 {
+    /// <summary>
+    /// Check the incoming last name value.
+    /// </summary>
     public class LastNameValidator : IRecordValidator
     {
         /// <summary>

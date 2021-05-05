@@ -9,7 +9,7 @@ namespace FileCabinetApp
     /// </summary>
     public class FileCabinetRecordData : FileCabinetRecord
     {
-        private IInputValidator validator;
+        private readonly IInputValidator validator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetRecordData"/> class.
@@ -160,7 +160,7 @@ namespace FileCabinetApp
         {
             if (!char.TryParse(gender, out char result))
             {
-                return new Tuple<bool, string, char>(false, gender, default(char));
+                return new Tuple<bool, string, char>(false, gender, default);
             }
 
             return new Tuple<bool, string, char>(true, gender, result);
@@ -175,7 +175,7 @@ namespace FileCabinetApp
         {
             if (!DateTime.TryParse(dateOfBirth, out DateTime result))
             {
-                return new Tuple<bool, string, DateTime>(false, dateOfBirth, default(DateTime));
+                return new Tuple<bool, string, DateTime>(false, dateOfBirth, default);
             }
 
             return new Tuple<bool, string, DateTime>(true, dateOfBirth, result);
@@ -190,7 +190,7 @@ namespace FileCabinetApp
         {
             if (!short.TryParse(height, out short result))
             {
-                return new Tuple<bool, string, short>(false, height, default(short));
+                return new Tuple<bool, string, short>(false, height, default);
             }
 
             return new Tuple<bool, string, short>(true, height, result);
@@ -205,7 +205,7 @@ namespace FileCabinetApp
         {
             if (!decimal.TryParse(money, out decimal result))
             {
-                return new Tuple<bool, string, decimal>(false, money, default(decimal));
+                return new Tuple<bool, string, decimal>(false, money, default);
             }
 
             return new Tuple<bool, string, decimal>(true, money, result);

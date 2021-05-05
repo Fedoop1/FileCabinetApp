@@ -6,11 +6,18 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
+    /// <summary>
+    /// Handle "find" command from user input.
+    /// </summary>
     public class FindCommandHandler : ServiceCommandHandlerBase
     {
-        private Action<IEnumerable<FileCabinetRecord>> printer;
+        private readonly Action<IEnumerable<FileCabinetRecord>> printer;
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FindCommandHandler"/> class.
+        /// </summary>
+        /// <param name="service"><see cref="IFileCabinetService"/> context required for the correct operation of the methods.</param>
+        /// <param name="printer">A delegate to a method that print data to the console according to a certain rule.</param>
         public FindCommandHandler(IFileCabinetService service, Action<IEnumerable<FileCabinetRecord>> printer)
             : base(service)
         {
@@ -41,11 +48,9 @@ namespace FileCabinetApp.CommandHandlers
         {
             const int FindParam = 0;
             const int FindData = 1;
-
-            FileCabinetRecord[] records = null;
             string[] arrayParameters = parameters.Split(" ", 2);
 
-            records = arrayParameters[FindParam] switch
+            FileCabinetRecord[] records = arrayParameters[FindParam] switch
             {
                 "firstname" => this.service.FindByFirstName(arrayParameters[FindData]),
                 "lastname" => this.service.FindByLastName(arrayParameters[FindData]),

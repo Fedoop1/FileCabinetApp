@@ -1,9 +1,4 @@
 ﻿using FileCabinetApp.Validators;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileCabinetApp
 {
@@ -12,7 +7,6 @@ namespace FileCabinetApp
     /// </summary>
     public class FileCabinetCustomService : FileCabinetMemoryService
     {
-
         /// <inheritdoc/>
         public override IRecordValidator CreateValidator()
         {

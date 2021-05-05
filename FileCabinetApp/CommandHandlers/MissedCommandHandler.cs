@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
+    /// <summary>
+    /// Handle <see cref="AppCommandRequest"/> if no one of the handlers was able to process the request.
+    /// </summary>
     public class MissedCommandHandler : CommandHadlerBase
     {
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (this.nextHandle != null)

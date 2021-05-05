@@ -6,9 +6,15 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
+    /// <summary>
+    /// Handle "stat" command from user input.
+    /// </summary>
     public class StatCommandHandler : ServiceCommandHandlerBase
     {
-        /// <inheritdoc/>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StatCommandHandler"/> class.
+        /// </summary>
+        /// <param name="service"><see cref="IFileCabinetService"/> context required for the correct operation of the methods.</param>
         public StatCommandHandler(IFileCabinetService service)
             : base(service)
         {
@@ -32,11 +38,10 @@ namespace FileCabinetApp.CommandHandlers
         /// <summary>
         /// A method that displays the number of records in the application.
         /// </summary>
-        /// <param name="parameters">Typically an empty parameter that does not affect method execution.</param>
         private void Stat()
         {
-            var recordsCount = this.service.GetStat();
-            Console.WriteLine($"{recordsCount.actualRecords} existing record(s). {recordsCount.deletedRecords} deleted record(s).");
+            var (actualRecords, deletedRecords) = this.service.GetStat();
+            Console.WriteLine($"{actualRecords} existing record(s). {deletedRecords} deleted record(s).");
         }
     }
 }

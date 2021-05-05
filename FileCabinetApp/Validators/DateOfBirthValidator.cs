@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.Validators
 {
+    /// <summary>
+    /// Class which validate incoming date of birth value.
+    /// </summary>
     public class DateOfBirthValidator : IRecordValidator
     {
         /// <summary>

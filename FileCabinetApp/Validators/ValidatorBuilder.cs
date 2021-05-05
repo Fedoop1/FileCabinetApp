@@ -6,56 +6,25 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.Validators
 {
+    /// <summary>
+    /// Create validation methods and composite it to <see cref="CompositeValidator"/>.
+    /// </summary>
     public class ValidatorBuilder
     {
-        private List<IRecordValidator> validators;
+        private readonly List<IRecordValidator> validators;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ValidatorBuilder"/> class.
+        /// </summary>
         public ValidatorBuilder()
         {
             this.validators = new List<IRecordValidator>();
         }
 
-        public ValidatorBuilder ValidateFirstName(int minFirstNameLength, int maxFirstNameLength)
-        {
-            this.validators.Add(new FirstNameValidator(minFirstNameLength, maxFirstNameLength));
-            return this;
-        }
-
-        public ValidatorBuilder ValidateLastName(int minLastNameLength, int maxLastNameLength)
-        {
-            this.validators.Add(new LastNameValidator(minLastNameLength, maxLastNameLength));
-            return this;
-        }
-
-        public ValidatorBuilder ValidateDateOfBirth(DateTime minDateOfBirth)
-        {
-            this.validators.Add(new DateOfBirthValidator(minDateOfBirth));
-            return this;
-        }
-
-        public ValidatorBuilder ValidateHeight(short minHeight, short maxHeight)
-        {
-            this.validators.Add(new HeightValidator(minHeight, maxHeight));
-            return this;
-        }
-
-        public ValidatorBuilder ValidateMoney(decimal minMoney)
-        {
-            this.validators.Add(new MoneyValidator(minMoney));
-            return this;
-        }
-
-        public ValidatorBuilder ValidateGender(char[] validGenderArray)
-        {
-            this.validators.Add(new GenderValidator(validGenderArray));
-            return this;
-        }
-
-        public IRecordValidator Create()
-        {
-            return new CompositeValidator(this.validators);
-        }
-
+        /// <summary>
+        /// Extension method which create <see cref="CompositeValidator"/> with the default rules.
+        /// </summary>
+        /// <returns>New instance of <see cref="CompositeValidator"/> with the default rules.</returns>
         public static IRecordValidator CreateDefault()
         {
             return new ValidatorBuilder()
@@ -68,6 +37,10 @@ namespace FileCabinetApp.Validators
                 .Create();
         }
 
+        /// <summary>
+        /// Extension method which create <see cref="CompositeValidator"/> with the custom rules.
+        /// </summary>
+        /// <returns>New instance of <see cref="CompositeValidator"/> with the custom rules.</returns>
         public static IRecordValidator CreateCustom()
         {
             return new ValidatorBuilder()
@@ -79,14 +52,83 @@ namespace FileCabinetApp.Validators
                 .ValidateGender(new char[] { 'f', 'F', 'M', 'm' })
                 .Create();
         }
+
+        /// <summary>
+        /// Add first name validator to validators list.
+        /// </summary>
+        /// <param name="minFirstNameLength">The minimum length of the first name.</param>
+        /// <param name="maxFirstNameLength">The maximum length of the first name.</param>
+        /// <returns>Instance of validator builder with first name validator in validators list.</returns>
+        public ValidatorBuilder ValidateFirstName(int minFirstNameLength, int maxFirstNameLength)
+        {
+            this.validators.Add(new FirstNameValidator(minFirstNameLength, maxFirstNameLength));
+            return this;
+        }
+
+        /// <summary>
+        /// Add last name validator to validators list.
+        /// </summary>
+        /// <param name="minLastNameLength">The minimum length of the last name.</param>
+        /// <param name="maxLastNameLength">The maximum length of the last name.</param>
+        /// <returns>Instance of validator builder with last name validator in validators list.</returns>
+        public ValidatorBuilder ValidateLastName(int minLastNameLength, int maxLastNameLength)
+        {
+            this.validators.Add(new LastNameValidator(minLastNameLength, maxLastNameLength));
+            return this;
+        }
+
+        /// <summary>
+        /// Add date of birth validator to validators list.
+        /// </summary>
+        /// <param name="minDateOfBirth">The minimum date of birth.</param>
+        /// <returns>Instance of validator builder with date of birth validator in validators list.</returns>
+        public ValidatorBuilder ValidateDateOfBirth(DateTime minDateOfBirth)
+        {
+            this.validators.Add(new DateOfBirthValidator(minDateOfBirth));
+            return this;
+        }
+
+        /// <summary>
+        /// Add height validator to validators list.
+        /// </summary>
+        /// <param name="minHeight">The minimum available height.</param>
+        /// <param name="maxHeight">The maximum available height.</param>
+        /// <returns>Instance of validator builder with height validator in validators list.</returns>
+        public ValidatorBuilder ValidateHeight(short minHeight, short maxHeight)
+        {
+            this.validators.Add(new HeightValidator(minHeight, maxHeight));
+            return this;
+        }
+
+        /// <summary>
+        /// Add money validator to validators list.
+        /// </summary>
+        /// <param name="minMoney">The minimum amount of money.</param>
+        /// <returns>Instance of validator builder with money validator in validators list.</returns>
+        public ValidatorBuilder ValidateMoney(decimal minMoney)
+        {
+            this.validators.Add(new MoneyValidator(minMoney));
+            return this;
+        }
+
+        /// <summary>
+        /// Add gender validator to validators list.
+        /// </summary>
+        /// <param name="validGenderArray">Array of valid genders.</param>
+        /// <returns>Instance of validator builder with gedner validator in validators list.</returns>
+        public ValidatorBuilder ValidateGender(char[] validGenderArray)
+        {
+            this.validators.Add(new GenderValidator(validGenderArray));
+            return this;
+        }
+
+        /// <summary>
+        /// Create new instance of <see cref="CompositeValidator"/> with the list of validators.
+        /// </summary>
+        /// <returns>New instance of <see cref="CompositeValidator"/> with the list of validators.</returns>
+        public IRecordValidator Create()
+        {
+            return new CompositeValidator(this.validators);
+        }
     }
 }
-
-
-/*  new FirstNameValidator(2, 60),
-    new LastNameValidator(2, 60),
-    new DateOfBirthValidator(DateTime.Parse("1.12.1950", System.Globalization.CultureInfo.InvariantCulture)),
-    new HeightValidator(10, 250),
-    new MoneyValidator(0),
-    new GenderValidator(new char[] { 'm', 'M', 'F', 'f' }),
-*/

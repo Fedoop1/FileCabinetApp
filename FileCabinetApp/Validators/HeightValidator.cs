@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.Validators
 {
+    /// <summary>
+    /// Class which validate incoming height value.
+    /// </summary>
     public class HeightValidator : IRecordValidator
     {
         /// <summary>

@@ -8,7 +8,7 @@ namespace FileCabinetGenerator
     using System.Xml.Serialization;
 
     /// <summary>
-    /// Static class wich serialize data array into XML file.
+    /// Static class which serialize data array into XML file.
     /// </summary>
     public static class XMLRecordExport
     {
@@ -24,7 +24,7 @@ namespace FileCabinetGenerator
                 throw new ArgumentNullException(nameof(recordArray), "Array of records is null");
             }
 
-            XmlSerializer formatter = new XmlSerializer(typeof(FileCabinetRecord[]));
+            var formatter = new XmlSerializer(typeof(FileCabinetRecord[]));
             formatter.Serialize(fileStream, recordArray);
         }
     }

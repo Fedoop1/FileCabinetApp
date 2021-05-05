@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.Validators
 {
+    /// <summary>
+    /// Class which validate incoming gender value.
+    /// </summary>
     public class GenderValidator : IRecordValidator
     {
         /// <summary>

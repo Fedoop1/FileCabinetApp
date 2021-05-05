@@ -6,9 +6,15 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
+    /// <summary>
+    /// Handle "remove" command to import data from file in special format.
+    /// </summary>
     public class RemoveCommandHanlder : ServiceCommandHandlerBase
     {
-        /// <inheritdoc/>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RemoveCommandHanlder"/> class.
+        /// </summary>
+        /// <param name="service">The <see cref="IFileCabinetService"/> context is necessary for the correct execution of the methods.</param>
         public RemoveCommandHanlder(IFileCabinetService service)
             : base(service)
         {
@@ -17,7 +23,7 @@ namespace FileCabinetApp.CommandHandlers
         /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
-            if (!string.IsNullOrEmpty(commandRequest.Command) && commandRequest.Command == "remove")
+            if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "remove")
             {
                 this.Remove(commandRequest.Parameters);
                 return;

@@ -6,12 +6,15 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.Validators
 {
+    /// <summary>
+    /// Validate the incoming amount of money.
+    /// </summary>
     public class MoneyValidator : IRecordValidator
     {
         /// <summary>
         /// The minimum amount of money.
         /// </summary>
-        private decimal minMoney;
+        private readonly decimal minMoney;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MoneyValidator"/> class.

@@ -14,8 +14,8 @@ namespace FileCabinetApp
     /// </summary>
     public class FileCabinetXMLReader
     {
-        private XmlSerializer formatter;
-        private XmlReader xmlReader;
+        private readonly XmlSerializer formatter;
+        private readonly XmlReader xmlReader;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetXMLReader"/> class.
@@ -33,7 +33,7 @@ namespace FileCabinetApp
         /// <returns><see cref="IList{FileCabinetRecord}"/> representation of redords into XML file.</returns>
         public IList<FileCabinetRecord> ReadAll()
         {
-            List<FileCabinetRecord> result = new List<FileCabinetRecord>();
+            var result = new List<FileCabinetRecord>();
 
             var record = this.formatter.Deserialize(this.xmlReader) as FileCabinetRecord[];
             result.AddRange(record);

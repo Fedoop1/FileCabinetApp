@@ -7,9 +7,15 @@ using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
+    /// <summary>
+    /// Handle "import" command to import data from file in special format.
+    /// </summary>
     public class ImportCommandHandler : ServiceCommandHandlerBase
     {
-        /// <inheritdoc/>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImportCommandHandler"/> class.
+        /// </summary>
+        /// <param name="service">The <see cref="IFileCabinetService"/> context is necessary for the correct execution of the methods.</param>
         public ImportCommandHandler(IFileCabinetService service)
             : base(service)
         {
@@ -46,26 +52,24 @@ namespace FileCabinetApp.CommandHandlers
 
             try
             {
-                using (var fileStream = new FileStream(parametersArray[FilePathIndex], FileMode.Open, FileAccess.Read))
+                using var fileStream = new FileStream(parametersArray[FilePathIndex], FileMode.Open, FileAccess.Read);
+                FileCabinetServiceShapshot snapshot = this.service.MakeSnapshot();
+                switch (parametersArray[ImportTypeIndex].ToUpperInvariant())
                 {
-                    FileCabinetServiceShapshot snapshot = this.service.MakeSnapshot();
-                    switch (parametersArray[ImportTypeIndex].ToUpperInvariant())
-                    {
-                        case "CSV":
-                            snapshot.LoadFromCSV(new StreamReader(fileStream));
-                            break;
-                        case "XML":
-                            snapshot.LoadFromXML(fileStream);
-                            break;
-                        default:
-                            Console.WriteLine("Unknown import format.");
-                            break;
-                    }
-
-                    Console.WriteLine($"{snapshot.Records.Count} records were imported from {parametersArray[FilePathIndex]}");
-                    this.service.Restore(snapshot);
-                    return;
+                    case "CSV":
+                        snapshot.LoadFromCSV(new StreamReader(fileStream));
+                        break;
+                    case "XML":
+                        snapshot.LoadFromXML(fileStream);
+                        break;
+                    default:
+                        Console.WriteLine("Unknown import format.");
+                        break;
                 }
+
+                Console.WriteLine($"{snapshot.Records.Count} records were imported from {parametersArray[FilePathIndex]}");
+                this.service.Restore(snapshot);
+                return;
             }
             catch (IOException)
             {
