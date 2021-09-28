@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileCabinetApp.Validators
 {
@@ -16,6 +12,8 @@ namespace FileCabinetApp.Validators
         /// </summary>
         private readonly DateTime minDateOfBirth;
 
+        private readonly DateTime maxDateOfBirth = DateTime.Now;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DateOfBirthValidator"/> class.
         /// </summary>
@@ -23,6 +21,12 @@ namespace FileCabinetApp.Validators
         public DateOfBirthValidator(DateTime minDateOfBirth)
         {
             this.minDateOfBirth = minDateOfBirth;
+        }
+
+        public DateOfBirthValidator(DateTime minDateOfBirth, DateTime maxDateOfBirth)
+        {
+            this.minDateOfBirth = minDateOfBirth;
+            this.maxDateOfBirth = maxDateOfBirth;
         }
 
         /// <inheritdoc/>
@@ -33,7 +37,7 @@ namespace FileCabinetApp.Validators
                 throw new ArgumentNullException(nameof(recordData), "Record data is null");
             }
 
-            if (recordData.DateOfBirth < this.minDateOfBirth || recordData.DateOfBirth > DateTime.Now)
+            if (recordData.DateOfBirth < this.minDateOfBirth || recordData.DateOfBirth > this.maxDateOfBirth)
             {
                 throw new ArgumentException("Date of birth is incorrect.");
             }

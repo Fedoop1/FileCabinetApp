@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace FileCabinetApp
@@ -51,25 +51,25 @@ namespace FileCabinetApp
         /// A method that returns a collection of records (read-only).
         /// </summary>
         /// <returns>Collection of records (read-only).</returns>
-        public ReadOnlyCollection<FileCabinetRecord> GetRecords();
+        public IReadOnlyCollection<FileCabinetRecord> GetRecords();
 
         /// <summary>
         /// A method that returns the count of records.
         /// </summary>
         /// <returns>Count of records.</returns>
-        public FileCabinetServiceShapshot MakeSnapshot();
+        public FileCabinetServiceSnapshot MakeSnapshot();
 
         /// <summary>
-        /// Restore information from <see cref="FileCabinetServiceShapshot"/> instance.
+        /// Restore information from <see cref="FileCabinetServiceSnapshot"/> instance.
         /// </summary>
         /// <param name="restoreSnapshot">Snapshot with information about records.</param>
-        public void Restore(FileCabinetServiceShapshot restoreSnapshot);
+        public void Restore(FileCabinetServiceSnapshot restoreSnapshot);
 
         /// <summary>
         /// Get the count of existing and deleted <see cref="FileCabinetRecord"/>'s.
         /// </summary>
         /// <returns>The count of the records.</returns>
-        public (int actualRecords, int deletedRecords) GetStat();
+        public (int RecordsCount, int DeletedRecords) GetStat();
 
         /// <summary>
         /// Removes a record from a data source.

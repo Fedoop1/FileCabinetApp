@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace FileCabinetApp
+namespace FileCabinetApp.Validators
 {
     /// <summary>
     /// Class with the default input validation rules.
@@ -17,7 +17,7 @@ namespace FileCabinetApp
         /// <inheritdoc/>
         public bool ValidateFirstName(string firstName)
         {
-            return !(string.IsNullOrEmpty(firstName) || string.IsNullOrWhiteSpace(firstName) || firstName.Any(symb => char.IsDigit(symb)));
+            return !(string.IsNullOrEmpty(firstName) || string.IsNullOrWhiteSpace(firstName) || firstName.Any(char.IsDigit));
         }
 
         /// <inheritdoc/>
@@ -35,7 +35,7 @@ namespace FileCabinetApp
         /// <inheritdoc/>
         public bool ValidateLastName(string lastName)
         {
-            return !(string.IsNullOrEmpty(lastName) || string.IsNullOrWhiteSpace(lastName) || lastName.Any(symb => char.IsDigit(symb)));
+            return !(string.IsNullOrEmpty(lastName) || string.IsNullOrWhiteSpace(lastName) || lastName.Any(char.IsDigit));
         }
 
         /// <inheritdoc/>

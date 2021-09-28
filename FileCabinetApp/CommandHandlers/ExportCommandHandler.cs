@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -75,8 +72,8 @@ namespace FileCabinetApp.CommandHandlers
                 }
 
                 using var streamWriter = new StreamWriter(parameterArray[filePathIndex], append);
-                FileCabinetServiceShapshot snapshot = this.service.MakeSnapshot();
-                switch (parameterArray[fileTypeIndex].ToLower(Program.Culture))
+                FileCabinetServiceSnapshot snapshot = this.service.MakeSnapshot();
+                switch (parameterArray[fileTypeIndex].ToLower(CultureInfo.CurrentCulture))
                 {
                     case "csv":
                         snapshot.SaveToCSV(streamWriter);

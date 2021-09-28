@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileCabinetApp.Validators
 {
@@ -16,13 +12,21 @@ namespace FileCabinetApp.Validators
         /// </summary>
         private readonly decimal minMoney;
 
+        private readonly decimal maxMoney;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MoneyValidator"/> class.
         /// </summary>
-        /// <param name="minMoney">The mininal amount of money.</param>
+        /// <param name="minMoney">The minimal amount of money.</param>
         public MoneyValidator(decimal minMoney)
         {
             this.minMoney = minMoney;
+        }
+
+        public MoneyValidator(decimal minMoney, decimal maxMoney)
+        {
+            this.minMoney = minMoney;
+            this.maxMoney = maxMoney;
         }
 
         /// <inheritdoc/>
@@ -33,9 +37,9 @@ namespace FileCabinetApp.Validators
                 throw new ArgumentNullException(nameof(recordData), "Record data is null");
             }
 
-            if (recordData?.Money < this.minMoney)
+            if (recordData.Money < this.minMoney || recordData.Money > this.maxMoney)
             {
-                throw new ArgumentException("Money can't be lower than zero.");
+                throw new ArgumentException("Invalid money amount.");
             }
         }
     }

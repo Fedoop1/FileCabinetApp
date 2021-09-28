@@ -1,8 +1,4 @@
-﻿// <copyright file="GeneratorCommandLineArgs.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
-namespace FileCabinetGenerator
+﻿namespace FileCabinetGenerator
 {
     using System;
 

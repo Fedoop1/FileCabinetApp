@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -53,7 +49,7 @@ namespace FileCabinetApp.CommandHandlers
             try
             {
                 using var fileStream = new FileStream(parametersArray[FilePathIndex], FileMode.Open, FileAccess.Read);
-                FileCabinetServiceShapshot snapshot = this.service.MakeSnapshot();
+                FileCabinetServiceSnapshot snapshot = this.service.MakeSnapshot();
                 switch (parametersArray[ImportTypeIndex].ToUpperInvariant())
                 {
                     case "CSV":

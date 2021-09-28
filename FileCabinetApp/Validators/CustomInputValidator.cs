@@ -1,50 +1,44 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace FileCabinetApp
+namespace FileCabinetApp.Validators
 {
     /// <summary>
-    /// Class with the custom input validation rules.
+    /// Class with input validation rules.
     /// </summary>
-    public class CustomInputValidator : IInputValidator
+    public class InputValidator : IInputValidator
     {
-        /// <inheritdoc/>
-        public bool ValidateDateOfBirth(DateTime dateOfBirth)
-        {
-            return dateOfBirth < DateTime.Now && DateTime.Now.Year - dateOfBirth.Year >= 18;
-        }
+        private readonly IValidationSettings validationSettings;
+
+        public InputValidator(IValidationSettings validationSettings) => this.validationSettings =
+            validationSettings ??
+            throw new ArgumentNullException(nameof(validationSettings), "Validation settings can't be null");
 
         /// <inheritdoc/>
-        public bool ValidateFirstName(string firstName)
-        {
-            return !(string.IsNullOrEmpty(firstName) || string.IsNullOrWhiteSpace(firstName) || firstName.Any(symb => char.IsDigit(symb)));
-        }
+        public bool ValidateDateOfBirth(DateTime dateOfBirth) =>
+            dateOfBirth > this.validationSettings.DateOfBirth_From &&
+            dateOfBirth < this.validationSettings.DateOfBirth_To;
 
         /// <inheritdoc/>
-        public bool ValidateGender(char gender)
-        {
-            return char.IsLetter(gender) && !char.IsPunctuation(gender);
-        }
+        public bool ValidateFirstName(string firstName) => !(string.IsNullOrEmpty(firstName) &&
+                                                             firstName.Length > this.validationSettings
+                                                                 .FirstName_Min && firstName.Length <
+                                                             this.validationSettings.FirstName_Max);
 
         /// <inheritdoc/>
-        public bool ValidateHeight(short height)
-        {
-            return height > 50;
-        }
+        public bool ValidateGender(char gender) => char.IsLetter(gender) && !char.IsPunctuation(gender);
 
         /// <inheritdoc/>
-        public bool ValidateLastName(string lastName)
-        {
-            return !(string.IsNullOrEmpty(lastName) || string.IsNullOrWhiteSpace(lastName) || lastName.Any(symb => char.IsDigit(symb)));
-        }
+        public bool ValidateHeight(short height) =>
+            this.validationSettings.Height_Min < height && this.validationSettings.Height_Max > height;
 
         /// <inheritdoc/>
-        public bool ValidateMoney(decimal money)
-        {
-            return money > 1;
-        }
+        public bool ValidateLastName(string lastName) => !(string.IsNullOrEmpty(lastName) &&
+                                                           lastName.Length > this.validationSettings
+                                                               .LastName_Min && lastName.Length <
+                                                           this.validationSettings.LastName_Max);
+
+        /// <inheritdoc/>
+        public bool ValidateMoney(decimal money) =>
+            this.validationSettings.Money_Min < money && this.validationSettings.Money_Max > money;
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
@@ -8,15 +7,15 @@ namespace FileCabinetApp
     /// <summary>
     /// Snapshot class with private information about list of <see cref="FileCabinetRecord"/> required for secure serialization.
     /// </summary>
-    public class FileCabinetServiceShapshot
+    public class FileCabinetServiceSnapshot
     {
         private FileCabinetRecord[] records;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileCabinetServiceShapshot"/> class and save information and assign inner field by reference to an array with records.
+        /// Initializes a new instance of the <see cref="FileCabinetServiceSnapshot"/> class and save information and assign inner field by reference to an array with records.
         /// </summary>
         /// <param name="fileCabinetRecords"><see cref="FileCabinetRecord"/> array with data about records.</param>
-        public FileCabinetServiceShapshot(FileCabinetRecord[] fileCabinetRecords)
+        public FileCabinetServiceSnapshot(FileCabinetRecord[] fileCabinetRecords)
         {
             this.records = fileCabinetRecords;
         }

@@ -1,0 +1,36 @@
+{
+  "Default": {
+    "FirstName_Min": 2,
+    "FirstName_Max": 60,
+
+    "LastName_Min": 2,
+    "LastName_Max": 60,
+
+    "DateOfBirth_From": "Jan-01-2000",
+    "DateOfBirth_To": "Jan-01-2021",
+
+    "Height_Min": 0,
+    "Height_Max": 220,
+
+    "Money_Min": 0,
+    "Money_Max": 1000000
+  },
+
+  "Custom": {
+    "FirstName_Min": 5,
+    "FirstName_Max": 120,
+
+    "LastName_Min": 5,
+    "LastName_Max": 120,
+
+    "DateOfBirth_From": "Jan/01/1940",
+    "DateOfBirth_To": "Jan/01/2021",
+
+    "Height_Min": 50,
+    "Height_Max": 240,
+
+    "Money_Min": 1,
+    "Money_Max": 10000000
+  }
+  
+}
