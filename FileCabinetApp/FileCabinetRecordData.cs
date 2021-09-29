@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Globalization;
 using FileCabinetApp.Validators;
 
 namespace FileCabinetApp
@@ -14,16 +14,10 @@ namespace FileCabinetApp
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetRecordData"/> class.
         /// </summary>
-        /// <param name="service">Validation rules.</param>
-        public FileCabinetRecordData(IFileCabinetService service)
-        {
-            this.validator = service?.GetType().Name switch
-            {
-                "FileCabinetDefaultService" => new DefaultInputValidator(),
-                "FileCabinetCustomService" => new CustomInputValidator(),
-                _ => new DefaultInputValidator(),
-            };
-        }
+        /// <param name="validationSettings">Validation rules.</param>
+        public FileCabinetRecordData(IValidationSettings validationSettings) => this.validator =
+            new InputValidator(validationSettings ??
+                               throw new ArgumentNullException(nameof(validationSettings), "Validation settings can't be null"));
 
         /// /// <summary>
         /// A method that collects information about a record from a user.
@@ -100,10 +94,10 @@ namespace FileCabinetApp
         {
             if (this.validator.ValidateDateOfBirth(dateOfBirth))
             {
-                return new Tuple<bool, string>(true, dateOfBirth.ToString(Program.Culture));
+                return new Tuple<bool, string>(true, dateOfBirth.ToString(CultureInfo.CurrentCulture));
             }
 
-            return new Tuple<bool, string>(false, dateOfBirth.ToString(Program.Culture));
+            return new Tuple<bool, string>(false, dateOfBirth.ToString(CultureInfo.CurrentCulture));
         }
 
         /// <summary>
@@ -115,10 +109,10 @@ namespace FileCabinetApp
         {
             if (this.validator.ValidateHeight(height))
             {
-                return new Tuple<bool, string>(true, height.ToString(Program.Culture));
+                return new Tuple<bool, string>(true, height.ToString(CultureInfo.CurrentCulture));
             }
 
-            return new Tuple<bool, string>(false, height.ToString(Program.Culture));
+            return new Tuple<bool, string>(false, height.ToString(CultureInfo.CurrentCulture));
         }
 
         /// <summary>
@@ -130,10 +124,10 @@ namespace FileCabinetApp
         {
             if (this.validator.ValidateMoney(money))
             {
-                return new Tuple<bool, string>(true, money.ToString(Program.Culture));
+                return new Tuple<bool, string>(true, money.ToString(CultureInfo.CurrentCulture));
             }
 
-            return new Tuple<bool, string>(false, money.ToString(Program.Culture));
+            return new Tuple<bool, string>(false, money.ToString(CultureInfo.CurrentCulture));
         }
 
         /// <summary>
@@ -145,10 +139,10 @@ namespace FileCabinetApp
         {
             if (this.validator.ValidateGender(gender))
             {
-                return new Tuple<bool, string>(true, gender.ToString(Program.Culture));
+                return new Tuple<bool, string>(true, gender.ToString(CultureInfo.CurrentCulture));
             }
 
-            return new Tuple<bool, string>(false, gender.ToString(Program.Culture));
+            return new Tuple<bool, string>(false, gender.ToString(CultureInfo.CurrentCulture));
         }
 
         /// <summary>

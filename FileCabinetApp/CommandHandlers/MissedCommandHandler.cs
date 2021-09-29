@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
     /// <summary>
     /// Handle <see cref="AppCommandRequest"/> if no one of the handlers was able to process the request.
     /// </summary>
-    public class MissedCommandHandler : CommandHadlerBase
+    public class MissedCommandHandler : CommandHandlerBase
     {
         /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)

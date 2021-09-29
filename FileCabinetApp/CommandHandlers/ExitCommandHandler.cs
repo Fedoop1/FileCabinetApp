@@ -46,10 +46,6 @@ namespace FileCabinetApp.CommandHandlers
         {
             Console.WriteLine("Exiting an application...");
             this.exitDelegate.Invoke(false);
-            if (this.service is FileCabinetFilesystemService service)
-            {
-                service.Dispose();
-            }
         }
     }
 }

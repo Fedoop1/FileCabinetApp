@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileCabinetApp.Validators
 {
@@ -40,7 +37,7 @@ namespace FileCabinetApp.Validators
                 throw new ArgumentNullException(nameof(recordData), "Record data is null");
             }
 
-            if (recordData.FirstName.Length < this.minNameLength || recordData.FirstName.Length > this.maxNameLength || recordData.FirstName.Any(symbol => char.IsNumber(symbol)))
+            if (recordData.FirstName.Length < this.minNameLength || recordData.FirstName.Length > this.maxNameLength || recordData.FirstName.Any(char.IsNumber))
             {
                 throw new ArgumentException("First name is incorrect.");
             }

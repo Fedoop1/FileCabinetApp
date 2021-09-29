@@ -1,8 +1,4 @@
-﻿// <copyright file="Program.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
-namespace FileCabinetGenerator
+﻿namespace FileCabinetGenerator
 {
     using System;
     using System.Globalization;
@@ -33,14 +29,14 @@ namespace FileCabinetGenerator
                 Console.Write(" " + parameters[parameterIndex]);
                 switch (parameters[parameterIndex])
                 {
-                    case string atribute when atribute.Contains("output-type"):
-                        atribute = atribute[(atribute.LastIndexOf("=", StringComparison.InvariantCulture) + 1) ..];
-                        if (atribute.ToUpperInvariant() == "CSV")
+                    case string attribute when attribute.Contains("output-type"):
+                        attribute = attribute[(attribute.LastIndexOf("=", StringComparison.InvariantCulture) + 1) ..];
+                        if (attribute.ToUpperInvariant() == "CSV")
                         {
                             outputType = "CSV";
                             break;
                         }
-                        else if (atribute.ToUpperInvariant() == "XML")
+                        else if (attribute.ToUpperInvariant() == "XML")
                         {
                             outputType = "XML";
                             break;
@@ -83,7 +79,7 @@ namespace FileCabinetGenerator
                             }
                         }
 
-                        throw new ArgumentException("Records amout is incorrect.");
+                        throw new ArgumentException("Records amount is incorrect.");
                     case string atribute when atribute.Contains("start-id"):
                         atribute = atribute[(atribute.LastIndexOf("=", StringComparison.InvariantCulture) + 1) ..];
                         if (!int.TryParse(atribute, out startId))
@@ -101,7 +97,7 @@ namespace FileCabinetGenerator
                             }
                         }
 
-                        throw new ArgumentException("Records amout is incorrect.");
+                        throw new ArgumentException("Records amount is incorrect.");
                     default: throw new ArgumentException("Command line arg doesn't exists!");
                 }
             }
