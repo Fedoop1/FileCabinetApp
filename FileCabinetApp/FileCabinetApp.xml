@@ -165,23 +165,6 @@
             </summary>
             <param name="parameters">Parameter with the choice of a specific command to display help about it.</param>
         </member>
-        <member name="T:FileCabinetApp.CommandHandlers.ICommandHandler">
-            <summary>
-            Interface which describe basic behavior to command handler classes that handle user input commands.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.ICommandHandler.SetNext(FileCabinetApp.CommandHandlers.ICommandHandler)">
-            <summary>
-            Set pointer for the next <see cref="T:FileCabinetApp.CommandHandlers.ICommandHandler"/>.
-            </summary>
-            <param name="commandHandler">Next command hanlder.</param>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.ICommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
-            <summary>
-            Try to handle command request. Othewise pass it further along the chain.
-            </summary>
-            <param name="commandRequest">Command with parameters.</param>
-        </member>
         <member name="T:FileCabinetApp.CommandHandlers.ImportCommandHandler">
             <summary>
             Handle "import" command to import data from file in special format.
@@ -310,6 +293,23 @@
             <summary>
             A method that displays the number of records in the application.
             </summary>
+        </member>
+        <member name="T:FileCabinetApp.CommandHandlers.ICommandHandler">
+            <summary>
+            Interface which describe basic behavior to command handler classes that handle user input commands.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ICommandHandler.SetNext(FileCabinetApp.CommandHandlers.ICommandHandler)">
+            <summary>
+            Set pointer for the next <see cref="T:FileCabinetApp.CommandHandlers.ICommandHandler"/>.
+            </summary>
+            <param name="commandHandler">Next command hanlder.</param>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ICommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <summary>
+            Try to handle command request. Othewise pass it further along the chain.
+            </summary>
+            <param name="commandRequest">Command with parameters.</param>
         </member>
         <member name="T:FileCabinetApp.Decorators.ServiceLogger">
             <summary>
@@ -493,14 +493,11 @@
         <member name="M:FileCabinetApp.FileCabinetMemoryService.RemoveRecord(System.Int32)">
             <inheritdoc/>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.DictionaryAdd(System.String,System.String,System.DateTime,FileCabinetRecord)">
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.DictionaryAdd(FileCabinetRecord)">
             <summary>
             An internal method that calls data updates in dictionaries.
             </summary>
-            <param name="firstName">New name.</param>
-            <param name="lastName">New surname.</param>
-            <param name="dateOfBirth">New date of birth.</param>
-            <param name="record">A record corresponding to these parameters.</param>
+            <param name="record">Record to add.</param>
         </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.DictionaryRemove(FileCabinetRecord)">
             <summary>
@@ -646,6 +643,74 @@
             </summary>
             <param name="fileStream">IO Flow with information about data storage file.</param>
         </member>
+        <member name="T:FileCabinetApp.FileCabinetCSVReader">
+            <summary>
+            Reads records from a CSV file.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetCSVReader.#ctor(System.IO.StreamReader)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetCSVReader"/> class and assign <see cref="T:System.IO.StreamReader"/>.
+            </summary>
+            <param name="streamReader"><see cref="T:System.IO.StreamReader"/> passed in the class.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetCSVReader.ReadAll">
+            <summary>
+            Read all <see cref="T:FileCabinetRecord"/> from the CSV file and add it to <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+            <returns><see cref="T:System.Collections.Generic.IList`1"/> representation of records in the CSV file.</returns>
+        </member>
+        <member name="T:FileCabinetApp.FileCabinetRecordCSVWriter">
+            <summary>
+            Create CSV document based on records array data, serialize and save it to disk.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordCSVWriter.#ctor(System.IO.TextWriter)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetRecordCSVWriter"/> class.
+            </summary>
+            <param name="writer"><see cref="T:System.IO.TextWriter"/> with file path and other additionфд settings.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordCSVWriter.Write(FileCabinetRecord[])">
+            <summary>
+            Wtite <see cref="T:FileCabinetRecord"/> array data into CSV file and save it.
+            </summary>
+            <param name="fileCabinetRecordsArray">Contains actual <see cref="T:FileCabinetRecord"/> data.</param>
+        </member>
+        <member name="T:FileCabinetApp.FileCabinetRecordXMLWriter">
+            <summary>
+            Create XMLDocument based on records array data, serialize and save it to disk.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordXMLWriter.#ctor(System.IO.StreamWriter)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetRecordXMLWriter"/> class and create <see cref="F:FileCabinetApp.FileCabinetRecordXMLWriter.xmlWriter"/> object based on <see cref="T:System.IO.StreamWriter"/> argument.
+            </summary>
+            <param name="writer"><see cref="T:System.IO.StreamWriter"/> with file path and other additional settings.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordXMLWriter.Write(FileCabinetRecord[])">
+            <summary>
+            Create and Write <see cref="T:FileCabinetRecord"/> array into <see cref="T:System.Xml.XmlDocument"/> and save it throught <see cref="T:System.Xml.XmlWriter"/>.
+            </summary>
+            <param name="fileCabinetRecordsArray">Array of <see cref="T:FileCabinetRecord"/>.</param>
+        </member>
+        <member name="T:FileCabinetApp.FileCabinetXMLReader">
+            <summary>
+            Class for working and deserializing information from an XML file.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetXMLReader.#ctor(System.IO.FileStream)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetXMLReader"/> class.
+            </summary>
+            <param name="fileStream"><see cref="T:System.IO.FileStream"/> with information about XML format file.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetXMLReader.ReadAll">
+            <summary>
+            Read and deserialize all information from file and return it <see cref="T:System.Collections.Generic.IList`1"/> representation.
+            </summary>
+            <returns><see cref="T:System.Collections.Generic.IList`1"/> representation of redords into XML file.</returns>
+        </member>
         <member name="T:FileCabinetApp.IFileCabinetService">
             <summary>
             The interface includes all the methods common to the classes inherited from FileCabinetService.
@@ -727,90 +792,63 @@
             </summary>
             <returns>Removal result.</returns>
         </member>
-        <member name="T:FileCabinetApp.FileCabinetCSVReader">
+        <member name="T:FileCabinetApp.IInputValidator">
             <summary>
-            Reads records from a CSV file.
+            Interface which describes basic behavior of Input validators classes.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetCSVReader.#ctor(System.IO.StreamReader)">
+        <member name="M:FileCabinetApp.IInputValidator.ValidateFirstName(System.String)">
             <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetCSVReader"/> class and assign <see cref="T:System.IO.StreamReader"/>.
+            Validate incoming first name using special rules.
             </summary>
-            <param name="streamReader"><see cref="T:System.IO.StreamReader"/> passed in the class.</param>
+            <param name="firstName">Incoming first name.</param>
+            <returns>The result of validating.</returns>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetCSVReader.ReadAll">
+        <member name="M:FileCabinetApp.IInputValidator.ValidateLastName(System.String)">
             <summary>
-            Read all <see cref="T:FileCabinetRecord"/> from the CSV file and add it to <see cref="T:System.Collections.Generic.IList`1"/>.
+            Validate incoming last name using special rules.
             </summary>
-            <returns><see cref="T:System.Collections.Generic.IList`1"/> representation of records in the CSV file.</returns>
+            <param name="lastName">Incoming last name.</param>
+            <returns>The result of validating.</returns>
         </member>
-        <member name="T:FileCabinetApp.FileCabinetRecordCSVWriter">
+        <member name="M:FileCabinetApp.IInputValidator.ValidateDateOfBirth(System.DateTime)">
             <summary>
-            Create CSV document based on records array data, serialize and save it to disk.
+            Validate incoming date of birth using special rules.
             </summary>
+            <param name="dateOfBirth">Incoming date of birth.</param>
+            <returns>The result of validating.</returns>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetRecordCSVWriter.#ctor(System.IO.TextWriter)">
+        <member name="M:FileCabinetApp.IInputValidator.ValidateHeight(System.Int16)">
             <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetRecordCSVWriter"/> class.
+            Validate incoming height using special rules.
             </summary>
-            <param name="writer"><see cref="T:System.IO.TextWriter"/> with file path and other additionфд settings.</param>
+            <param name="height">Incoming height.</param>
+            <returns>The result of validating.</returns>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetRecordCSVWriter.Write(FileCabinetRecord[])">
+        <member name="M:FileCabinetApp.IInputValidator.ValidateMoney(System.Decimal)">
             <summary>
-            Wtite <see cref="T:FileCabinetRecord"/> array data into CSV file and save it.
+            Validate incoming amount of money using special rules.
             </summary>
-            <param name="fileCabinetRecordsArray">Contains actual <see cref="T:FileCabinetRecord"/> data.</param>
+            <param name="money">Incoming amount of money.</param>
+            <returns>The result of validating.</returns>
         </member>
-        <member name="T:FileCabinetApp.FileCabinetRecordXMLWriter">
+        <member name="M:FileCabinetApp.IInputValidator.ValidateGender(System.Char)">
             <summary>
-            Create XMLDocument based on records array data, serialize and save it to disk.
+            Validate incoming gender using special rules.
             </summary>
+            <param name="gender">Incoming gender.</param>
+            <returns>The result of validation.</returns>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetRecordXMLWriter.#ctor(System.IO.StreamWriter)">
+        <member name="T:FileCabinetApp.IRecordValidator">
             <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetRecordXMLWriter"/> class and create <see cref="F:FileCabinetApp.FileCabinetRecordXMLWriter.xmlWriter"/> object based on <see cref="T:System.IO.StreamWriter"/> argument.
-            </summary>
-            <param name="writer"><see cref="T:System.IO.StreamWriter"/> with file path and other additional settings.</param>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetRecordXMLWriter.Write(FileCabinetRecord[])">
-            <summary>
-            Create and Write <see cref="T:FileCabinetRecord"/> array into <see cref="T:System.Xml.XmlDocument"/> and save it throught <see cref="T:System.Xml.XmlWriter"/>.
-            </summary>
-            <param name="fileCabinetRecordsArray">Array of <see cref="T:FileCabinetRecord"/>.</param>
-        </member>
-        <member name="T:FileCabinetApp.FileCabinetXMLReader">
-            <summary>
-            Class for working and deserializing information from an XML file.
+            The interface required to validate the parameters in accordance with the selected rules.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetXMLReader.#ctor(System.IO.FileStream)">
+        <member name="M:FileCabinetApp.IRecordValidator.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
             <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetXMLReader"/> class.
+            A method that invokes parameter validation through the class that implements this interface.
             </summary>
-            <param name="fileStream"><see cref="T:System.IO.FileStream"/> with information about XML format file.</param>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetXMLReader.ReadAll">
-            <summary>
-            Read and deserialize all information from file and return it <see cref="T:System.Collections.Generic.IList`1"/> representation.
-            </summary>
-            <returns><see cref="T:System.Collections.Generic.IList`1"/> representation of redords into XML file.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Program">
-            <summary>
-            The main class from where all available functions are called.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Program.Configure(System.String[])">
-            <summary>
-            A method that accepts command line parameters to control the check rules depending on the passed argument.
-            </summary>
-            <param name="parameters">An array of arguments passed to the Main method.</param>
-        </member>
-        <member name="M:FileCabinetApp.Program.Main(System.String[])">
-            <summary>
-            The main application method from which the user interacts with all available methods.
-            </summary>
-            <param name="args">Command line arguments required to control check parameters.</param>
+            <param name="recordData">The container class includes all the information about the record.</param>
         </member>
         <member name="T:FileCabinetApp.Validators.CompositeValidator">
             <summary>
@@ -1071,63 +1109,22 @@
             </summary>
             <returns>New instance of <see cref="T:FileCabinetApp.Validators.CompositeValidator"/> with the list of validators.</returns>
         </member>
-        <member name="T:FileCabinetApp.IInputValidator">
+        <member name="T:FileCabinetApp.Program">
             <summary>
-            Interface which describes basic behavior of Input validators classes.
+            The main class from where all available functions are called.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.IInputValidator.ValidateFirstName(System.String)">
+        <member name="M:FileCabinetApp.Program.Configure(System.String[])">
             <summary>
-            Validate incoming first name using special rules.
+            A method that accepts command line parameters to control the check rules depending on the passed argument.
             </summary>
-            <param name="firstName">Incoming first name.</param>
-            <returns>The result of validating.</returns>
+            <param name="parameters">An array of arguments passed to the Main method.</param>
         </member>
-        <member name="M:FileCabinetApp.IInputValidator.ValidateLastName(System.String)">
+        <member name="M:FileCabinetApp.Program.Main(System.String[])">
             <summary>
-            Validate incoming last name using special rules.
+            The main application method from which the user interacts with all available methods.
             </summary>
-            <param name="lastName">Incoming last name.</param>
-            <returns>The result of validating.</returns>
-        </member>
-        <member name="M:FileCabinetApp.IInputValidator.ValidateDateOfBirth(System.DateTime)">
-            <summary>
-            Validate incoming date of birth using special rules.
-            </summary>
-            <param name="dateOfBirth">Incoming date of birth.</param>
-            <returns>The result of validating.</returns>
-        </member>
-        <member name="M:FileCabinetApp.IInputValidator.ValidateHeight(System.Int16)">
-            <summary>
-            Validate incoming height using special rules.
-            </summary>
-            <param name="height">Incoming height.</param>
-            <returns>The result of validating.</returns>
-        </member>
-        <member name="M:FileCabinetApp.IInputValidator.ValidateMoney(System.Decimal)">
-            <summary>
-            Validate incoming amount of money using special rules.
-            </summary>
-            <param name="money">Incoming amount of money.</param>
-            <returns>The result of validating.</returns>
-        </member>
-        <member name="M:FileCabinetApp.IInputValidator.ValidateGender(System.Char)">
-            <summary>
-            Validate incoming gender using special rules.
-            </summary>
-            <param name="gender">Incoming gender.</param>
-            <returns>The result of validation.</returns>
-        </member>
-        <member name="T:FileCabinetApp.IRecordValidator">
-            <summary>
-            The interface required to validate the parameters in accordance with the selected rules.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.IRecordValidator.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
-            <summary>
-            A method that invokes parameter validation through the class that implements this interface.
-            </summary>
-            <param name="recordData">The container class includes all the information about the record.</param>
+            <param name="args">Command line arguments required to control check parameters.</param>
         </member>
         <member name="T:FileCabinetRecord">
             <summary>

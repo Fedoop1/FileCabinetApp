@@ -44,11 +44,6 @@ namespace FileCabinetApp.CommandHandlers
         {
             var recordsArray = this.service.GetRecords();
 
-            if (recordsArray.Count == 0)
-            {
-                Console.WriteLine("Records list is empty.");
-            }
-
             return recordsArray;
         }
     }

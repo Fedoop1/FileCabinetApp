@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -50,18 +47,13 @@ namespace FileCabinetApp.CommandHandlers
             const int FindData = 1;
             string[] arrayParameters = parameters.Split(" ", 2);
 
-            FileCabinetRecord[] records = arrayParameters[FindParam] switch
+            IEnumerable<FileCabinetRecord> records = arrayParameters[FindParam] switch
             {
                 "firstname" => this.service.FindByFirstName(arrayParameters[FindData]),
                 "lastname" => this.service.FindByLastName(arrayParameters[FindData]),
                 "dateofbirth" => this.service.FindByDayOfBirth(arrayParameters[FindData]),
                 _ => Array.Empty<FileCabinetRecord>()
             };
-
-            if (records.Length == 0)
-            {
-                Console.WriteLine("There are no records with this parameters.");
-            }
 
             return records;
         }

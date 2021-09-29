@@ -31,7 +31,7 @@ namespace FileCabinetApp
             return result;
         }
 
-        public FileCabinetRecord[] FindByFirstName(string firstName)
+        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
             this.stopwatch.Restart();
             var result = this.service.FindByFirstName(firstName);
@@ -40,7 +40,7 @@ namespace FileCabinetApp
             return result;
         }
 
-        public FileCabinetRecord[] FindByLastName(string lastName)
+        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
         {
             this.stopwatch.Restart();
             var result = this.service.FindByLastName(lastName);
@@ -49,7 +49,7 @@ namespace FileCabinetApp
             return result;
         }
 
-        public FileCabinetRecord[] FindByDayOfBirth(string dateOfBirth)
+        public IEnumerable<FileCabinetRecord> FindByDayOfBirth(string dateOfBirth)
         {
             this.stopwatch.Restart();
             var result = this.service.FindByDayOfBirth(dateOfBirth);
@@ -66,7 +66,7 @@ namespace FileCabinetApp
             WriteResult(this.stopwatch.ElapsedTicks);
         }
 
-        public IReadOnlyCollection<FileCabinetRecord> GetRecords()
+        public IEnumerable<FileCabinetRecord> GetRecords()
         {
             this.stopwatch.Restart();
             var result = this.service.GetRecords();
@@ -92,7 +92,7 @@ namespace FileCabinetApp
             WriteResult(this.stopwatch.ElapsedTicks);
         }
 
-        public (int RecordsCount, int DeletedRecords) GetStat()
+        public (int AliveRecords, int DeletedRecords) GetStat()
         {
             this.stopwatch.Restart();
             var result = this.service.GetStat();

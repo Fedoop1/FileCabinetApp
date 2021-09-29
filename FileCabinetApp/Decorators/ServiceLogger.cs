@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 
 namespace FileCabinetApp.Decorators
@@ -47,29 +48,29 @@ namespace FileCabinetApp.Decorators
         }
 
         /// <inheritdoc/>
-        public FileCabinetRecord[] FindByFirstName(string firstName)
+        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
             this.logger.LogInformation($"{DateTime.Now} - Calling FindByFirstName(firstName) with firstName = {firstName}");
             var result = this.service.FindByFirstName(firstName);
-            this.logger.LogInformation($"{DateTime.Now} - FindByFirstName(firstName) return {result.Length} record(s)");
+            this.logger.LogInformation($"{DateTime.Now} - FindByFirstName(firstName) return {result.Count()} record(s)");
             return result;
         }
 
         /// <inheritdoc/>
-        public FileCabinetRecord[] FindByLastName(string lastName)
+        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
         {
             this.logger.LogInformation($"{DateTime.Now} - Calling FindByLastName(lastName) with lastName = {lastName}");
             var result = this.service.FindByLastName(lastName);
-            this.logger.LogInformation($"{DateTime.Now} - FindByLastName(lastName) return {result.Length} record(s)");
+            this.logger.LogInformation($"{DateTime.Now} - FindByLastName(lastName) return {result.Count()} record(s)");
             return result;
         }
 
         /// <inheritdoc/>
-        public FileCabinetRecord[] FindByDayOfBirth(string dateOfBirth)
+        public IEnumerable<FileCabinetRecord> FindByDayOfBirth(string dateOfBirth)
         {
             this.logger.LogInformation($"{DateTime.Now} - Calling FindByDayOfBirth(dateOfBirth) with dateOfBirth = {dateOfBirth}");
             var result = this.service.FindByDayOfBirth(dateOfBirth);
-            this.logger.LogInformation($"{DateTime.Now} - FindByDayOfBirth(dateOfBirth) return {result.Length} record(s)");
+            this.logger.LogInformation($"{DateTime.Now} - FindByDayOfBirth(dateOfBirth) return {result.Count()} record(s)");
             return result;
         }
 
@@ -82,11 +83,11 @@ namespace FileCabinetApp.Decorators
         }
 
         /// <inheritdoc/>
-        public IReadOnlyCollection<FileCabinetRecord> GetRecords()
+        public IEnumerable<FileCabinetRecord> GetRecords()
         {
             this.logger.LogInformation($"{DateTime.Now} - Calling GetRecords()");
             var result = this.service.GetRecords();
-            this.logger.LogInformation($"{DateTime.Now} - GetRecords() return {result.Count} record(s)");
+            this.logger.LogInformation($"{DateTime.Now} - GetRecords() return {result.Count()} record(s)");
             return result;
         }
 
@@ -108,11 +109,11 @@ namespace FileCabinetApp.Decorators
         }
 
         /// <inheritdoc/>
-        public (int RecordsCount, int DeletedRecords) GetStat()
+        public (int AliveRecords, int DeletedRecords) GetStat()
         {
             this.logger.LogInformation($"{DateTime.Now} - Calling GetStat()");
             var result = this.service.GetStat();
-            this.logger.LogInformation($"{DateTime.Now} - GetStat() return actual records: {result.RecordsCount}, deleted records {result.DeletedRecords}");
+            this.logger.LogInformation($"{DateTime.Now} - GetStat() return actual records: {result.AliveRecords}, deleted records {result.DeletedRecords}");
             return result;
         }
 

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Text;
 using FileCabinetApp.Validators;
 
@@ -114,7 +113,7 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public FileCabinetRecord[] FindByDayOfBirth(string dateOfBirth)
+        public IEnumerable<FileCabinetRecord> FindByDayOfBirth(string dateOfBirth)
         {
             if (!DateTime.TryParse(dateOfBirth, out DateTime birthDate))
             {
@@ -127,22 +126,22 @@ namespace FileCabinetApp
                 return Array.Empty<FileCabinetRecord>();
             }
 
-            var recordBuffer = new byte[MaxRecordLength];
-            var result = new FileCabinetRecord[this.dateTimeOffsetDictionary[birthDate].Count];
+            return this.FindByDayOfBirthEnumerable(birthDate);
+        }
 
-            int index = 0;
-            foreach (var position in this.dateTimeOffsetDictionary[birthDate])
+        private IEnumerable<FileCabinetRecord> FindByDayOfBirthEnumerable(DateTime dateOfBirth)
+        {
+            var recordBuffer = new byte[MaxRecordLength];
+            foreach (var position in this.dateTimeOffsetDictionary[dateOfBirth])
             {
                 this.fileStream.Position = position;
                 this.fileStream.Read(recordBuffer);
-                result[index++] = FromByteToRecord(recordBuffer, out _);
+                yield return FromByteToRecord(recordBuffer, out _);
             }
-
-            return result;
         }
 
         /// <inheritdoc/>
-        public FileCabinetRecord[] FindByFirstName(string firstName)
+        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
             if (string.IsNullOrEmpty(firstName))
             {
@@ -155,22 +154,22 @@ namespace FileCabinetApp
                 return Array.Empty<FileCabinetRecord>();
             }
 
-            var recordBuffer = new byte[MaxRecordLength];
-            var result = new FileCabinetRecord[this.firstNameOffsetDictionary[firstName].Count];
+            return this.FindByFirstNameEnumerable(firstName);
+        }
 
-            int index = 0;
+        private IEnumerable<FileCabinetRecord> FindByFirstNameEnumerable(string firstName)
+        {
+            var recordBuffer = new byte[MaxRecordLength];
             foreach (var position in this.firstNameOffsetDictionary[firstName])
             {
                 this.fileStream.Position = position;
                 this.fileStream.Read(recordBuffer);
-                result[index++] = FromByteToRecord(recordBuffer, out _);
+                yield return FromByteToRecord(recordBuffer, out _);
             }
-
-            return result;
         }
 
         /// <inheritdoc/>
-        public FileCabinetRecord[] FindByLastName(string lastName)
+        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
         {
             if (string.IsNullOrEmpty(lastName))
             {
@@ -183,24 +182,23 @@ namespace FileCabinetApp
                 return Array.Empty<FileCabinetRecord>();
             }
 
-            var recordBuffer = new byte[MaxRecordLength];
-            var result = new FileCabinetRecord[this.lastNameOffsetDictionary[lastName].Count];
+            return this.FindByLastNameEnumerable(lastName);
+        }
 
-            int index = 0;
+        private IEnumerable<FileCabinetRecord> FindByLastNameEnumerable(string lastName)
+        {
+            var recordBuffer = new byte[MaxRecordLength];
             foreach (var position in this.lastNameOffsetDictionary[lastName])
             {
                 this.fileStream.Position = position;
                 this.fileStream.Read(recordBuffer);
-                result[index++] = FromByteToRecord(recordBuffer, out _);
+                yield return FromByteToRecord(recordBuffer, out _);
             }
-
-            return result;
         }
 
         /// <inheritdoc/>
-        public IReadOnlyCollection<FileCabinetRecord> GetRecords()
+        public IEnumerable<FileCabinetRecord> GetRecords()
         {
-            var recordArray = new FileCabinetRecord[(int)Math.Ceiling((double)this.fileStream.Length / MaxRecordLength)];
             var recordBuffer = new byte[MaxRecordLength];
             int index = default;
 
@@ -212,15 +210,13 @@ namespace FileCabinetApp
 
                 if (state == RecordState.Alive)
                 {
-                    recordArray[index++] = record;
+                    yield return record;
                 }
             }
-
-            return Array.AsReadOnly(recordArray);
         }
 
         /// <inheritdoc/>
-        public (int RecordsCount, int DeletedRecords) GetStat()
+        public (int AliveRecords, int DeletedRecords) GetStat()
         {
             int aliveCount = default;
             int deletedCount = default;
@@ -337,7 +333,7 @@ namespace FileCabinetApp
                 purgedCount++;
             }
 
-            return $"Data file processing is completed: {purgedCount} of {initialStat.DeletedRecords + initialStat.RecordsCount} records were purged.";
+            return $"Data file processing is completed: {purgedCount} of {initialStat.DeletedRecords + initialStat.AliveRecords} records were purged.";
         }
 
         private (int index, int position) FindDeletedRecord()

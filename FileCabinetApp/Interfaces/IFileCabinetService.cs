@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace FileCabinetApp
 {
@@ -25,21 +24,21 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="firstName">A parameter consisting of the first name.</param>
         /// <returns>Returns an array of all records matching the search term.</returns>
-        public FileCabinetRecord[] FindByFirstName(string firstName);
+        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName);
 
         /// <summary>
         /// A method that searches for a record by second name.
         /// </summary>
         /// <param name="lastName">A parameter consisting of the last name.</param>
         /// <returns>Returns an array of all records matching the search term.</returns>
-        public FileCabinetRecord[] FindByLastName(string lastName);
+        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName);
 
         /// <summary>
         /// A method that searches for a record by date of birth.
         /// </summary>
         /// <param name="dateOfBirth">A parameter consisting of the date of birth.</param>
         /// <returns>Returns an array of all records matching the search term.</returns>
-        public FileCabinetRecord[] FindByDayOfBirth(string dateOfBirth);
+        public IEnumerable<FileCabinetRecord> FindByDayOfBirth(string dateOfBirth);
 
         /// <summary>
         /// A method for editing data in a particular record.
@@ -51,7 +50,7 @@ namespace FileCabinetApp
         /// A method that returns a collection of records (read-only).
         /// </summary>
         /// <returns>Collection of records (read-only).</returns>
-        public IReadOnlyCollection<FileCabinetRecord> GetRecords();
+        public IEnumerable<FileCabinetRecord> GetRecords();
 
         /// <summary>
         /// A method that returns the count of records.
@@ -69,7 +68,7 @@ namespace FileCabinetApp
         /// Get the count of existing and deleted <see cref="FileCabinetRecord"/>'s.
         /// </summary>
         /// <returns>The count of the records.</returns>
-        public (int RecordsCount, int DeletedRecords) GetStat();
+        public (int AliveRecords, int DeletedRecords) GetStat();
 
         /// <summary>
         /// Removes a record from a data source.
