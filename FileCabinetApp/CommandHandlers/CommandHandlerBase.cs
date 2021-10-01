@@ -1,4 +1,6 @@
-﻿namespace FileCabinetApp.CommandHandlers
+﻿using FileCabinetApp.Interfaces;
+
+namespace FileCabinetApp.CommandHandlers
 {
     /// <summary>
     /// Abstract class implementing the <see cref="ICommandHandler"/> and is the basic class for all <see cref="CommandHandlerBase"/> inheritance.

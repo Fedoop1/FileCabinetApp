@@ -1,4 +1,4 @@
-﻿namespace FileCabinetApp
+﻿namespace FileCabinetApp.Interfaces
 {
     /// <summary>
     /// The interface required to validate the parameters in accordance with the selected rules.

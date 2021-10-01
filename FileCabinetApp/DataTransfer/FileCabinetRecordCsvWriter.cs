@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using FileCabinetApp.Interfaces;
 
-namespace FileCabinetApp
+namespace FileCabinetApp.DataTransfer
 {
     /// <summary>
     /// Create CSV document based on records array data, serialize and save it to disk.

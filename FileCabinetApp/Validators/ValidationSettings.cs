@@ -1,4 +1,6 @@
 ﻿using System;
+using FileCabinetApp.Interfaces;
+
 namespace FileCabinetApp.Validators
 {
     public sealed class ValidationSettings : IValidationSettings

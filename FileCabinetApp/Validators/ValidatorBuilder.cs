@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.Validators
 {

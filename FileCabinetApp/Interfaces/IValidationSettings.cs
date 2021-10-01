@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FileCabinetApp.Validators
+namespace FileCabinetApp.Interfaces
 {
     public interface IValidationSettings
     {

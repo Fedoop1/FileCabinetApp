@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FileCabinetApp.CommandHandlers;
 
-namespace FileCabinetApp.CommandHandlers
+namespace FileCabinetApp.Interfaces
 {
     /// <summary>
     /// Interface which describe basic behavior to command handler classes that handle user input commands.

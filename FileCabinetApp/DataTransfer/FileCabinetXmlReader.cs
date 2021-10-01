@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using FileCabinetApp.Interfaces;
 
-namespace FileCabinetApp
+namespace FileCabinetApp.DataTransfer
 {
     /// <summary>
     /// Class for deserializing <see cref="FileCabinetRecord"/> information from XML file.
@@ -30,10 +31,21 @@ namespace FileCabinetApp
         /// <returns><see cref="IList{FileCabinetRecord}"/> representation of records into XML file.</returns>
         public IEnumerable<FileCabinetRecord> Load()
         {
-            // TODO: Change implementation to XPath navigation and parsing XML Document
             this.reader ??= new StreamReader(this.filepath);
-            var xmlSerializer = new XmlSerializer(typeof(FileCabinetRecord[]));
-            return xmlSerializer.Deserialize(this.reader) is FileCabinetRecord[] records ? records : throw new ArgumentException($"Xml file doesn't contain data to {nameof(FileCabinetRecord)} type.");
+            var document = XDocument.Load(this.reader);
+            foreach (var record in document.XPathSelectElements("Records/Record"))
+            {
+                yield return new FileCabinetRecord()
+                {
+                    Id = int.Parse(record.Attribute("Id").Value, CultureInfo.CurrentCulture),
+                    FirstName = record.XPathSelectElement("Name").Attribute("First").Value,
+                    LastName = record.XPathSelectElement("Name").Attribute("Last").Value,
+                    DateOfBirth = DateTime.Parse(record.XPathSelectElement("DateOfBirth").Value, CultureInfo.CurrentCulture),
+                    Height = short.Parse(record.XPathSelectElement("Height").Value, CultureInfo.CurrentCulture),
+                    Gender = char.Parse(record.XPathSelectElement("Gender").Value),
+                    Money = decimal.Parse(record.XPathSelectElement("Money").Value, CultureInfo.CurrentCulture),
+                };
+            }
         }
     }
 }

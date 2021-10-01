@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FileCabinetApp
+namespace FileCabinetApp.Interfaces
 {
     /// <summary>
     /// Interface which describes basic behavior of Input validators classes.

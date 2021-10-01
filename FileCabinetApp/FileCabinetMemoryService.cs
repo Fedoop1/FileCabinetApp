@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FileCabinetApp.DataTransfer;
+using FileCabinetApp.Interfaces;
 using FileCabinetApp.Validators;
 
 namespace FileCabinetApp
@@ -142,15 +144,15 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public int Restore(FileCabinetSnapshotService restoreSnapshot)
+        public int Restore(RecordShapshot snapshot)
         {
-            if (restoreSnapshot is null)
+            if (snapshot is null)
             {
-                throw new ArgumentNullException(nameof(restoreSnapshot), "Restore snapshot is null");
+                throw new ArgumentNullException(nameof(snapshot), "Restore snapshot is null");
             }
 
             int affectedRecordsCount = default;
-            foreach (var restoreRecord in restoreSnapshot.Records)
+            foreach (var restoreRecord in snapshot.Records)
             {
                 if (this.recordList.TryGetValue(restoreRecord, out var oldValue))
                 {

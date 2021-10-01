@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using FileCabinetApp.Interfaces;
 
-namespace FileCabinetApp
+namespace FileCabinetApp.DataTransfer
 {
     /// <summary>
     /// Reads records from a CSV file.
     /// </summary>
-    public class FileCabinetCSVReader : IRecordDataLoader
+    public class FileCabinetCsvReader : IRecordDataLoader
     {
         private const int IdIndex = 0;
         private const int FirstNameIndex = 1;
@@ -19,17 +19,26 @@ namespace FileCabinetApp
         private const int GenderIndex = 6;
         private const int FieldsCount = 7;
 
-        private TextReader reader;
         private readonly string filepath;
+        private TextReader reader;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileCabinetCSVReader"/> class and assign <see cref="StreamReader"/>.
+        /// Initializes a new instance of the <see cref="FileCabinetCsvReader"/> class and assign <see cref="StreamReader"/>.
         /// </summary>
-        /// <param name="streamReader"><see cref="TextReader"/> passed in the class.</param>
-        public FileCabinetCSVReader(TextReader reader) => this.reader = reader;
+        /// <param name="reader">Destination file stream.</param>
+        public FileCabinetCsvReader(TextReader reader) => this.reader = reader;
 
-        public FileCabinetCSVReader(string filePath) => this.filepath =
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileCabinetCsvReader"/> class.
+        /// </summary>
+        /// <param name="filePath">Destination file path.</param>
+        public FileCabinetCsvReader(string filePath) => this.filepath =
             filePath ?? throw new ArgumentNullException(nameof(filePath), "File path can't be null");
+
+        /// <summary>
+        /// Finalizes an instance of the <see cref="FileCabinetCsvReader"/> class.
+        /// </summary>
+        ~FileCabinetCsvReader() => this.reader.Dispose();
 
         /// <summary>
         /// Read all <see cref="FileCabinetRecord"/> from the CSV file and add it to <see cref="IList{T}"/>.

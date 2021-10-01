@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -52,7 +49,7 @@ namespace FileCabinetApp.CommandHandlers
                 throw new ArgumentException("Invalid index.");
             }
 
-            if (this.service.RemoveRecord(index))
+            if (this.Service.RemoveRecord(index))
             {
                 Console.WriteLine($"Record #{index} is removed.");
                 return;

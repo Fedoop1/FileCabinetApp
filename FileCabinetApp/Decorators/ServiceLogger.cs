@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FileCabinetApp.DataTransfer;
+using FileCabinetApp.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace FileCabinetApp.Decorators
@@ -8,7 +10,7 @@ namespace FileCabinetApp.Decorators
     /// <summary>
     /// Class decorator which wrap instance of <see cref="IFileCabinetService"/> and log all information about it activity.
     /// </summary>
-    /// <seealso cref="FileCabinetApp.IFileCabinetService" />
+    /// <seealso cref="IFileCabinetService" />
     public sealed class ServiceLogger : IFileCabinetService
     {
         private readonly IFileCabinetService service;
@@ -102,10 +104,10 @@ namespace FileCabinetApp.Decorators
         }
 
         /// <inheritdoc/>
-        public int Restore(FileCabinetSnapshotService restoreSnapshot)
+        public int Restore(RecordShapshot snapshot)
         {
             this.logger.LogInformation($"{DateTime.Now} - Calling Restore(restoreSnapshot)");
-            var result = this.service.Restore(restoreSnapshot);
+            var result = this.service.Restore(snapshot);
             this.logger.LogInformation($"{DateTime.Now} - Restore(restoreSnapshot) finished it work with result: {result}");
             return result;
         }

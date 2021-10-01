@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -49,9 +50,9 @@ namespace FileCabinetApp.CommandHandlers
 
             IEnumerable<FileCabinetRecord> records = arrayParameters[FindParam] switch
             {
-                "firstname" => this.service.FindByFirstName(arrayParameters[FindData]),
-                "lastname" => this.service.FindByLastName(arrayParameters[FindData]),
-                "dateofbirth" => this.service.FindByDayOfBirth(arrayParameters[FindData]),
+                "firstname" => this.Service.FindByFirstName(arrayParameters[FindData]),
+                "lastname" => this.Service.FindByLastName(arrayParameters[FindData]),
+                "dateofbirth" => this.Service.FindByDayOfBirth(arrayParameters[FindData]),
                 _ => Array.Empty<FileCabinetRecord>()
             };
 

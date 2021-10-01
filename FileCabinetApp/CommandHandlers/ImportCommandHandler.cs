@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using FileCabinetApp.DataTransfer;
 using FileCabinetApp.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +14,7 @@ namespace FileCabinetApp.CommandHandlers
         private const int FilePathIndex = 1;
 
         private readonly IServiceProvider provider;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ImportCommandHandler"/> class.
         /// </summary>
@@ -30,6 +31,7 @@ namespace FileCabinetApp.CommandHandlers
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "import")
             {
                 this.Import(commandRequest.Parameters);
+                return;
             }
 
             if (this.nextHandle != null)
@@ -56,7 +58,7 @@ namespace FileCabinetApp.CommandHandlers
             {
                 var snapshotService = this.provider.GetService<IRecordSnapshotService>();
                 snapshotService.LoadFrom(parametersArray[ImportTypeIndex], parametersArray[FilePathIndex]);
-                var restoreResult = this.service.Restore(new FileCabinetSnapshotService(snapshotService.Records));
+                var restoreResult = this.Service.Restore(new RecordShapshot(snapshotService.Records));
                 Console.WriteLine($"{restoreResult} records were imported from {parametersArray[FilePathIndex]}");
             }
             catch (Exception exception)

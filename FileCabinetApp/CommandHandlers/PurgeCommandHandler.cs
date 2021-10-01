@@ -1,4 +1,5 @@
 ﻿using System;
+using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -36,7 +37,7 @@ namespace FileCabinetApp.CommandHandlers
         /// </summary>
         private void Purge()
         {
-            string result = this.service.Purge();
+            string result = this.Service.Purge();
             Console.WriteLine(result);
         }
     }

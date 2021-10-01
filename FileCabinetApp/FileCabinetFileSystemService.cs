@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using FileCabinetApp.DataTransfer;
 using FileCabinetApp.Interfaces;
 using FileCabinetApp.Validators;
 
@@ -253,17 +254,17 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public int Restore(FileCabinetSnapshotService restoreSnapshot)
+        public int Restore(RecordShapshot snapshot)
         {
-            if (restoreSnapshot is null)
+            if (snapshot is null)
             {
-                throw new ArgumentNullException(nameof(restoreSnapshot), "Restore snapshot is null");
+                throw new ArgumentNullException(nameof(snapshot), "Restore snapshot is null");
             }
 
             int affectedRecordsCount = default;
             var recordByteArray = new byte[MaxRecordLength];
             (FileCabinetRecord record, RecordState state, int position) recordData;
-            foreach (var restoreRecord in restoreSnapshot.Records)
+            foreach (var restoreRecord in snapshot.Records)
             {
                 recordByteArray = RecordToByteConverter(restoreRecord);
                 if ((recordData = this.TryFindRecordById(restoreRecord.Id)).record != null)
@@ -316,7 +317,9 @@ namespace FileCabinetApp
             {
                 if ((aliveRecordData = this.FindAliveRecord()).Position < deletedRecordData.Position)
                 {
-                    break;
+                    this.fileStream.SetLength(this.fileStream.Length - MaxRecordLength);
+                    purgedCount++;
+                    continue;
                 }
 
                 this.fileStream.Position = deletedRecordData.Position;

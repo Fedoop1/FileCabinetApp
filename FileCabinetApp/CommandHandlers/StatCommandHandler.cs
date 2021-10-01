@@ -1,4 +1,5 @@
 ﻿using System;
+using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -36,7 +37,7 @@ namespace FileCabinetApp.CommandHandlers
         /// </summary>
         private void Stat()
         {
-            var (actualRecords, deletedRecords) = this.service.GetStat();
+            var (actualRecords, deletedRecords) = this.Service.GetStat();
             Console.WriteLine($"{actualRecords} existing record(s). {deletedRecords} deleted record(s).");
         }
     }

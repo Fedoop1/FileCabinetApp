@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -40,7 +37,7 @@ namespace FileCabinetApp.CommandHandlers
         /// </summary>
         private void Create()
         {
-            int result = this.service.CreateRecord();
+            int result = this.Service.CreateRecord();
 
             Console.WriteLine($"Record #{result} is created.");
         }

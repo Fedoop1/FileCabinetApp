@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -47,7 +44,7 @@ namespace FileCabinetApp.CommandHandlers
                 return;
             }
 
-            this.service.EditRecord(id);
+            this.Service.EditRecord(id);
         }
     }
 }

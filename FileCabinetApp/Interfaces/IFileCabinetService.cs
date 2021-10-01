@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using FileCabinetApp.Interfaces;
+using FileCabinetApp.DataTransfer;
 
-namespace FileCabinetApp
+namespace FileCabinetApp.Interfaces
 {
     /// <summary>
     /// The interface includes all the methods common to the classes inherited from FileCabinetService.
@@ -54,7 +54,7 @@ namespace FileCabinetApp
         public IEnumerable<FileCabinetRecord> GetRecords();
 
         /// <summary>
-        /// A method that returns the count of records.
+        /// A method that returns actual records.
         /// </summary>
         /// <returns>Count of records.</returns>
         public RecordShapshot MakeSnapshot();
@@ -63,7 +63,7 @@ namespace FileCabinetApp
         /// Restore information from <see cref="FileCabinetSnapshotService"/> instance.
         /// </summary>
         /// <param name="restoreSnapshot">Snapshot with information about records.</param>
-        public int Restore(FileCabinetSnapshotService restoreSnapshot);
+        public int Restore(RecordShapshot restoreSnapshot);
 
         /// <summary>
         /// Get the count of existing and deleted <see cref="FileCabinetRecord"/>'s.

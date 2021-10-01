@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FileCabinetApp.CommandHandlers;
+using FileCabinetApp.DataTransfer;
 using FileCabinetApp.Decorators;
 using FileCabinetApp.Interfaces;
 using FileCabinetApp.Validators;
@@ -29,7 +30,7 @@ namespace FileCabinetApp
 
         private static void DefaultRecordPrint(IEnumerable<FileCabinetRecord> records)
         {
-            foreach (var item in records ?? Array.Empty<FileCabinetRecord>())
+            foreach (var item in records)
             {
                 Console.WriteLine(item);
             }
@@ -134,11 +135,11 @@ namespace FileCabinetApp
                 .AddTransient(typeof(IRecordSnapshotService),
                     service =>
                     {
-                        var result = new FileCabinetSnapshotService(service.GetService<IFileCabinetService>().MakeSnapshot().Records);
+                        var result = new FileCabinetSnapshotService(service.GetService<IFileCabinetService>() !.MakeSnapshot());
                         result.AddDataSaver("xml", filepath => new FileCabinetRecordXmlLWriter(filepath));
                         result.AddDataSaver("csv", filepath => new FileCabinetRecordCSVWriter(filepath));
                         result.AddDataLoader("xml", filepath => new FileCabinetXMLReader(filepath));
-                        result.AddDataLoader("csv", filepath => new FileCabinetCSVReader(filepath));
+                        result.AddDataLoader("csv", filepath => new FileCabinetCsvReader(filepath));
 
                         return result;
                     });

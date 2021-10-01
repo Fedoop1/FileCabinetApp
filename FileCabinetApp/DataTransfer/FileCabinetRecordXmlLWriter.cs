@@ -5,7 +5,7 @@ using System.Linq;
 using System.Xml.Linq;
 using FileCabinetApp.Interfaces;
 
-namespace FileCabinetApp
+namespace FileCabinetApp.DataTransfer
 {
     /// <summary>
     /// Create XMLDocument based on records array data, serialize and save it to disk.
@@ -16,24 +16,34 @@ namespace FileCabinetApp
         private TextWriter writer;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileCabinetRecordXmlLWriter"/> class and create <see cref="xmlWriter"/> object based on <see cref="StreamWriter"/> argument.
+        /// Initializes a new instance of the <see cref="FileCabinetRecordXmlLWriter"/> class.
         /// </summary>
-        /// <param name="writer"><see cref="StreamWriter"/> with file path and other additional settings.</param>
+        /// <param name="writer">Stream to destination file.</param>
         public FileCabinetRecordXmlLWriter(TextWriter writer) => this.writer = writer;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileCabinetRecordXmlLWriter"/> class.
+        /// </summary>
+        /// <param name="filepath">Destination file path.</param>
         public FileCabinetRecordXmlLWriter(string filepath) => this.filepath =
             filepath ?? throw new ArgumentNullException(nameof(filepath), "File path can't be null");
+
+        /// <summary>
+        /// Finalizes an instance of the <see cref="FileCabinetRecordXmlLWriter"/> class.
+        /// </summary>
+        ~FileCabinetRecordXmlLWriter() => this.writer.Dispose();
 
         /// <summary>
         /// Create and Write <see cref="FileCabinetRecord"/> source to XML format and save it to destination file.
         /// </summary>
         /// <param name="source">Array of <see cref="FileCabinetRecord"/>.</param>
+        /// <param name="append">Flag which indicate if file will appended or rewritten.</param>
         public void Save(IEnumerable<FileCabinetRecord> source, bool append)
         {
             this.writer ??= new StreamWriter(this.filepath, append);
 
             var document = new XElement("Records", source.Select(record =>
-                new XElement("Record", 
+                new XElement("Record",
                     new XAttribute("Id", record.Id),
                     new XElement("Name",
                         new XAttribute("First", record.FirstName),

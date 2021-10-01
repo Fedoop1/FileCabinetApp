@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using FileCabinetApp.DataTransfer;
+using FileCabinetApp.Interfaces;
 
-namespace FileCabinetApp
+namespace FileCabinetApp.Decorators
 {
     public sealed class ServiceMeter : IFileCabinetService
     {
@@ -85,7 +87,7 @@ namespace FileCabinetApp
             return result;
         }
 
-        public int Restore(FileCabinetSnapshotService restoreSnapshot)
+        public int Restore(RecordShapshot restoreSnapshot)
         {
             this.stopwatch.Restart();
             var result = this.service.Restore(restoreSnapshot);

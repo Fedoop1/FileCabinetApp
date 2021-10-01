@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FileCabinetApp
+namespace FileCabinetApp.DataTransfer
 {
     public class RecordShapshot
     {

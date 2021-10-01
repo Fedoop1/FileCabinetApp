@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -26,8 +27,7 @@ namespace FileCabinetApp.CommandHandlers
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "list")
             {
-                var records = this.List();
-                this.printer.Invoke(records);
+                this.printer.Invoke(this.List());
                 return;
             }
 
@@ -40,11 +40,6 @@ namespace FileCabinetApp.CommandHandlers
         /// <summary>
         /// A method that returns all available records in the application, outputting from the console.
         /// </summary>
-        private IEnumerable<FileCabinetRecord> List()
-        {
-            var recordsArray = this.service.GetRecords();
-
-            return recordsArray;
-        }
+        private IEnumerable<FileCabinetRecord> List() => this.Service.GetRecords();
     }
 }
