@@ -110,7 +110,7 @@
             Handle "export" command from user input.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.CommandHandlers.ExportCommandHandler.#ctor(FileCabinetApp.IFileCabinetService)">
+        <member name="M:FileCabinetApp.CommandHandlers.ExportCommandHandler.#ctor(FileCabinetApp.IFileCabinetService,System.IServiceProvider)">
             <summary>
             Initializes a new instance of the <see cref="T:FileCabinetApp.CommandHandlers.ExportCommandHandler"/> class.
             </summary>
@@ -170,7 +170,7 @@
             Handle "import" command to import data from file in special format.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.CommandHandlers.ImportCommandHandler.#ctor(FileCabinetApp.IFileCabinetService)">
+        <member name="M:FileCabinetApp.CommandHandlers.ImportCommandHandler.#ctor(FileCabinetApp.IFileCabinetService,System.IServiceProvider)">
             <summary>
             Initializes a new instance of the <see cref="T:FileCabinetApp.CommandHandlers.ImportCommandHandler"/> class.
             </summary>
@@ -311,6 +311,93 @@
             </summary>
             <param name="commandRequest">Command with parameters.</param>
         </member>
+        <member name="T:FileCabinetApp.FileCabinetCSVReader">
+            <summary>
+            Reads records from a CSV file.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetCSVReader.#ctor(System.IO.TextReader)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetCSVReader"/> class and assign <see cref="T:System.IO.StreamReader"/>.
+            </summary>
+            <param name="streamReader"><see cref="T:System.IO.TextReader"/> passed in the class.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetCSVReader.Load">
+            <summary>
+            Read all <see cref="T:FileCabinetRecord"/> from the CSV file and add it to <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+            <returns><see cref="T:System.Collections.Generic.IList`1"/> representation of records in the CSV file.</returns>
+        </member>
+        <member name="T:FileCabinetApp.FileCabinetRecordCSVWriter">
+            <summary>
+            Create CSV document based on records array data, serialize and save it to disk.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordCSVWriter.#ctor(System.IO.TextWriter)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetRecordCSVWriter"/> class.
+            </summary>
+            <param name="writer"><see cref="T:System.IO.TextWriter"/> with file path and other addition settings.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordCSVWriter.Save(System.Collections.Generic.IEnumerable{FileCabinetRecord},System.Boolean)">
+            <summary>
+            Write <see cref="T:FileCabinetRecord"/> sequence to CSV file and save it.
+            </summary>
+            <param name="source">Contains actual <see cref="T:FileCabinetRecord"/> data.</param>
+        </member>
+        <member name="T:FileCabinetApp.FileCabinetRecordXmlLWriter">
+            <summary>
+            Create XMLDocument based on records array data, serialize and save it to disk.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordXmlLWriter.#ctor(System.IO.TextWriter)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetRecordXmlLWriter"/> class and create <see cref="!:xmlWriter"/> object based on <see cref="T:System.IO.StreamWriter"/> argument.
+            </summary>
+            <param name="writer"><see cref="T:System.IO.StreamWriter"/> with file path and other additional settings.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordXmlLWriter.Save(System.Collections.Generic.IEnumerable{FileCabinetRecord},System.Boolean)">
+            <summary>
+            Create and Write <see cref="T:FileCabinetRecord"/> source to XML format and save it to destination file.
+            </summary>
+            <param name="source">Array of <see cref="T:FileCabinetRecord"/>.</param>
+        </member>
+        <member name="T:FileCabinetApp.FileCabinetSnapshotService">
+            <summary>
+            Snapshot class with private information about list of <see cref="T:FileCabinetRecord"/> required for secure serialization.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetSnapshotService.#ctor(System.Collections.Generic.IEnumerable{FileCabinetRecord})">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetSnapshotService"/> class and save information and assign inner field by reference to an array with records.
+            </summary>
+            <param name="source"><see cref="T:FileCabinetRecord"/> array with data about records.</param>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetSnapshotService.Records">
+            <summary>
+            Gets <see cref="T:System.Collections.ObjectModel.ReadOnlyCollection`1"/> of <see cref="T:FileCabinetRecord"/> which is stored into snapshot.
+            </summary>
+            <value>
+            Read only collection of <see cref="T:FileCabinetRecord"/>.
+            </value>
+        </member>
+        <member name="T:FileCabinetApp.FileCabinetXMLReader">
+            <summary>
+            Class for deserializing <see cref="T:FileCabinetRecord"/> information from XML file.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetXMLReader.#ctor(System.IO.TextReader)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetXMLReader"/> class.
+            </summary>
+            <param name="reader"><see cref="T:System.IO.TextReader"/> with information about XML format file.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetXMLReader.Load">
+            <summary>
+            Read and deserialize all information from file and return it <see cref="T:System.Collections.Generic.IList`1"/> representation.
+            </summary>
+            <returns><see cref="T:System.Collections.Generic.IList`1"/> representation of records into XML file.</returns>
+        </member>
         <member name="T:FileCabinetApp.Decorators.ServiceLogger">
             <summary>
             Class decorator which wrap instance of <see cref="T:FileCabinetApp.IFileCabinetService"/> and log all information about it activity.
@@ -353,7 +440,7 @@
         <member name="M:FileCabinetApp.Decorators.ServiceLogger.MakeSnapshot">
             <inheritdoc/>
         </member>
-        <member name="M:FileCabinetApp.Decorators.ServiceLogger.Restore(FileCabinetApp.FileCabinetServiceSnapshot)">
+        <member name="M:FileCabinetApp.Decorators.ServiceLogger.Restore(FileCabinetApp.FileCabinetSnapshotService)">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.Decorators.ServiceLogger.GetStat">
@@ -403,14 +490,14 @@
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.MakeSnapshot">
             <summary>
-            Create a new instance of <see cref="T:FileCabinetApp.FileCabinetServiceSnapshot"/> which contain all information about exists records.
+            Create a new instance of <see cref="T:FileCabinetApp.FileCabinetSnapshotService"/> which contain all information about exists records.
             </summary>
-            <returns>Instance of <see cref="T:FileCabinetApp.FileCabinetServiceSnapshot"/>.</returns>
+            <returns>Instance of <see cref="T:FileCabinetApp.FileCabinetSnapshotService"/>.</returns>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
             <inheritdoc/> 
         </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.Restore(FileCabinetApp.FileCabinetServiceSnapshot)">
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.Restore(FileCabinetApp.FileCabinetSnapshotService)">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.RemoveRecord(System.Int32)">
@@ -447,9 +534,9 @@
         </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.MakeSnapshot">
             <summary>
-            Initialize a new <see cref="T:FileCabinetApp.FileCabinetServiceSnapshot"/> which contains <see cref="T:FileCabinetRecord"/> array.
+            Initialize a new <see cref="T:FileCabinetApp.FileCabinetSnapshotService"/> which contains <see cref="T:FileCabinetRecord"/> array.
             </summary>
-            <returns>Returns <see cref="T:FileCabinetApp.FileCabinetServiceSnapshot"/> with data about existing records.</returns>
+            <returns>Returns <see cref="T:FileCabinetApp.FileCabinetSnapshotService"/> with data about existing records.</returns>
         </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.ValidateParameters(FileCabinetApp.FileCabinetRecordData)">
             <inheritdoc/>
@@ -484,7 +571,7 @@
         <member name="M:FileCabinetApp.FileCabinetMemoryService.GetStat">
             <inheritdoc/>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.Restore(FileCabinetApp.FileCabinetServiceSnapshot)">
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.Restore(FileCabinetApp.FileCabinetSnapshotService)">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.Purge">
@@ -600,117 +687,6 @@
             <param name="name">Information for verification.</param>
             <returns>A tuple with the result of the check, a string representation of the entered information, and the converted variable.</returns>
         </member>
-        <member name="T:FileCabinetApp.FileCabinetServiceSnapshot">
-            <summary>
-            Snapshot class with private information about list of <see cref="T:FileCabinetRecord"/> required for secure serialization.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetServiceSnapshot.#ctor(FileCabinetRecord[])">
-            <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetServiceSnapshot"/> class and save information and assign inner field by reference to an array with records.
-            </summary>
-            <param name="fileCabinetRecords"><see cref="T:FileCabinetRecord"/> array with data about records.</param>
-        </member>
-        <member name="P:FileCabinetApp.FileCabinetServiceSnapshot.Records">
-            <summary>
-            Gets <see cref="T:System.Collections.ObjectModel.ReadOnlyCollection`1"/> of <see cref="T:FileCabinetRecord"/> which is stored into snapshot.
-            </summary>
-            <value>
-            Read only collection of <see cref="T:FileCabinetRecord"/>.
-            </value>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetServiceSnapshot.LoadFromCSV(System.IO.StreamReader)">
-            <summary>
-            Load data from CSV file and deserialize it to <see cref="T:FileCabinetRecord"/> representation.
-            </summary>
-            <param name="streamReader">IO Flow with information about data storage file.</param>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetServiceSnapshot.SaveToCSV(System.IO.StreamWriter)">
-            <summary>
-            Create a new instance of <see cref="T:FileCabinetApp.FileCabinetRecordCSVWriter"/> and invoke Write method.
-            </summary>
-            <param name="writer"><see cref="T:System.IO.StreamWriter"/> with information about file path and addition settings.</param>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetServiceSnapshot.SaveToXML(System.IO.StreamWriter)">
-            <summary>
-            Create a new instance of <see cref="T:FileCabinetApp.FileCabinetRecordXMLWriter"/> and invoke Write method.
-            </summary>
-            <param name="writer"><see cref="T:System.IO.StreamWriter"/> with information about file path and addition settings.</param>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetServiceSnapshot.LoadFromXML(System.IO.FileStream)">
-            <summary>
-            Load data from XML file and deserialize it to <see cref="T:FileCabinetRecord"/> representation.
-            </summary>
-            <param name="fileStream">IO Flow with information about data storage file.</param>
-        </member>
-        <member name="T:FileCabinetApp.FileCabinetCSVReader">
-            <summary>
-            Reads records from a CSV file.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetCSVReader.#ctor(System.IO.StreamReader)">
-            <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetCSVReader"/> class and assign <see cref="T:System.IO.StreamReader"/>.
-            </summary>
-            <param name="streamReader"><see cref="T:System.IO.StreamReader"/> passed in the class.</param>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetCSVReader.ReadAll">
-            <summary>
-            Read all <see cref="T:FileCabinetRecord"/> from the CSV file and add it to <see cref="T:System.Collections.Generic.IList`1"/>.
-            </summary>
-            <returns><see cref="T:System.Collections.Generic.IList`1"/> representation of records in the CSV file.</returns>
-        </member>
-        <member name="T:FileCabinetApp.FileCabinetRecordCSVWriter">
-            <summary>
-            Create CSV document based on records array data, serialize and save it to disk.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetRecordCSVWriter.#ctor(System.IO.TextWriter)">
-            <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetRecordCSVWriter"/> class.
-            </summary>
-            <param name="writer"><see cref="T:System.IO.TextWriter"/> with file path and other additionфд settings.</param>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetRecordCSVWriter.Write(FileCabinetRecord[])">
-            <summary>
-            Wtite <see cref="T:FileCabinetRecord"/> array data into CSV file and save it.
-            </summary>
-            <param name="fileCabinetRecordsArray">Contains actual <see cref="T:FileCabinetRecord"/> data.</param>
-        </member>
-        <member name="T:FileCabinetApp.FileCabinetRecordXMLWriter">
-            <summary>
-            Create XMLDocument based on records array data, serialize and save it to disk.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetRecordXMLWriter.#ctor(System.IO.StreamWriter)">
-            <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetRecordXMLWriter"/> class and create <see cref="F:FileCabinetApp.FileCabinetRecordXMLWriter.xmlWriter"/> object based on <see cref="T:System.IO.StreamWriter"/> argument.
-            </summary>
-            <param name="writer"><see cref="T:System.IO.StreamWriter"/> with file path and other additional settings.</param>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetRecordXMLWriter.Write(FileCabinetRecord[])">
-            <summary>
-            Create and Write <see cref="T:FileCabinetRecord"/> array into <see cref="T:System.Xml.XmlDocument"/> and save it throught <see cref="T:System.Xml.XmlWriter"/>.
-            </summary>
-            <param name="fileCabinetRecordsArray">Array of <see cref="T:FileCabinetRecord"/>.</param>
-        </member>
-        <member name="T:FileCabinetApp.FileCabinetXMLReader">
-            <summary>
-            Class for working and deserializing information from an XML file.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetXMLReader.#ctor(System.IO.FileStream)">
-            <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetXMLReader"/> class.
-            </summary>
-            <param name="fileStream"><see cref="T:System.IO.FileStream"/> with information about XML format file.</param>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetXMLReader.ReadAll">
-            <summary>
-            Read and deserialize all information from file and return it <see cref="T:System.Collections.Generic.IList`1"/> representation.
-            </summary>
-            <returns><see cref="T:System.Collections.Generic.IList`1"/> representation of redords into XML file.</returns>
-        </member>
         <member name="T:FileCabinetApp.IFileCabinetService">
             <summary>
             The interface includes all the methods common to the classes inherited from FileCabinetService.
@@ -767,9 +743,9 @@
             </summary>
             <returns>Count of records.</returns>
         </member>
-        <member name="M:FileCabinetApp.IFileCabinetService.Restore(FileCabinetApp.FileCabinetServiceSnapshot)">
+        <member name="M:FileCabinetApp.IFileCabinetService.Restore(FileCabinetApp.FileCabinetSnapshotService)">
             <summary>
-            Restore information from <see cref="T:FileCabinetApp.FileCabinetServiceSnapshot"/> instance.
+            Restore information from <see cref="T:FileCabinetApp.FileCabinetSnapshotService"/> instance.
             </summary>
             <param name="restoreSnapshot">Snapshot with information about records.</param>
         </member>

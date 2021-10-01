@@ -58,12 +58,13 @@ namespace FileCabinetApp
             return result;
         }
 
-        public void EditRecord(int id)
+        public bool EditRecord(int id)
         {
             this.stopwatch.Restart();
-            this.service.EditRecord(id);
+            var result = this.service.EditRecord(id);
             this.stopwatch.Stop();
             WriteResult(this.stopwatch.ElapsedTicks);
+            return result;
         }
 
         public IEnumerable<FileCabinetRecord> GetRecords()
@@ -75,7 +76,7 @@ namespace FileCabinetApp
             return result;
         }
 
-        public FileCabinetServiceSnapshot MakeSnapshot()
+        public RecordShapshot MakeSnapshot()
         {
             this.stopwatch.Restart();
             var result = this.service.MakeSnapshot();
@@ -84,12 +85,13 @@ namespace FileCabinetApp
             return result;
         }
 
-        public void Restore(FileCabinetServiceSnapshot restoreSnapshot)
+        public int Restore(FileCabinetSnapshotService restoreSnapshot)
         {
             this.stopwatch.Restart();
-            this.service.Restore(restoreSnapshot);
+            var result = this.service.Restore(restoreSnapshot);
             this.stopwatch.Stop();
             WriteResult(this.stopwatch.ElapsedTicks);
+            return result;
         }
 
         public (int AliveRecords, int DeletedRecords) GetStat()

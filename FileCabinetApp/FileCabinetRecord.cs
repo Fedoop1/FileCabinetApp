@@ -14,7 +14,7 @@ public class FileCabinetRecord : IEquatable<FileCabinetRecord>
     /// <value>
     /// Id property.
     /// </value>
-    [XmlAttribute]
+    [XmlAttribute("Id")]
     public int Id { get; set; }
 
     /// <summary>
@@ -23,7 +23,7 @@ public class FileCabinetRecord : IEquatable<FileCabinetRecord>
     /// <value>
     /// Height property.
     /// </value>
-    [XmlElement]
+    [XmlElement("Height")]
     public short Height { get; set; }
 
     /// <summary>
@@ -32,16 +32,16 @@ public class FileCabinetRecord : IEquatable<FileCabinetRecord>
     /// <value>
     /// Money property.
     /// </value>
-    [XmlElement]
+    [XmlElement("Money")]
     public decimal Money { get; set; }
 
-        /// <summary>
+    /// <summary>
     /// Gets or sets the gender field.
     /// </summary>
     /// <value>
     /// Gender property.
     /// </value>
-    [XmlElement]
+    [XmlElement("Gender")]
     public char Gender { get; set; }
 
     /// <summary>
@@ -50,7 +50,7 @@ public class FileCabinetRecord : IEquatable<FileCabinetRecord>
     /// <value>
     /// First name property.
     /// </value>
-    [XmlElement("First-Name")]
+    [XmlAttribute("First")]
     public string FirstName { get; set; }
 
     /// <summary>
@@ -59,7 +59,7 @@ public class FileCabinetRecord : IEquatable<FileCabinetRecord>
     /// <value>
     /// Last name property.
     /// </value>
-    [XmlElement("Last-Name")]
+    [XmlAttribute("Last")]
     public string LastName { get; set; }
 
     /// <summary>
@@ -68,7 +68,7 @@ public class FileCabinetRecord : IEquatable<FileCabinetRecord>
     /// <value>
     /// Date of birth property.
     /// </value>
-    [XmlElement("Date-of-Birth")]
+    [XmlElement("DateofBirth")]
     public DateTime DateOfBirth { get; set; }
 
     /// <summary>

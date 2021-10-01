@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp
 {
@@ -44,7 +45,7 @@ namespace FileCabinetApp
         /// A method for editing data in a particular record.
         /// </summary>
         /// <param name="id">A unique identifier by which the editing will take place.</param>
-        public void EditRecord(int id);
+        public bool EditRecord(int id);
 
         /// <summary>
         /// A method that returns a collection of records (read-only).
@@ -56,13 +57,13 @@ namespace FileCabinetApp
         /// A method that returns the count of records.
         /// </summary>
         /// <returns>Count of records.</returns>
-        public FileCabinetServiceSnapshot MakeSnapshot();
+        public RecordShapshot MakeSnapshot();
 
         /// <summary>
-        /// Restore information from <see cref="FileCabinetServiceSnapshot"/> instance.
+        /// Restore information from <see cref="FileCabinetSnapshotService"/> instance.
         /// </summary>
         /// <param name="restoreSnapshot">Snapshot with information about records.</param>
-        public void Restore(FileCabinetServiceSnapshot restoreSnapshot);
+        public int Restore(FileCabinetSnapshotService restoreSnapshot);
 
         /// <summary>
         /// Get the count of existing and deleted <see cref="FileCabinetRecord"/>'s.

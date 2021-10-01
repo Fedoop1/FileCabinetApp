@@ -20,13 +20,10 @@ namespace FileCabinetApp
         public FileCabinetMemoryService(IValidationSettings settings) => this.validationSettings = settings ?? throw new ArgumentNullException(nameof(settings), "Validation settings can't be null");
 
         /// <summary>
-        /// Initialize a new <see cref="FileCabinetServiceSnapshot"/> which contains <see cref="FileCabinetRecord"/> array.
+        /// Initialize a new <see cref="FileCabinetSnapshotService"/> which contains <see cref="FileCabinetRecord"/> array.
         /// </summary>
-        /// <returns>Returns <see cref="FileCabinetServiceSnapshot"/> with data about existing records.</returns>
-        public FileCabinetServiceSnapshot MakeSnapshot()
-        {
-            return new FileCabinetServiceSnapshot(this.recordList.ToArray());
-        }
+        /// <returns>Returns <see cref="FileCabinetSnapshotService"/> with data about existing records.</returns>
+        public RecordShapshot MakeSnapshot() => new (this.GetRecords());
 
         /// <inheritdoc/>
         public void ValidateParameters(FileCabinetRecordData recordData)
@@ -100,21 +97,12 @@ namespace FileCabinetApp
             return Array.Empty<FileCabinetRecord>();
         }
 
-        private static IEnumerable<FileCabinetRecord> RecordsIterator(IEnumerable<FileCabinetRecord> source)
-        {
-            foreach (var record in source)
-            {
-                yield return record;
-            }
-        }
-
         /// <inheritdoc/>
-        public void EditRecord(int id)
+        public bool EditRecord(int id)
         {
             if (!this.RemoveRecord(id))
             {
-                Console.WriteLine("Record doesn't exist.");
-                return;
+                return false;
             }
 
             var dataContainer = new FileCabinetRecordData(this.validationSettings);
@@ -135,7 +123,7 @@ namespace FileCabinetApp
             this.recordList.Add(newRecord);
             this.DictionaryAdd(newRecord);
 
-            Console.WriteLine($"Record #{id} is updated.");
+            return true;
         }
 
         /// <inheritdoc/>
@@ -154,26 +142,28 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public void Restore(FileCabinetServiceSnapshot restoreSnapshot)
+        public int Restore(FileCabinetSnapshotService restoreSnapshot)
         {
             if (restoreSnapshot is null)
             {
                 throw new ArgumentNullException(nameof(restoreSnapshot), "Restore snapshot is null");
             }
 
-            var restoreRecordList = restoreSnapshot.Records;
-            foreach (var restoreRecord in restoreRecordList)
+            int affectedRecordsCount = default;
+            foreach (var restoreRecord in restoreSnapshot.Records)
             {
                 if (this.recordList.TryGetValue(restoreRecord, out var oldValue))
                 {
                     this.recordList.Remove(oldValue);
                     this.DictionaryRemove(oldValue);
-                    Console.WriteLine($"Record #{restoreRecord.Id} was updated!");
                 }
 
                 this.recordList.Add(restoreRecord);
                 this.DictionaryAdd(restoreRecord);
+                affectedRecordsCount++;
             }
+
+            return affectedRecordsCount;
         }
 
         /// <inheritdoc/>
@@ -240,6 +230,14 @@ namespace FileCabinetApp
             this.firstNameDictionary[record.FirstName].Remove(record);
             this.lastNameDictionary[record.LastName].Remove(record);
             this.dateOfBirthDictionary[record.DateOfBirth].Remove(record);
+        }
+
+        private static IEnumerable<FileCabinetRecord> RecordsIterator(IEnumerable<FileCabinetRecord> source)
+        {
+            foreach (var record in source)
+            {
+                yield return record;
+            }
         }
     }
 }

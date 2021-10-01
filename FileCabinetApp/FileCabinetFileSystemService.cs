@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using FileCabinetApp.Interfaces;
 using FileCabinetApp.Validators;
 
 namespace FileCabinetApp
@@ -79,14 +80,13 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public void EditRecord(int id)
+        public bool EditRecord(int id)
         {
             var (record, recordState, position) = this.TryFindRecordById(id);
 
             if (record is null || recordState == RecordState.Deleted)
             {
-                Console.WriteLine("Record doesn't exist.");
-                return;
+                return false;
             }
 
             var recordData = new FileCabinetRecordData(this.validationSettings);
@@ -109,7 +109,7 @@ namespace FileCabinetApp
             this.fileStream.Position = position;
             this.fileStream.Write(recordByteArray);
 
-            Console.WriteLine($"Record {id} successful update.");
+            return true;
         }
 
         /// <inheritdoc/>
@@ -241,14 +241,10 @@ namespace FileCabinetApp
         }
 
         /// <summary>
-        /// Create a new instance of <see cref="FileCabinetServiceSnapshot"/> which contain all information about exists records.
+        /// Create a new instance of <see cref="FileCabinetSnapshotService"/> which contain all information about exists records.
         /// </summary>
-        /// <returns>Instance of <see cref="FileCabinetServiceSnapshot"/>.</returns>
-        public FileCabinetServiceSnapshot MakeSnapshot()
-        {
-            var recordsArray = this.GetRecords().ToArray();
-            return new FileCabinetServiceSnapshot(recordsArray);
-        }
+        /// <returns>Instance of <see cref="FileCabinetSnapshotService"/>.</returns>
+        public RecordShapshot MakeSnapshot() => new (this.GetRecords());
 
         /// <inheritdoc/> 
         public void ValidateParameters(FileCabinetRecordData recordData)
@@ -257,30 +253,34 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public void Restore(FileCabinetServiceSnapshot restoreSnapshot)
+        public int Restore(FileCabinetSnapshotService restoreSnapshot)
         {
             if (restoreSnapshot is null)
             {
                 throw new ArgumentNullException(nameof(restoreSnapshot), "Restore snapshot is null");
             }
 
-            var restoreRecordsList = restoreSnapshot.Records;
-            var recordList = this.GetRecords();
-
-            foreach (var restoreRecord in restoreRecordsList)
+            int affectedRecordsCount = default;
+            var recordByteArray = new byte[MaxRecordLength];
+            (FileCabinetRecord record, RecordState state, int position) recordData;
+            foreach (var restoreRecord in restoreSnapshot.Records)
             {
-                byte[] recordByteArray = RecordToByteConverter(restoreRecord);
-
-                if (recordList.Any(record => record.Id == restoreRecord.Id))
+                recordByteArray = RecordToByteConverter(restoreRecord);
+                if ((recordData = this.TryFindRecordById(restoreRecord.Id)).record != null)
                 {
-                    this.fileStream.Position = this.TryFindRecordById(restoreRecord.Id).position;
+                    this.fileStream.Position = recordData.position;
                     this.fileStream.Write(recordByteArray);
                 }
                 else
                 {
+                    this.fileStream.Position = this.fileStream.Length;
                     this.fileStream.Write(recordByteArray);
                 }
+
+                affectedRecordsCount++;
             }
+
+            return affectedRecordsCount;
         }
 
         /// <inheritdoc/>

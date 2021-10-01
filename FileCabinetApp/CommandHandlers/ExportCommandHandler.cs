@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
+using FileCabinetApp.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -9,13 +10,18 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class ExportCommandHandler : ServiceCommandHandlerBase
     {
+        private readonly IServiceProvider provider;
+        private const int FileTypeIndex = 0;
+        private const int FilePathIndex = 1;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ExportCommandHandler"/> class.
         /// </summary>
         /// <param name="service"><see cref="IFileCabinetService"/> context required for the correct operation of the methods.</param>
-        public ExportCommandHandler(IFileCabinetService service)
+        public ExportCommandHandler(IFileCabinetService service, IServiceProvider provider)
             : base(service)
         {
+            this.provider = provider;
         }
 
         /// <inheritdoc/>
@@ -39,60 +45,38 @@ namespace FileCabinetApp.CommandHandlers
         /// <param name="parameters">Contain type of export document and filename to save document.</param>
         private void Export(string parameters)
         {
-            string[] parameterArray = parameters.Split(" ", 2);
+            if (string.IsNullOrEmpty(parameters))
+            {
+                Console.WriteLine("Invalid parameters.");
+                return;
+            }
 
-            const int fileTypeIndex = 0;
-            const int filePathIndex = 1;
-            bool append = true;
-            if (parameters?.Length == 0)
+            string[] parametersArray = parameters.Split(" ", 2, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+            if (parametersArray.Length != 2)
             {
-                Console.WriteLine("Empty parameters");
-                return;
-            }
-            else if (parameterArray.Length < 2)
-            {
-                Console.WriteLine("File path or export type is empty.");
-                return;
-            }
-            else if (string.IsNullOrWhiteSpace(parameterArray[filePathIndex]) || parameterArray[filePathIndex].Length == 0)
-            {
-                Console.WriteLine("File path is empty or incorrect.");
-                return;
+                Console.WriteLine("Invalid parameters.");
             }
 
             try
             {
-                if (File.Exists(parameterArray[filePathIndex]))
+                bool append = true;
+                if (File.Exists(parametersArray[FilePathIndex]))
                 {
-                    Console.WriteLine($"File is exist - rewrite {parameterArray[filePathIndex]} ? [Y/N]");
+                    Console.WriteLine($"File is exist - rewrite {parametersArray[FilePathIndex]} ? [Y/N]");
                     if (Console.ReadKey().Key == ConsoleKey.Y)
                     {
                         append = false;
                     }
                 }
 
-                using var streamWriter = new StreamWriter(parameterArray[filePathIndex], append);
-                FileCabinetServiceSnapshot snapshot = this.service.MakeSnapshot();
-                switch (parameterArray[fileTypeIndex].ToLower(CultureInfo.CurrentCulture))
-                {
-                    case "csv":
-                        snapshot.SaveToCSV(streamWriter);
-                        break;
-                    case "xml":
-                        snapshot.SaveToXML(streamWriter);
-                        break;
-                    default:
-                        Console.WriteLine("Unknown export type format.");
-                        return;
-                }
+                this.provider.GetService<IRecordSnapshotService>()?.SaveTo(parametersArray[FileTypeIndex], parametersArray[FilePathIndex], append);
+                Console.WriteLine($"\nAll records are exported to file {parametersArray[FilePathIndex]}.");
             }
-            catch (IOException)
+            catch (Exception exception)
             {
-                Console.WriteLine($"Can't open file {parameterArray[filePathIndex]}");
-                return;
+                Console.WriteLine($"During saving an error was happened. Error message: {exception.Message}.");
             }
-
-            Console.WriteLine($"\nAll records are exported to file {parameterArray[filePathIndex]}.");
         }
     }
 }

@@ -75,11 +75,12 @@ namespace FileCabinetApp.Decorators
         }
 
         /// <inheritdoc/>
-        public void EditRecord(int id)
+        public bool EditRecord(int id)
         {
             this.logger.LogInformation($"{DateTime.Now} - Calling EditRecord(id) with id = {id}");
-            this.service.EditRecord(id);
-            this.logger.LogInformation($"{DateTime.Now} - EditRecord(id) finished it work");
+            var result = this.service.EditRecord(id);
+            this.logger.LogInformation($"{DateTime.Now} - EditRecord(id) finished it work with result: {result}");
+            return result;
         }
 
         /// <inheritdoc/>
@@ -92,7 +93,7 @@ namespace FileCabinetApp.Decorators
         }
 
         /// <inheritdoc/>
-        public FileCabinetServiceSnapshot MakeSnapshot()
+        public RecordShapshot MakeSnapshot()
         {
             this.logger.LogInformation($"{DateTime.Now} - Calling MakeSnapshot()");
             var result = this.service.MakeSnapshot();
@@ -101,11 +102,12 @@ namespace FileCabinetApp.Decorators
         }
 
         /// <inheritdoc/>
-        public void Restore(FileCabinetServiceSnapshot restoreSnapshot)
+        public int Restore(FileCabinetSnapshotService restoreSnapshot)
         {
             this.logger.LogInformation($"{DateTime.Now} - Calling Restore(restoreSnapshot)");
-            this.service.Restore(restoreSnapshot);
-            this.logger.LogInformation($"{DateTime.Now} - Restore(restoreSnapshot) finished it work");
+            var result = this.service.Restore(restoreSnapshot);
+            this.logger.LogInformation($"{DateTime.Now} - Restore(restoreSnapshot) finished it work with result: {result}");
+            return result;
         }
 
         /// <inheritdoc/>

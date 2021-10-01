@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using FileCabinetApp.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -8,13 +10,18 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class ImportCommandHandler : ServiceCommandHandlerBase
     {
+        private const int ImportTypeIndex = 0;
+        private const int FilePathIndex = 1;
+
+        private readonly IServiceProvider provider;
         /// <summary>
         /// Initializes a new instance of the <see cref="ImportCommandHandler"/> class.
         /// </summary>
         /// <param name="service">The <see cref="IFileCabinetService"/> context is necessary for the correct execution of the methods.</param>
-        public ImportCommandHandler(IFileCabinetService service)
+        public ImportCommandHandler(IFileCabinetService service, IServiceProvider provider)
             : base(service)
         {
+            this.provider = provider;
         }
 
         /// <inheritdoc/>
@@ -37,40 +44,24 @@ namespace FileCabinetApp.CommandHandlers
         /// <param name="parameters">Includes the data type of the imported file and its path.</param>
         private void Import(string parameters)
         {
-            const int ImportTypeIndex = 0;
-            const int FilePathIndex = 1;
-            var parametersArray = parameters.Split(" ", 2);
-            if (parametersArray.Length < 2)
+            var parametersArray = new string[2];
+
+            if (string.IsNullOrEmpty(parameters) || (parametersArray = parameters.Split(" ", 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)).Length != 2)
             {
-                Console.WriteLine("Import parameters are incorrect.");
+                Console.WriteLine("Invalid parameters");
                 return;
             }
 
             try
             {
-                using var fileStream = new FileStream(parametersArray[FilePathIndex], FileMode.Open, FileAccess.Read);
-                FileCabinetServiceSnapshot snapshot = this.service.MakeSnapshot();
-                switch (parametersArray[ImportTypeIndex].ToUpperInvariant())
-                {
-                    case "CSV":
-                        snapshot.LoadFromCSV(new StreamReader(fileStream));
-                        break;
-                    case "XML":
-                        snapshot.LoadFromXML(fileStream);
-                        break;
-                    default:
-                        Console.WriteLine("Unknown import format.");
-                        break;
-                }
-
-                Console.WriteLine($"{snapshot.Records.Count} records were imported from {parametersArray[FilePathIndex]}");
-                this.service.Restore(snapshot);
-                return;
+                var snapshotService = this.provider.GetService<IRecordSnapshotService>();
+                snapshotService.LoadFrom(parametersArray[ImportTypeIndex], parametersArray[FilePathIndex]);
+                var restoreResult = this.service.Restore(new FileCabinetSnapshotService(snapshotService.Records));
+                Console.WriteLine($"{restoreResult} records were imported from {parametersArray[FilePathIndex]}");
             }
-            catch (IOException)
+            catch (Exception exception)
             {
-                Console.WriteLine($"Can't open file {parametersArray[FilePathIndex]}");
-                return;
+                Console.WriteLine($"During saving an error was happened. Error message: {exception.Message}.");
             }
         }
     }

@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using FileCabinetApp.CommandHandlers;
 using FileCabinetApp.Decorators;
+using FileCabinetApp.Interfaces;
 using FileCabinetApp.Validators;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace FileCabinetApp
@@ -21,8 +23,9 @@ namespace FileCabinetApp
         private static IConfiguration configuration;
 
         private static bool isRunning = true;
-        private static IFileCabinetService service;
+        private static IFileCabinetService fileCabinetService;
         private static IValidationSettings settings;
+        private static IServiceProvider services;
 
         private static void DefaultRecordPrint(IEnumerable<FileCabinetRecord> records)
         {
@@ -34,18 +37,18 @@ namespace FileCabinetApp
 
         private static ICommandHandler CreateCommandHandler()
         {
-            var createHandler = new CreateCommandHandler(service);
-            var editHandler = new EditCommandHandler(service);
-            var exitHandler = new ExitCommandHandler(service, UpdateApplicationStatus);
-            var exportHandler = new ExportCommandHandler(service);
-            var findHandler = new FindCommandHandler(service, DefaultRecordPrint);
+            var createHandler = new CreateCommandHandler(fileCabinetService);
+            var editHandler = new EditCommandHandler(fileCabinetService);
+            var exitHandler = new ExitCommandHandler(fileCabinetService, UpdateApplicationStatus);
+            var exportHandler = new ExportCommandHandler(fileCabinetService, services);
+            var findHandler = new FindCommandHandler(fileCabinetService, DefaultRecordPrint);
             var helpHandler = new HelpCommandHandler();
-            var importHandler = new ImportCommandHandler(service);
-            var listHandler = new ListCommandHandler(service, DefaultRecordPrint);
+            var importHandler = new ImportCommandHandler(fileCabinetService, services);
+            var listHandler = new ListCommandHandler(fileCabinetService, DefaultRecordPrint);
             var missedHandler = new MissedCommandHandler();
-            var purgeHandler = new PurgeCommandHandler(service);
-            var removeHandler = new RemoveCommandHanlder(service);
-            var statHandler = new StatCommandHandler(service);
+            var purgeHandler = new PurgeCommandHandler(fileCabinetService);
+            var removeHandler = new RemoveCommandHanlder(fileCabinetService);
+            var statHandler = new StatCommandHandler(fileCabinetService);
 
             createHandler.SetNext(editHandler);
             editHandler.SetNext(exitHandler);
@@ -123,13 +126,34 @@ namespace FileCabinetApp
             return (service, settings);
         }
 
+        private static IServiceProvider ConfigureServices()
+        {
+            IServiceCollection result = new ServiceCollection()
+                .AddSingleton(typeof(IFileCabinetService), fileCabinetService)
+                .AddSingleton(typeof(IValidationSettings), settings)
+                .AddTransient(typeof(IRecordSnapshotService),
+                    service =>
+                    {
+                        var result = new FileCabinetSnapshotService(service.GetService<IFileCabinetService>().MakeSnapshot().Records);
+                        result.AddDataSaver("xml", filepath => new FileCabinetRecordXmlLWriter(filepath));
+                        result.AddDataSaver("csv", filepath => new FileCabinetRecordCSVWriter(filepath));
+                        result.AddDataLoader("xml", filepath => new FileCabinetXMLReader(filepath));
+                        result.AddDataLoader("csv", filepath => new FileCabinetCSVReader(filepath));
+
+                        return result;
+                    });
+
+            return result.BuildServiceProvider();
+        }
+
         /// <summary>
         /// The main application method from which the user interacts with all available methods.
         /// </summary>
         /// <param name="args">Command line arguments required to control check parameters.</param>
         private static void Main(string[] args)
         {
-            (service, settings) = Configure(args);
+            (fileCabinetService, settings) = Configure(args);
+            services = ConfigureServices();
             var commandHandler = CreateCommandHandler();
             Console.WriteLine($"\nFile Cabinet Application, developed by {DeveloperName}");
             Console.WriteLine(HintMessage);
