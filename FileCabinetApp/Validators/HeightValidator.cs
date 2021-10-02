@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.Validators
@@ -34,17 +30,14 @@ namespace FileCabinetApp.Validators
         }
 
         /// <inheritdoc/>
-        public void ValidateParameters(FileCabinetRecordData recordData)
+        public bool ValidateRecord(FileCabinetRecord record)
         {
-            if (recordData is null)
+            if (record is null)
             {
-                throw new ArgumentNullException(nameof(recordData), "Record data is null");
+                throw new ArgumentNullException(nameof(record), "Record data is null");
             }
 
-            if (recordData.Height < this.minHeight || recordData.Height > this.maxHeight)
-            {
-                throw new ArgumentException("Height is incorrect.");
-            }
+            return record.Height > this.minHeight && record.Height < this.maxHeight;
         }
     }
 }

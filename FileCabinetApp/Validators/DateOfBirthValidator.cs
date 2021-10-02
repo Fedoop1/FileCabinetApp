@@ -31,17 +31,14 @@ namespace FileCabinetApp.Validators
         }
 
         /// <inheritdoc/>
-        public void ValidateParameters(FileCabinetRecordData recordData)
+        public bool ValidateRecord(FileCabinetRecord record)
         {
-            if (recordData is null)
+            if (record is null)
             {
-                throw new ArgumentNullException(nameof(recordData), "Record data is null");
+                throw new ArgumentNullException(nameof(record), "Record can't be null");
             }
 
-            if (recordData.DateOfBirth < this.minDateOfBirth || recordData.DateOfBirth > this.maxDateOfBirth)
-            {
-                throw new ArgumentException("Date of birth is incorrect.");
-            }
+            return record.DateOfBirth > this.minDateOfBirth && record.DateOfBirth < this.maxDateOfBirth;
         }
     }
 }

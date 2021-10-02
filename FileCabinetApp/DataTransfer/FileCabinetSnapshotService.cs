@@ -15,16 +15,15 @@ namespace FileCabinetApp.DataTransfer
         private readonly Dictionary<string, Func<string, object>> dataLoaderProviders =
             new (StringComparer.CurrentCultureIgnoreCase);
 
+        private readonly IFileCabinetService service;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetSnapshotService"/> class.
         /// </summary>
         /// <param name="snapshot">The snapshot.</param>
         /// <exception cref="System.ArgumentNullException">Throws when snapshot is null.</exception>
-        public FileCabinetSnapshotService(RecordShapshot snapshot) => this.Records = snapshot?.Records ??
-            throw new ArgumentNullException(nameof(snapshot), "Snapshot can't be null");
-
-        /// <inheritdoc />
-        public IEnumerable<FileCabinetRecord> Records { get; private set; }
+        public FileCabinetSnapshotService(IFileCabinetService service) => this.service = service ??
+            throw new ArgumentNullException(nameof(service), "Service can't be null");
 
         /// <inheritdoc/>
         public void SaveTo(string fileFormat, string filePath, bool append)
@@ -34,18 +33,18 @@ namespace FileCabinetApp.DataTransfer
                 throw new ArgumentException("File format doesn't support");
             }
 
-            saver.Save(this.Records, append);
+            saver.Save(this.service.MakeSnapshot().Records, append);
         }
 
         /// <inheritdoc/>
-        public void LoadFrom(string fileFormat, string filePath)
+        public RecordShapshot LoadFrom(string fileFormat, string filePath)
         {
             if (!this.dataLoaderProviders.TryGetValue(fileFormat, out var storageLoader) || storageLoader.Invoke(filePath) is not IRecordDataLoader loader)
             {
                 throw new ArgumentException("File format doesn't support");
             }
 
-            this.Records = loader.Load();
+            return new RecordShapshot(loader.Load());
         }
 
         /// <summary>

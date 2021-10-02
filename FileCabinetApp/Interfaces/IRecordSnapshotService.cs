@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FileCabinetApp.DataTransfer;
 
 namespace FileCabinetApp.Interfaces
 {
@@ -7,12 +8,6 @@ namespace FileCabinetApp.Interfaces
     /// </summary>
     public interface IRecordSnapshotService
     {
-        /// <summary>
-        /// Gets <see cref="FileCabinetRecord"/> records.
-        /// </summary>
-        /// <value></value>
-        public IEnumerable<FileCabinetRecord> Records { get; }
-
         /// <summary>
         /// Saves records in special record format to destination file.
         /// </summary>
@@ -26,6 +21,7 @@ namespace FileCabinetApp.Interfaces
         /// </summary>
         /// <param name="fileFormat">The file format.</param>
         /// <param name="filePath">The file path.</param>
-        public void LoadFrom(string fileFormat, string filePath);
+        /// <returns>Loaded records snapshot.</returns>
+        public RecordShapshot LoadFrom(string fileFormat, string filePath);
     }
 }

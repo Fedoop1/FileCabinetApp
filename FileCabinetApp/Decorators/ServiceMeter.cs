@@ -15,22 +15,12 @@ namespace FileCabinetApp.Decorators
         public ServiceMeter(IFileCabinetService service) => this.service =
             service ?? throw new ArgumentNullException(nameof(service), "Service can't be null");
 
-        public IRecordValidator CreateValidator()
+        public void AddRecord(FileCabinetRecord record)
         {
             this.stopwatch.Restart();
-            var result = this.service.CreateValidator();
+            this.service.AddRecord(record);
             this.stopwatch.Stop();
             WriteResult(this.stopwatch.ElapsedTicks);
-            return result;
-        }
-
-        public int CreateRecord()
-        {
-            this.stopwatch.Restart();
-            var result = this.service.CreateRecord();
-            this.stopwatch.Stop();
-            WriteResult(this.stopwatch.ElapsedTicks);
-            return result;
         }
 
         public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
@@ -60,13 +50,12 @@ namespace FileCabinetApp.Decorators
             return result;
         }
 
-        public bool EditRecord(int id)
+        public void EditRecord(FileCabinetRecord record)
         {
             this.stopwatch.Restart();
-            var result = this.service.EditRecord(id);
+            this.service.EditRecord(record);
             this.stopwatch.Stop();
             WriteResult(this.stopwatch.ElapsedTicks);
-            return result;
         }
 
         public IEnumerable<FileCabinetRecord> GetRecords()
@@ -105,13 +94,12 @@ namespace FileCabinetApp.Decorators
             return result;
         }
 
-        public bool RemoveRecord(int index)
+        public void RemoveRecord(FileCabinetRecord record)
         {
             this.stopwatch.Restart();
-            var result = this.service.RemoveRecord(index);
+            this.service.RemoveRecord(record);
             this.stopwatch.Stop();
             WriteResult(this.stopwatch.ElapsedTicks);
-            return result;
         }
 
         public string Purge()

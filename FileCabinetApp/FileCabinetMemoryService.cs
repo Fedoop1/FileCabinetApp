@@ -35,19 +35,11 @@ namespace FileCabinetApp
         /// </summary>
         public void AddRecord(FileCabinetRecord record)
         {
-            if (record is null)
-            {
-                throw new ArgumentNullException(nameof(record), "Record can't be null");
-            }
+            this.ValidateInputRecord(record);
 
             if (!this.isExist(record.Id))
             {
                 throw new ArgumentException("Record with this Id already exists");
-            }
-
-            if (this.ValidateRecord(record))
-            {
-                throw new ArgumentException("Record data doesn't according validation rules");
             }
 
             this.recordList.Add(record);
@@ -90,10 +82,7 @@ namespace FileCabinetApp
         /// <inheritdoc/>
         public void EditRecord(FileCabinetRecord record)
         {
-            if (record is null)
-            {
-                throw new ArgumentNullException(nameof(record), "Record can't be null");
-            }
+            this.ValidateInputRecord(record);
 
             if (!this.isExist(record.Id))
             {
@@ -220,5 +209,18 @@ namespace FileCabinetApp
         }
 
         private bool isExist(int id) => this.recordList.Contains(new FileCabinetRecord() { Id = id });
+
+        private void ValidateInputRecord(FileCabinetRecord record)
+        {
+            if (record is null)
+            {
+                throw new ArgumentNullException(nameof(record), "Record can't be null");
+            }
+
+            if (!this.ValidateRecord(record))
+            {
+                throw new ArgumentException("Record data doesn't according validation rules");
+            }
+        }
     }
 }

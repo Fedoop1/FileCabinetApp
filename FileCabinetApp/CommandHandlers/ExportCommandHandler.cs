@@ -13,6 +13,7 @@ namespace FileCabinetApp.CommandHandlers
         private readonly IServiceProvider provider;
         private const int FileTypeIndex = 0;
         private const int FilePathIndex = 1;
+        private const int ParametersCount = 2;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExportCommandHandler"/> class.
@@ -47,15 +48,15 @@ namespace FileCabinetApp.CommandHandlers
         {
             if (string.IsNullOrEmpty(parameters))
             {
-                Console.WriteLine("Invalid parameters.");
+                Console.WriteLine("Parameters is null or empty");
                 return;
             }
 
             string[] parametersArray = parameters.Split(" ", 2, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
-            if (parametersArray.Length != 2)
+            if (parametersArray.Length != ParametersCount)
             {
-                Console.WriteLine("Invalid parameters.");
+                Console.WriteLine("Invalid parameters count.");
             }
 
             try

@@ -24,6 +24,11 @@ namespace FileCabinetApp.Validators
             this.minMoney = minMoney;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MoneyValidator"/> class.
+        /// </summary>
+        /// <param name="minMoney">The minimum amount of money.</param>
+        /// <param name="maxMoney">The maximum amount of money.</param>
         public MoneyValidator(decimal minMoney, decimal maxMoney)
         {
             this.minMoney = minMoney;
@@ -31,17 +36,14 @@ namespace FileCabinetApp.Validators
         }
 
         /// <inheritdoc/>
-        public void ValidateParameters(FileCabinetRecordData recordData)
+        public bool ValidateRecord(FileCabinetRecord record)
         {
-            if (recordData is null)
+            if (record is null)
             {
-                throw new ArgumentNullException(nameof(recordData), "Record data is null");
+                throw new ArgumentNullException(nameof(record), "Record data is null");
             }
 
-            if (recordData.Money < this.minMoney || recordData.Money > this.maxMoney)
-            {
-                throw new ArgumentException("Invalid money amount.");
-            }
+            return record.Money > this.minMoney && record.Money < this.maxMoney;
         }
     }
 }

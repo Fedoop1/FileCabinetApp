@@ -6,7 +6,7 @@
     "LastName_Min": 2,
     "LastName_Max": 60,
 
-    "DateOfBirth_From": "Jan-01-2000",
+    "DateOfBirth_From": "Jan-01-1950",
     "DateOfBirth_To": "Jan-01-2021",
 
     "Height_Min": 0,

@@ -25,17 +25,11 @@ namespace FileCabinetApp
         private readonly Dictionary<string, List<int>> firstNameOffsetDictionary = new (comparer: StringComparer.CurrentCultureIgnoreCase);
         private readonly Dictionary<string, List<int>> lastNameOffsetDictionary = new (comparer: StringComparer.CurrentCultureIgnoreCase);
 
-        private enum RecordState : byte
-        {
-            Alive = 0,
-            Deleted,
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetFilesystemService"/> class and set the file stream instance.
         /// </summary>
         /// <param name="fileName">Storage file name.</param>
-        /// <param name="settings">Validation settings.</param>
+        /// <param name="validator">Record validator.</param>
         public FileCabinetFilesystemService(string fileName, IRecordValidator validator)
         {
             this.fileName = fileName ?? throw new ArgumentNullException(nameof(fileName), "File name can't be null");
@@ -46,22 +40,26 @@ namespace FileCabinetApp
             this.AnalyseDatabase();
         }
 
+        /// <summary>
+        /// Finalizes an instance of the <see cref="FileCabinetFilesystemService"/> class.
+        /// </summary>
+        /// <returns></returns>
+        ~FileCabinetFilesystemService() => this.fileStream.Dispose();
+
+        private enum RecordState : byte
+        {
+            Alive = 0,
+            Deleted,
+        }
+
         /// <inheritdoc/>
         public void AddRecord(FileCabinetRecord record)
         {
-            if (record is null)
-            {
-                throw new ArgumentNullException(nameof(record), "Record can't be null");
-            }
+            this.ValidateInputRecord(record);
 
-            if (this.TryFindRecordById(record.Id).state != RecordState.Deleted)
+            if (this.TryFindRecordById(record.Id).state == RecordState.Alive)
             {
                 throw new ArgumentException("Record with this Id already exists");
-            }
-
-            if (!this.ValidateRecord(record))
-            {
-                throw new ArgumentException("Record data doesn't according validation rules");
             }
 
             byte[] recordByteArray = RecordToByteConverter(record);
@@ -71,28 +69,14 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public bool EditRecord(FileCabinetRecord record)
+        public void EditRecord(FileCabinetRecord record)
         {
-            if (record is null)
-            {
-                throw new ArgumentNullException(nameof(record), "Record can't be null");
-            }
-
-            var (actualRecord, recordState, position) = this.TryFindRecordById(record.Id);
-
-            if (actualRecord is null || recordState == RecordState.Deleted)
-            {
-                return false;
-            }
-
-            this.ValidateRecord(record);
+            this.ValidateInputRecord(record);
 
             byte[] recordByteArray = RecordToByteConverter(record);
 
-            this.fileStream.Position = position;
+            this.fileStream.Position = this.TryFindRecordById(record.Id).position;
             this.fileStream.Write(recordByteArray);
-
-            return true;
         }
 
         /// <inheritdoc/>
@@ -264,22 +248,16 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public bool RemoveRecord(int index)
+        public void RemoveRecord(FileCabinetRecord record)
         {
-            var (record, state, position) = this.TryFindRecordById(index);
+            this.ValidateInputRecord(record);
 
-            if (record is null || state == RecordState.Deleted)
-            {
-                return false;
-            }
+            var recordPosition = this.TryFindRecordById(record.Id).position;
 
-            this.RemoveFromIndexTable(record, position);
-
-            this.fileStream.Position = position;
+            this.RemoveFromIndexTable(record, recordPosition);
+            this.fileStream.Position = recordPosition;
             this.fileStream.Position += MaxRecordLength - sizeof(bool);
             this.fileStream.WriteByte((byte)RecordState.Deleted);
-
-            return true;
         }
 
         /// <inheritdoc/>
@@ -588,6 +566,17 @@ namespace FileCabinetApp
             return result.TrimEnd('\0');
         }
 
-        ~FileCabinetFilesystemService() => this.fileStream.Dispose();
+        private void ValidateInputRecord(FileCabinetRecord record)
+        {
+            if (record is null)
+            {
+                throw new ArgumentNullException(nameof(record), "Record can't be null");
+            }
+
+            if (!this.ValidateRecord(record))
+            {
+                throw new ArgumentException("Record doesn't satisfy validation rules");
+            }
+        }
     }
 }

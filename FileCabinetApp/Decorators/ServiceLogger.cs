@@ -26,27 +26,17 @@ namespace FileCabinetApp.Decorators
         /// or
         /// Throws when logger is null.
         /// </exception>
-        public ServiceLogger(IFileCabinetService service, ILogger<ServiceLogger> logger) =>
+        public ServiceLogger(IFileCabinetService service, ILogger logger) =>
             (this.service, this.logger) = (
                 service ?? throw new ArgumentNullException(nameof(service), "Service can't be null"),
                 logger ?? throw new ArgumentNullException(nameof(logger), "Logger can't be null"));
 
         /// <inheritdoc/>
-        public IRecordValidator CreateValidator()
+        public void AddRecord(FileCabinetRecord record)
         {
-            this.logger.LogInformation($"{DateTime.Now} - Calling CreateValidator()");
-            var result = this.service.CreateValidator();
-            this.logger.LogInformation($"{DateTime.Now} - CreateValidator() return instance of {result.GetType()}");
-            return result;
-        }
-
-        /// <inheritdoc/>
-        public int CreateRecord()
-        {
-            this.logger.LogInformation($"{DateTime.Now} - Calling CreateRecord()");
-            var result = this.service.CreateRecord();
-            this.logger.LogInformation($"{DateTime.Now} - CreateRecord() create record with id = {result}");
-            return result;
+            this.logger.LogInformation($"{DateTime.Now} - Calling CreateRecord(Record)");
+            this.service.AddRecord(record);
+            this.logger.LogInformation($"{DateTime.Now} - CreateRecord() successfully created record");
         }
 
         /// <inheritdoc/>
@@ -77,12 +67,11 @@ namespace FileCabinetApp.Decorators
         }
 
         /// <inheritdoc/>
-        public bool EditRecord(int id)
+        public void EditRecord(FileCabinetRecord record)
         {
-            this.logger.LogInformation($"{DateTime.Now} - Calling EditRecord(id) with id = {id}");
-            var result = this.service.EditRecord(id);
-            this.logger.LogInformation($"{DateTime.Now} - EditRecord(id) finished it work with result: {result}");
-            return result;
+            this.logger.LogInformation($"{DateTime.Now} - Calling EditRecord(Record)");
+            this.service.EditRecord(record);
+            this.logger.LogInformation($"{DateTime.Now} - EditRecord(id) finished it work");
         }
 
         /// <inheritdoc/>
@@ -122,12 +111,11 @@ namespace FileCabinetApp.Decorators
         }
 
         /// <inheritdoc/>
-        public bool RemoveRecord(int index)
+        public void RemoveRecord(FileCabinetRecord record)
         {
-            this.logger.LogInformation($"{DateTime.Now} - Calling RemoveRecord(int index) with index = {index}");
-            var result = this.service.RemoveRecord(index);
-            this.logger.LogInformation($"{DateTime.Now} - RemoveRecord(int index) return result: {result}");
-            return result;
+            this.logger.LogInformation($"{DateTime.Now} - Calling RemoveRecord(Record)");
+            this.service.RemoveRecord(record);
+            this.logger.LogInformation($"{DateTime.Now} - RemoveRecord(Record) finished it's work");
         }
 
         /// <inheritdoc/>

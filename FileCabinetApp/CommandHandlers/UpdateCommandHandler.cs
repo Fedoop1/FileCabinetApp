@@ -6,13 +6,13 @@ namespace FileCabinetApp.CommandHandlers
     /// <summary>
     /// Handle "edit" command from user input.
     /// </summary>
-    public class EditCommandHandler : ServiceCommandHandlerBase
+    public class UpdateCommandHandler : ServiceCommandHandlerBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EditCommandHandler"/> class.
+        /// Initializes a new instance of the <see cref="UpdateCommandHandler"/> class.
         /// </summary>
         /// <param name="service"><see cref="IFileCabinetService"/> context required for the correct operation of the methods.</param>
-        public EditCommandHandler(IFileCabinetService service)
+        public UpdateCommandHandler(IFileCabinetService service)
             : base(service)
         {
         }
@@ -20,9 +20,9 @@ namespace FileCabinetApp.CommandHandlers
         /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
-            if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "edit")
+            if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command.Contains("update", StringComparison.CurrentCultureIgnoreCase))
             {
-                this.Edit(commandRequest.Parameters);
+                this.Update(commandRequest.Parameters);
                 return;
             }
 
@@ -36,15 +36,17 @@ namespace FileCabinetApp.CommandHandlers
         /// A method that edits information about a specific record.
         /// </summary>
         /// <param name="parameters">A parameter consisting of a unique identifier required to search for a record.</param>
-        private void Edit(string parameters)
+        private void Update(string parameters)
         {
-            if (!int.TryParse(parameters, out int id))
+            try
             {
-                Console.WriteLine($"Id is incorrect.");
-                return;
+                this.Service.EditRecord(null);
             }
-
-            this.Service.EditRecord(id);
+            catch (Exception exception)
+            {
+                Console.WriteLine($"During updating an error was happened. Error message: {exception.Message}.");
+                throw;
+            }
         }
     }
 }
