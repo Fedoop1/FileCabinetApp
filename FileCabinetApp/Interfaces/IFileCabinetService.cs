@@ -9,16 +9,9 @@ namespace FileCabinetApp.Interfaces
     public interface IFileCabinetService
     {
         /// <summary>
-        /// A method that creates an instance of the IRecordValidator interface required for data validation.
-        /// </summary>
-        /// <returns>Returns an instance of the IRecordValidator interface.</returns>
-        public IRecordValidator CreateValidator();
-
-        /// <summary>
         /// The method that creates a new FileCabinetRecord.
         /// </summary>
-        /// <returns>Returns the unique identifier of the record.</returns>
-        public int CreateRecord();
+        public void AddRecord(FileCabinetRecord record);
 
         /// <summary>
         /// A method that searches for a record by name.
@@ -44,8 +37,7 @@ namespace FileCabinetApp.Interfaces
         /// <summary>
         /// A method for editing data in a particular record.
         /// </summary>
-        /// <param name="id">A unique identifier by which the editing will take place.</param>
-        public bool EditRecord(int id);
+        public void EditRecord(FileCabinetRecord record);
 
         /// <summary>
         /// A method that returns a collection of records (read-only).
@@ -76,7 +68,7 @@ namespace FileCabinetApp.Interfaces
         /// </summary>
         /// <param name="index">The identifier of the record to be deleted.</param>
         /// <returns>Removal result.</returns>
-        public bool RemoveRecord(int index);
+        public void RemoveRecord(FileCabinetRecord record);
 
         /// <summary>
         /// Find and remove record from data source file by index.

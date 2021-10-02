@@ -8,7 +8,7 @@
         /// <summary>
         /// A method that invokes parameter validation through the class that implements this interface.
         /// </summary>
-        /// <param name="recordData">The container class includes all the information about the record.</param>
-        void ValidateParameters(FileCabinetRecordData recordData);
+        /// <param name="record">The container class includes all the information about the record.</param>
+        bool ValidateRecord(FileCabinetRecord record);
     }
 }

@@ -17,9 +17,9 @@ namespace FileCabinetApp
         private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new (StringComparer.CurrentCultureIgnoreCase);
         private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new ();
 
-        private readonly IValidationSettings validationSettings;
+        private readonly IRecordValidator validator;
 
-        public FileCabinetMemoryService(IValidationSettings settings) => this.validationSettings = settings ?? throw new ArgumentNullException(nameof(settings), "Validation settings can't be null");
+        public FileCabinetMemoryService(IRecordValidator validator) => this.validator = validator ?? throw new ArgumentNullException(nameof(validator), "Validator can't be null");
 
         /// <summary>
         /// Initialize a new <see cref="FileCabinetSnapshotService"/> which contains <see cref="FileCabinetRecord"/> array.
@@ -28,42 +28,30 @@ namespace FileCabinetApp
         public RecordShapshot MakeSnapshot() => new (this.GetRecords());
 
         /// <inheritdoc/>
-        public void ValidateParameters(FileCabinetRecordData recordData)
-        {
-            this.CreateValidator().ValidateParameters(recordData);
-        }
-
-        /// <summary>
-        /// Create an instance of <see cref="IRecordValidator"/> and return it.
-        /// </summary>
-        /// <returns>Class which realize <see cref="IRecordValidator"/> for calling .ValidateParameters() method.</returns>
-        public IRecordValidator CreateValidator() => ValidatorBuilder.CreateValidator(this.validationSettings);
+        public bool ValidateRecord(FileCabinetRecord record) => this.validator.ValidateRecord(record);
 
         /// <summary>
         /// Create a new instance of <see cref="FileCabinetRecord"/> and save it to storage.
         /// </summary>
-        /// <returns>Returns the unique identifier of the record.</returns>
-        public int CreateRecord()
+        public void AddRecord(FileCabinetRecord record)
         {
-            var dataContainer = new FileCabinetRecordData(this.validationSettings);
-            dataContainer.InputData();
-            this.ValidateParameters(dataContainer);
-
-            var record = new FileCabinetRecord
+            if (record is null)
             {
-                Id = this.recordList.Count + 1,
-                FirstName = dataContainer.FirstName,
-                LastName = dataContainer.LastName,
-                DateOfBirth = dataContainer.DateOfBirth,
-                Height = dataContainer.Height,
-                Money = dataContainer.Money,
-                Gender = dataContainer.Gender,
-            };
+                throw new ArgumentNullException(nameof(record), "Record can't be null");
+            }
+
+            if (!this.isExist(record.Id))
+            {
+                throw new ArgumentException("Record with this Id already exists");
+            }
+
+            if (this.ValidateRecord(record))
+            {
+                throw new ArgumentException("Record data doesn't according validation rules");
+            }
 
             this.recordList.Add(record);
             this.DictionaryAdd(record);
-
-            return record.Id;
         }
 
         /// <inheritdoc/>
@@ -100,32 +88,21 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public bool EditRecord(int id)
+        public void EditRecord(FileCabinetRecord record)
         {
-            if (!this.RemoveRecord(id))
+            if (record is null)
             {
-                return false;
+                throw new ArgumentNullException(nameof(record), "Record can't be null");
             }
 
-            var dataContainer = new FileCabinetRecordData(this.validationSettings);
-            dataContainer.InputData();
-            this.ValidateParameters(dataContainer);
-
-            var newRecord = new FileCabinetRecord()
+            if (!this.isExist(record.Id))
             {
-                Id = id,
-                FirstName = dataContainer.FirstName,
-                LastName = dataContainer.LastName,
-                DateOfBirth = dataContainer.DateOfBirth,
-                Height = dataContainer.Height,
-                Money = dataContainer.Money,
-                Gender = dataContainer.Gender,
-            };
+                throw new ArgumentException("Record with this Id already exists");
+            }
 
-            this.recordList.Add(newRecord);
-            this.DictionaryAdd(newRecord);
-
-            return true;
+            this.ValidateRecord(record);
+            this.recordList.Add(record);
+            this.DictionaryAdd(record);
         }
 
         /// <inheritdoc/>
@@ -175,18 +152,18 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public bool RemoveRecord(int index)
+        public void RemoveRecord(FileCabinetRecord record)
         {
-            var record = this.recordList.FirstOrDefault(rec => rec.Id == index);
-
             if (record is null)
             {
-                return false;
+                throw new ArgumentNullException(nameof(record), "Record can't be null");
             }
 
-            this.recordList.Remove(record);
-            this.DictionaryRemove(record);
-            return true;
+            if (this.recordList.TryGetValue(record, out var actualValue))
+            {
+                this.recordList.Remove(actualValue);
+                this.DictionaryRemove(actualValue);
+            }
         }
 
         /// <summary>
@@ -241,5 +218,7 @@ namespace FileCabinetApp
                 yield return record;
             }
         }
+
+        private bool isExist(int id) => this.recordList.Contains(new FileCabinetRecord() { Id = id });
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using FileCabinetApp.DataTransfer;
 
 namespace FileCabinetApp.Interfaces
 {

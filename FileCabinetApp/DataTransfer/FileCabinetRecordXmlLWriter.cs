@@ -8,7 +8,7 @@ using FileCabinetApp.Interfaces;
 namespace FileCabinetApp.DataTransfer
 {
     /// <summary>
-    /// Create XMLDocument based on records array data, serialize and save it to disk.
+    /// Serialize <see cref="FileCabinetRecord"/> data and save it to destination file.
     /// </summary>
     public class FileCabinetRecordXmlLWriter : IRecordDataSaver
     {

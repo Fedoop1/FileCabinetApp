@@ -20,7 +20,7 @@ namespace FileCabinetApp.DataTransfer
         /// </summary>
         /// <param name="snapshot">The snapshot.</param>
         /// <exception cref="System.ArgumentNullException">Throws when snapshot is null.</exception>
-        public FileCabinetSnapshotService(RecordShapshot snapshot) => this.Records = snapshot.Records ??
+        public FileCabinetSnapshotService(RecordShapshot snapshot) => this.Records = snapshot?.Records ??
             throw new ArgumentNullException(nameof(snapshot), "Snapshot can't be null");
 
         /// <inheritdoc />

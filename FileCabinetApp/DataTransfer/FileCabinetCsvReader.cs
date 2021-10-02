@@ -23,13 +23,13 @@ namespace FileCabinetApp.DataTransfer
         private TextReader reader;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileCabinetCsvReader"/> class and assign <see cref="StreamReader"/>.
+        /// Initializes a new instance of the <see cref="FileCabinetCsvReader"/> class.
         /// </summary>
         /// <param name="reader">Destination file stream.</param>
         public FileCabinetCsvReader(TextReader reader) => this.reader = reader;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileCabinetCsvReader"/> class.
+        /// Initializes a new instance of the <see cref="FileCabinetCsvReader"/> class and save path to destination file.
         /// </summary>
         /// <param name="filePath">Destination file path.</param>
         public FileCabinetCsvReader(string filePath) => this.filepath =

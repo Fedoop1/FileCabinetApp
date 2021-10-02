@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using FileCabinetApp.DataTransfer;
 using FileCabinetApp.Interfaces;
-using FileCabinetApp.Validators;
 
 namespace FileCabinetApp
 {
@@ -17,7 +16,7 @@ namespace FileCabinetApp
         private const int MaxRecordLength = 255 + sizeof(short) + sizeof(decimal) + sizeof(char) + sizeof(bool);
         private const int MaxStringLength = 120;
 
-        private readonly IValidationSettings validationSettings;
+        private readonly IRecordValidator validator;
         private readonly string fileName;
         private readonly FileStream fileStream;
 
@@ -37,75 +36,58 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="fileName">Storage file name.</param>
         /// <param name="settings">Validation settings.</param>
-        public FileCabinetFilesystemService(string fileName, IValidationSettings settings)
+        public FileCabinetFilesystemService(string fileName, IRecordValidator validator)
         {
             this.fileName = fileName ?? throw new ArgumentNullException(nameof(fileName), "File name can't be null");
-            this.validationSettings = settings ??
-                                      throw new ArgumentNullException(nameof(settings), "Validation settings can't be null");
+            this.validator = validator ??
+                                      throw new ArgumentNullException(nameof(validator), "Validator can't be null");
             this.fileStream = new FileStream(this.fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
 
             this.AnalyseDatabase();
         }
 
         /// <inheritdoc/>
-        public int CreateRecord()
+        public void AddRecord(FileCabinetRecord record)
         {
-            var recordData = new FileCabinetRecordData(this.validationSettings);
-            recordData.InputData();
-            this.ValidateParameters(recordData);
-
-            var record = new FileCabinetRecord
+            if (record is null)
             {
-                Id = this.FindNextIndex(),
-                FirstName = recordData.FirstName,
-                LastName = recordData.LastName,
-                DateOfBirth = recordData.DateOfBirth,
-                Height = recordData.Height,
-                Money = recordData.Money,
-                Gender = recordData.Gender,
-            };
+                throw new ArgumentNullException(nameof(record), "Record can't be null");
+            }
+
+            if (this.TryFindRecordById(record.Id).state != RecordState.Deleted)
+            {
+                throw new ArgumentException("Record with this Id already exists");
+            }
+
+            if (!this.ValidateRecord(record))
+            {
+                throw new ArgumentException("Record data doesn't according validation rules");
+            }
 
             byte[] recordByteArray = RecordToByteConverter(record);
             this.fileStream.Position = this.fileStream.Length;
             this.AddToIndexTable(record, (int)this.fileStream.Position);
             this.fileStream.Write(recordByteArray);
-
-            Console.WriteLine($"Record successfully created. Record id #{record.Id}");
-            return record.Id;
         }
 
         /// <inheritdoc/>
-        public IRecordValidator CreateValidator()
+        public bool EditRecord(FileCabinetRecord record)
         {
-            return ValidatorBuilder.CreateValidator(this.validationSettings);
-        }
+            if (record is null)
+            {
+                throw new ArgumentNullException(nameof(record), "Record can't be null");
+            }
 
-        /// <inheritdoc/>
-        public bool EditRecord(int id)
-        {
-            var (record, recordState, position) = this.TryFindRecordById(id);
+            var (actualRecord, recordState, position) = this.TryFindRecordById(record.Id);
 
-            if (record is null || recordState == RecordState.Deleted)
+            if (actualRecord is null || recordState == RecordState.Deleted)
             {
                 return false;
             }
 
-            var recordData = new FileCabinetRecordData(this.validationSettings);
-            recordData.InputData();
-            this.ValidateParameters(recordData);
+            this.ValidateRecord(record);
 
-            var newRecord = new FileCabinetRecord
-            {
-                Id = id,
-                FirstName = recordData?.FirstName,
-                LastName = recordData.LastName,
-                DateOfBirth = recordData.DateOfBirth,
-                Height = recordData.Height,
-                Money = recordData.Money,
-                Gender = recordData.Gender,
-            };
-
-            byte[] recordByteArray = RecordToByteConverter(newRecord);
+            byte[] recordByteArray = RecordToByteConverter(record);
 
             this.fileStream.Position = position;
             this.fileStream.Write(recordByteArray);
@@ -247,11 +229,8 @@ namespace FileCabinetApp
         /// <returns>Instance of <see cref="FileCabinetSnapshotService"/>.</returns>
         public RecordShapshot MakeSnapshot() => new (this.GetRecords());
 
-        /// <inheritdoc/> 
-        public void ValidateParameters(FileCabinetRecordData recordData)
-        {
-            this.CreateValidator().ValidateParameters(recordData);
-        }
+        /// <inheritdoc/>
+        public bool ValidateRecord(FileCabinetRecord record) => this.validator.ValidateRecord(record);
 
         /// <inheritdoc/>
         public int Restore(RecordShapshot snapshot)
@@ -263,11 +242,11 @@ namespace FileCabinetApp
 
             int affectedRecordsCount = default;
             var recordByteArray = new byte[MaxRecordLength];
-            (FileCabinetRecord record, RecordState state, int position) recordData;
+            (FileCabinetRecord actualRecord, RecordState state, int position) recordData;
             foreach (var restoreRecord in snapshot.Records)
             {
                 recordByteArray = RecordToByteConverter(restoreRecord);
-                if ((recordData = this.TryFindRecordById(restoreRecord.Id)).record != null)
+                if ((recordData = this.TryFindRecordById(restoreRecord.Id)).actualRecord != null)
                 {
                     this.fileStream.Position = recordData.position;
                     this.fileStream.Write(recordByteArray);
@@ -407,7 +386,7 @@ namespace FileCabinetApp
             return result == default ? this.idOffsetDictionary.Keys.Max() + 1 : result;
         }
 
-        private (FileCabinetRecord record, RecordState state, int position) TryFindRecordById(int id)
+        private (FileCabinetRecord actualRecord, RecordState state, int position) TryFindRecordById(int id)
         {
             byte[] recordBuffer = new byte[MaxRecordLength];
             using BinaryReader reader = new BinaryReader(this.fileStream, Encoding.Default, true);
