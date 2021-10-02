@@ -111,10 +111,10 @@ namespace FileCabinetApp.Decorators
         }
 
         /// <inheritdoc/>
-        public void RemoveRecord(FileCabinetRecord record)
+        public void DeleteRecord(FileCabinetRecord record)
         {
             this.logger.LogInformation($"{DateTime.Now} - Calling RemoveRecord(Record)");
-            this.service.RemoveRecord(record);
+            this.service.DeleteRecord(record);
             this.logger.LogInformation($"{DateTime.Now} - RemoveRecord(Record) finished it's work");
         }
 

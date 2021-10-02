@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.CommandHandlers
@@ -8,6 +9,10 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class DeleteCommandHandler : ServiceCommandHandlerBase
     {
+        private const int KeyIndex = 0;
+        private const int ValueIndex = 1;
+        private const int ParametersCount = 1;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DeleteCommandHandler"/> class.
         /// </summary>
@@ -46,18 +51,54 @@ namespace FileCabinetApp.CommandHandlers
                     return;
                 }
 
-                if (!int.TryParse(parameters, out int index))
+                var parametersArray = parameters.Split(new[] { "where", "WHERE" },
+                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+                if (parametersArray.Length != ParametersCount)
                 {
-                    throw new ArgumentException("Invalid index.");
+                    Console.WriteLine("Invalid parameters count");
                 }
 
-                this.Service.RemoveRecord(null);
-                Console.WriteLine($"Record #{index} was removed.");
+                var pair = ExtractKeyValuePair(parametersArray[0]);
+                var predicate = GeneratePredicate(pair.key, pair.value);
+
+                var recordsToRemove = this.Service.GetRecords().Where(record => predicate(record)).ToArray();
+                foreach (var record in recordsToRemove)
+                {
+                    this.Service.DeleteRecord(record);
+                }
+
+                Console.WriteLine($"Record(s) {string.Join(", ", recordsToRemove.Select(record => $"#{record.Id}")).TrimEnd(new[] { ',', ' ' })} are deleted.");
             }
             catch (Exception exception)
             {
                 Console.WriteLine($"During deleting an error was happened. Error message: {exception.Message}.");
             }
+        }
+
+        private static (string key, string value) ExtractKeyValuePair(string parameter)
+        {
+            var pair = parameter.Split('=', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            if (pair.Length != 2)
+            {
+                throw new ArgumentException("Invalid key-value pair");
+            }
+
+            return (pair[KeyIndex], pair[ValueIndex].Trim('\u0027'));
+        }
+
+        private static Predicate<FileCabinetRecord> GeneratePredicate(string key, string value)
+        {
+            var property =
+                typeof(FileCabinetRecord).GetProperties().FirstOrDefault(property => property.Name.Contains(key, StringComparison.CurrentCultureIgnoreCase));
+
+            if (property is null)
+            {
+                throw new ArgumentNullException(nameof(key), "Property with this name doesn't exists");
+            }
+
+            return (record) => property.GetValue(record) !.ToString() !.Equals(value);
         }
     }
 }

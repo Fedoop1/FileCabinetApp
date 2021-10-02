@@ -94,10 +94,10 @@ namespace FileCabinetApp.Decorators
             return result;
         }
 
-        public void RemoveRecord(FileCabinetRecord record)
+        public void DeleteRecord(FileCabinetRecord record)
         {
             this.stopwatch.Restart();
-            this.service.RemoveRecord(record);
+            this.service.DeleteRecord(record);
             this.stopwatch.Stop();
             WriteResult(this.stopwatch.ElapsedTicks);
         }

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using FileCabinetApp.DataTransfer;
 using FileCabinetApp.Interfaces;
-using FileCabinetApp.Validators;
 
 namespace FileCabinetApp
 {
@@ -141,7 +139,7 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public void RemoveRecord(FileCabinetRecord record)
+        public void DeleteRecord(FileCabinetRecord record)
         {
             if (record is null)
             {

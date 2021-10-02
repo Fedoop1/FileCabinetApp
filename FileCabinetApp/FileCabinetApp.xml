@@ -471,7 +471,7 @@
         <member name="M:FileCabinetApp.Decorators.ServiceLogger.GetStat">
             <inheritdoc/>
         </member>
-        <member name="M:FileCabinetApp.Decorators.ServiceLogger.RemoveRecord(FileCabinetRecord)">
+        <member name="M:FileCabinetApp.Decorators.ServiceLogger.DeleteRecord(FileCabinetRecord)">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.Decorators.ServiceLogger.Purge">
@@ -528,7 +528,7 @@
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.Restore(FileCabinetApp.DataTransfer.RecordShapshot)">
             <inheritdoc/>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.RemoveRecord(FileCabinetRecord)">
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.DeleteRecord(FileCabinetRecord)">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.Purge">
@@ -598,7 +598,7 @@
         <member name="M:FileCabinetApp.FileCabinetMemoryService.Purge">
             <inheritdoc/>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.RemoveRecord(FileCabinetRecord)">
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.DeleteRecord(FileCabinetRecord)">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.DictionaryAdd(FileCabinetRecord)">
@@ -690,12 +690,11 @@
             </summary>
             <returns>The count of the records.</returns>
         </member>
-        <member name="M:FileCabinetApp.Interfaces.IFileCabinetService.RemoveRecord(FileCabinetRecord)">
+        <member name="M:FileCabinetApp.Interfaces.IFileCabinetService.DeleteRecord(FileCabinetRecord)">
             <summary>
             Removes a record from a data source.
             </summary>
             <param name="index">The identifier of the record to be deleted.</param>
-            <returns>Removal result.</returns>
         </member>
         <member name="M:FileCabinetApp.Interfaces.IFileCabinetService.Purge">
             <summary>

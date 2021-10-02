@@ -52,7 +52,7 @@ namespace FileCabinetApp.CommandHandlers
                     return;
                 }
 
-                var parametersArray = parameters.Split("values", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                var parametersArray = parameters.Split(new[] { "values", "VALUES" }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
                 if (parametersArray.Length != ParametersCount)
                 {

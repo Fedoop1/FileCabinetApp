@@ -248,7 +248,7 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public void RemoveRecord(FileCabinetRecord record)
+        public void DeleteRecord(FileCabinetRecord record)
         {
             this.ValidateInputRecord(record);
 

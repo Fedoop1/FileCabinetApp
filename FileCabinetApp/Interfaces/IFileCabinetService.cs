@@ -67,8 +67,7 @@ namespace FileCabinetApp.Interfaces
         /// Removes a record from a data source.
         /// </summary>
         /// <param name="index">The identifier of the record to be deleted.</param>
-        /// <returns>Removal result.</returns>
-        public void RemoveRecord(FileCabinetRecord record);
+        public void DeleteRecord(FileCabinetRecord record);
 
         /// <summary>
         /// Find and remove record from data source file by index.
