@@ -35,7 +35,7 @@ namespace FileCabinetApp
         {
             this.ValidateInputRecord(record);
 
-            if (!this.isExist(record.Id))
+            if (this.isExist(record.Id))
             {
                 throw new ArgumentException("Record with this Id already exists");
             }
@@ -206,7 +206,7 @@ namespace FileCabinetApp
             }
         }
 
-        private bool isExist(int id) => this.recordList.Contains(new FileCabinetRecord() { Id = id });
+        private bool isExist(int id) => this.recordList.Contains(new FileCabinetRecord { Id = id });
 
         private void ValidateInputRecord(FileCabinetRecord record)
         {

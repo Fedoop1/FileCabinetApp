@@ -94,8 +94,5 @@ public class FileCabinetRecord : IEquatable<FileCabinetRecord>
         return this.Id == other.Id;
     }
 
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(this.Id, this.Height, this.Money, this.Gender, this.FirstName, this.LastName, this.DateOfBirth);
-    }
+    public override int GetHashCode() => this.Id;
 }

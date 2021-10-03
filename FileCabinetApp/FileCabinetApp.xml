@@ -48,7 +48,7 @@
         </member>
         <member name="T:FileCabinetApp.CommandHandlers.DeleteCommandHandler">
             <summary>
-            Handle "remove" command to import data from file in special format.
+            Handle "Delete" command to import data from file in special format.
             </summary>
         </member>
         <member name="M:FileCabinetApp.CommandHandlers.DeleteCommandHandler.#ctor(FileCabinetApp.Interfaces.IFileCabinetService)">
@@ -168,7 +168,7 @@
         </member>
         <member name="T:FileCabinetApp.CommandHandlers.InsertCommandHandler">
             <summary>
-            Handle "create" command from user input.
+            Handle "Insert" command from user input.
             </summary>
         </member>
         <member name="M:FileCabinetApp.CommandHandlers.InsertCommandHandler.#ctor(FileCabinetApp.Interfaces.IFileCabinetService)">
@@ -276,7 +276,7 @@
         </member>
         <member name="T:FileCabinetApp.CommandHandlers.UpdateCommandHandler">
             <summary>
-            Handle "edit" command from user input.
+            Handle "Update" command from user input.
             </summary>
         </member>
         <member name="M:FileCabinetApp.CommandHandlers.UpdateCommandHandler.#ctor(FileCabinetApp.Interfaces.IFileCabinetService)">

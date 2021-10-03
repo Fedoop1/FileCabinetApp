@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.CommandHandlers
 {
     /// <summary>
-    /// Handle "remove" command to import data from file in special format.
+    /// Handle "Delete" command to import data from file in special format.
     /// </summary>
     public class DeleteCommandHandler : ServiceCommandHandlerBase
     {
@@ -51,7 +52,7 @@ namespace FileCabinetApp.CommandHandlers
                     return;
                 }
 
-                var parametersArray = parameters.Split(new[] { "where", "WHERE" },
+                var parametersArray = parameters.ToLowerInvariant().Split(new[] { "where" },
                     StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
                 if (parametersArray.Length != ParametersCount)
@@ -62,13 +63,20 @@ namespace FileCabinetApp.CommandHandlers
                 var pair = ExtractKeyValuePair(parametersArray[0]);
                 var predicate = GeneratePredicate(pair.key, pair.value);
 
-                var recordsToRemove = this.Service.GetRecords().Where(record => predicate(record)).ToArray();
-                foreach (var record in recordsToRemove)
+                List<int> deletedRecordsId = new ();
+                foreach (var record in this.Service.GetRecords().Where(record => predicate(record)))
                 {
                     this.Service.DeleteRecord(record);
+                    deletedRecordsId.Add(record.Id);
                 }
 
-                Console.WriteLine($"Record(s) {string.Join(", ", recordsToRemove.Select(record => $"#{record.Id}")).TrimEnd(new[] { ',', ' ' })} are deleted.");
+                if (deletedRecordsId.Count == 0)
+                {
+                    Console.WriteLine("There isn't record to delete");
+                    return;
+                }
+
+                Console.WriteLine($"Record(s) {string.Join(", ", deletedRecordsId.Select(record => $"#{record}")).TrimEnd(new[] { ',', ' ' })} are deleted.");
             }
             catch (Exception exception)
             {

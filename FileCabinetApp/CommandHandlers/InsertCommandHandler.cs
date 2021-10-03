@@ -7,7 +7,7 @@ using FileCabinetApp.Interfaces;
 namespace FileCabinetApp.CommandHandlers
 {
     /// <summary>
-    /// Handle "create" command from user input.
+    /// Handle "Insert" command from user input.
     /// </summary>
     public class InsertCommandHandler : ServiceCommandHandlerBase
     {
@@ -48,20 +48,23 @@ namespace FileCabinetApp.CommandHandlers
             {
                 if (string.IsNullOrEmpty(parameters))
                 {
-                    Console.WriteLine("Invalid arguments");
+                    Console.WriteLine("Parameters can't be null or empty");
                     return;
                 }
 
-                var parametersArray = parameters.Split(new[] { "values", "VALUES" }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                var parametersArray = parameters.ToLowerInvariant().Split(new[] { "values" }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
                 if (parametersArray.Length != ParametersCount)
                 {
-                    Console.WriteLine("Invalid arguments");
+                    Console.WriteLine("Invalid parameters count");
                     return;
                 }
 
-                var parameterArray = ParseValueTuple(parametersArray[FieldsIndex]);
-                var valueArray = ParseValueTuple(parametersArray[ValuesIndex]);
+                var parametersString = parameters[..parametersArray[FieldsIndex].Length];
+                var valuesString = parameters[^parametersArray[ValuesIndex].Length..];
+
+                var parameterArray = ParseValueTuple(parametersString);
+                var valueArray = ParseValueTuple(valuesString);
 
                 if (parameterArray.Length != valueArray.Length)
                 {
@@ -98,9 +101,9 @@ namespace FileCabinetApp.CommandHandlers
 
             foreach (var property in result.GetType().GetProperties())
             {
-                var parseMethod = property.PropertyType.GetMethods(BindingFlags.Public | BindingFlags.Static)
+                var parseMethod = property.PropertyType.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase)
                     .FirstOrDefault(method =>
-                        method.Name == "Parse" && method.GetParameters().Length == 1);
+                        method.Name.Contains("Parse") && method.GetParameters().Length == 1);
                 property!.SetValue(result, property.PropertyType.Name == "String" ? keyValueTuple[property.Name] : parseMethod!.Invoke(null, new object[] { keyValueTuple[property.Name] }));
             }
 
