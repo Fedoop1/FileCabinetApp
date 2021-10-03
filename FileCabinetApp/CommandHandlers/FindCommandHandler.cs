@@ -58,5 +58,7 @@ namespace FileCabinetApp.CommandHandlers
 
             return records;
         }
+
+        public override string Command => "find";
     }
 }

@@ -24,6 +24,8 @@ namespace FileCabinetApp.CommandHandlers
         {
         }
 
+        public override string Command => "insert";
+
         /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
@@ -113,5 +115,7 @@ namespace FileCabinetApp.CommandHandlers
         private static string[] ParseValueTuple(string values) => values.Trim(' ', '(', ')').Split(',',
                 StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Distinct(StringComparer.CurrentCultureIgnoreCase).Select(value => value.Trim('\u0027')).ToArray();
+
+
     }
 }

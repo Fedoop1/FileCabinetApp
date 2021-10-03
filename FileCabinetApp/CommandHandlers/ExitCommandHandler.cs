@@ -42,7 +42,9 @@ namespace FileCabinetApp.CommandHandlers
         private void Exit()
         {
             Console.WriteLine("Exiting an application...");
-            this.exitDelegate.Invoke(false);
+            this.exitDelegate(false);
         }
+
+        public override string Command => "exit";
     }
 }

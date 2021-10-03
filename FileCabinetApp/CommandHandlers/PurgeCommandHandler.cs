@@ -40,5 +40,7 @@ namespace FileCabinetApp.CommandHandlers
             string result = this.Service.Purge();
             Console.WriteLine(result);
         }
+
+        public override string Command => "purge";
     }
 }

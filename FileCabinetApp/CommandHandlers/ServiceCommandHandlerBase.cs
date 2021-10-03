@@ -11,9 +11,9 @@ namespace FileCabinetApp.CommandHandlers
         /// <summary>
         /// <see cref="IFileCabinetService"/> context required for the correct operation of the methods.
         /// </summary>
-#pragma warning disable CA1051 // Do not declare visible instance fields
         protected readonly IFileCabinetService Service;
-#pragma warning restore CA1051 // Do not declare visible instance fields
+
+        public abstract string Command { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceCommandHandlerBase"/> class.

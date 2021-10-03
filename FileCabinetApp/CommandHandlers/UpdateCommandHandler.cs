@@ -171,5 +171,7 @@ namespace FileCabinetApp.CommandHandlers
 
             return result;
         }
+
+        public override string Command => "update";
     }
 }

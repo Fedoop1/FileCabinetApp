@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using FileCabinetApp.CommandHandlers;
 using FileCabinetApp.DataTransfer;
 using FileCabinetApp.Decorators;
@@ -33,34 +34,47 @@ namespace FileCabinetApp
             }
         }
 
-        private static ICommandHandler CreateCommandHandler()
+        private static ICommandHandler CreateAndSetCommandHandlers()
         {
-            var createHandler = new InsertCommandHandler(services.GetService<IFileCabinetService>());
-            var editHandler = new UpdateCommandHandler(services.GetService<IFileCabinetService>());
-            var exitHandler = new ExitCommandHandler(services.GetService<IFileCabinetService>(), UpdateApplicationStatus);
-            var exportHandler = new ExportCommandHandler(services.GetService<IFileCabinetService>(), services);
-            var findHandler = new FindCommandHandler(services.GetService<IFileCabinetService>(), DefaultRecordPrint);
-            var helpHandler = new HelpCommandHandler();
-            var importHandler = new ImportCommandHandler(services.GetService<IFileCabinetService>(), services.GetService<IRecordSnapshotService>());
-            var listHandler = new ListCommandHandler(services.GetService<IFileCabinetService>(), DefaultRecordPrint);
-            var missedHandler = new MissedCommandHandler();
-            var purgeHandler = new PurgeCommandHandler(services.GetService<IFileCabinetService>());
-            var removeHandler = new DeleteCommandHandler(services.GetService<IFileCabinetService>());
-            var statHandler = new StatCommandHandler(services.GetService<IFileCabinetService>());
+            CommandHandlerBase[] handlers =
+            {
+                new InsertCommandHandler(services.GetService<IFileCabinetService>()),
+                new UpdateCommandHandler(services.GetService<IFileCabinetService>()),
+                new ExitCommandHandler(services.GetService<IFileCabinetService>(), UpdateApplicationStatus),
+                new ExportCommandHandler(services.GetService<IFileCabinetService>(), services),
+                new FindCommandHandler(services.GetService<IFileCabinetService>(), DefaultRecordPrint),
+                new HelpCommandHandler(),
+                new ImportCommandHandler(services.GetService<IFileCabinetService>(), services.GetService<IRecordSnapshotService>()),
+                new ListCommandHandler(services.GetService<IFileCabinetService>(), DefaultRecordPrint),
+                new PurgeCommandHandler(services.GetService<IFileCabinetService>()),
+                new DeleteCommandHandler(services.GetService<IFileCabinetService>()),
+                new StatCommandHandler(services.GetService<IFileCabinetService>()),
 
-            createHandler.SetNext(editHandler);
-            editHandler.SetNext(exitHandler);
-            exitHandler.SetNext(exportHandler);
-            exportHandler.SetNext(findHandler);
-            findHandler.SetNext(helpHandler);
-            helpHandler.SetNext(importHandler);
-            importHandler.SetNext(listHandler);
-            listHandler.SetNext(purgeHandler);
-            purgeHandler.SetNext(removeHandler);
-            removeHandler.SetNext(statHandler);
-            statHandler.SetNext(missedHandler);
+                // Additional cell to MissedCommandHandler, it's always last.
+                null,
+            };
 
-            return createHandler;
+            handlers[^1] = new MissedCommandHandler(GetAvailableCommands(handlers));
+
+            SetupHandlersChain(handlers);
+
+            const int firstHandlerInChain = 0;
+            return handlers[firstHandlerInChain];
+
+            static void SetupHandlersChain(IList<CommandHandlerBase> source)
+            {
+                for (int index = 0; index < source.Count - 1; index++)
+                {
+                    source[index].SetNext(source[index + 1]);
+                }
+            }
+            static IEnumerable<string> GetAvailableCommands(IEnumerable<CommandHandlerBase> source)
+            {
+                foreach (var handler in source.OfType<ServiceCommandHandlerBase>())
+                {
+                    yield return handler.Command;
+                }
+            }
         }
 
         private static void UpdateApplicationStatus(bool status)
@@ -144,7 +158,7 @@ namespace FileCabinetApp
         {
             Configure(args);
             services = ConfigureServices();
-            var commandHandler = CreateCommandHandler();
+            var firstCommandHandler = CreateAndSetCommandHandlers();
             Console.Write("$FileCabinetApp.exe");
 
             foreach (var parameter in args)
@@ -164,7 +178,7 @@ namespace FileCabinetApp
                 const int commandIndex = 0;
                 const int parametersIndex = 1;
                 string parameters = inputs.Length > parametersIndex ? inputs[parametersIndex] : string.Empty;
-                commandHandler.Handle(new AppCommandRequest(inputs[commandIndex], parameters));
+                firstCommandHandler.Handle(new AppCommandRequest(inputs[commandIndex], parameters));
             }
             while (isRunning);
         }

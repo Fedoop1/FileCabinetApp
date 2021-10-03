@@ -10,11 +10,11 @@ namespace FileCabinetApp.Interfaces
         /// <summary>
         /// Set pointer for the next <see cref="ICommandHandler"/>.
         /// </summary>
-        /// <param name="commandHandler">Next command hanlder.</param>
+        /// <param name="commandHandler">Next command handler.</param>
         void SetNext(ICommandHandler commandHandler);
 
         /// <summary>
-        /// Try to handle command request. Othewise pass it further along the chain.
+        /// Try to handle command request. Otherwise pass it further along the chain.
         /// </summary>
         /// <param name="commandRequest">Command with parameters.</param>
         void Handle(AppCommandRequest commandRequest);

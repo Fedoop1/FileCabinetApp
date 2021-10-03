@@ -41,5 +41,7 @@ namespace FileCabinetApp.CommandHandlers
         /// A method that returns all available records in the application, outputting from the console.
         /// </summary>
         private IEnumerable<FileCabinetRecord> List() => this.Service.GetRecords();
+
+        public override string Command => "list";
     }
 }

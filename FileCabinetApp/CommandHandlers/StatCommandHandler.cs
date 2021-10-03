@@ -40,5 +40,7 @@ namespace FileCabinetApp.CommandHandlers
             var (actualRecords, deletedRecords) = this.Service.GetStat();
             Console.WriteLine($"{actualRecords} existing record(s). {deletedRecords} deleted record(s).");
         }
+
+        public override string Command => "stat";
     }
 }

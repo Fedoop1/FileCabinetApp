@@ -79,5 +79,7 @@ namespace FileCabinetApp.CommandHandlers
                 Console.WriteLine($"During saving an error was happened. Error message: {exception.Message}.");
             }
         }
+
+        public override string Command => "export";
     }
 }

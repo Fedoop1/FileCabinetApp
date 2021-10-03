@@ -108,5 +108,7 @@ namespace FileCabinetApp.CommandHandlers
 
             return (record) => property.GetValue(record) !.ToString() !.Equals(value);
         }
+
+        public override string Command => "delete";
     }
 }

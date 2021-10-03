@@ -210,6 +210,12 @@
             Handle <see cref="T:FileCabinetApp.CommandHandlers.AppCommandRequest"/> if no one of the handlers was able to process the request.
             </summary>
         </member>
+        <member name="M:FileCabinetApp.CommandHandlers.MissedCommandHandler.#ctor(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.CommandHandlers.MissedCommandHandler"/> class.
+            </summary>
+            <param name="availableCommands">The available commands.</param>
+        </member>
         <member name="M:FileCabinetApp.CommandHandlers.MissedCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
             <inheritdoc/>
         </member>
@@ -622,11 +628,11 @@
             <summary>
             Set pointer for the next <see cref="T:FileCabinetApp.Interfaces.ICommandHandler"/>.
             </summary>
-            <param name="commandHandler">Next command hanlder.</param>
+            <param name="commandHandler">Next command handler.</param>
         </member>
         <member name="M:FileCabinetApp.Interfaces.ICommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
             <summary>
-            Try to handle command request. Othewise pass it further along the chain.
+            Try to handle command request. Otherwise pass it further along the chain.
             </summary>
             <param name="commandRequest">Command with parameters.</param>
         </member>

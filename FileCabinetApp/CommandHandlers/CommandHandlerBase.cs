@@ -7,14 +7,10 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public abstract class CommandHandlerBase : ICommandHandler
     {
-#pragma warning disable SA1401 // Do not declare visible instance fields
-#pragma warning disable CA1051 // Do not declare visible instance fields
         /// <summary>
         /// Pointer for the next <see cref="ICommandHandler"/>.
         /// </summary>
         protected ICommandHandler nextHandle;
-#pragma warning restore CA1051 // Do not declare visible instance fields
-#pragma warning restore SA1401 // Do not declare visible instance fields
 
         /// <inheritdoc/>
         public abstract void Handle(AppCommandRequest commandRequest);
