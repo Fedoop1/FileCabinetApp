@@ -22,6 +22,9 @@ namespace FileCabinetApp.CommandHandlers
         }
 
         /// <inheritdoc/>
+        public override string Command => "exit";
+
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "exit")
@@ -30,9 +33,9 @@ namespace FileCabinetApp.CommandHandlers
                 return;
             }
 
-            if (this.nextHandle != null)
+            if (this.NextHandle != null)
             {
-                this.nextHandle.Handle(commandRequest);
+                this.NextHandle.Handle(commandRequest);
             }
         }
 
@@ -44,7 +47,5 @@ namespace FileCabinetApp.CommandHandlers
             Console.WriteLine("Exiting an application...");
             this.exitDelegate(false);
         }
-
-        public override string Command => "exit";
     }
 }

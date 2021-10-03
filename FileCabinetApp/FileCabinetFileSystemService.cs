@@ -37,7 +37,7 @@ namespace FileCabinetApp
                                       throw new ArgumentNullException(nameof(validator), "Validator can't be null");
             this.fileStream = new FileStream(this.fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
 
-            this.AnalyseDatabase();
+            this.AnalyzeDatabase();
         }
 
         /// <summary>
@@ -96,16 +96,7 @@ namespace FileCabinetApp
             return this.FindByDayOfBirthEnumerable(birthDate);
         }
 
-        private IEnumerable<FileCabinetRecord> FindByDayOfBirthEnumerable(DateTime dateOfBirth)
-        {
-            var recordBuffer = new byte[MaxRecordLength];
-            foreach (var position in this.dateTimeOffsetDictionary[dateOfBirth])
-            {
-                this.fileStream.Position = position;
-                this.fileStream.Read(recordBuffer);
-                yield return FromByteToRecord(recordBuffer, out _);
-            }
-        }
+        
 
         /// <inheritdoc/>
         public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
@@ -122,17 +113,6 @@ namespace FileCabinetApp
             }
 
             return this.FindByFirstNameEnumerable(firstName);
-        }
-
-        private IEnumerable<FileCabinetRecord> FindByFirstNameEnumerable(string firstName)
-        {
-            var recordBuffer = new byte[MaxRecordLength];
-            foreach (var position in this.firstNameOffsetDictionary[firstName])
-            {
-                this.fileStream.Position = position;
-                this.fileStream.Read(recordBuffer);
-                yield return FromByteToRecord(recordBuffer, out _);
-            }
         }
 
         /// <inheritdoc/>
@@ -167,7 +147,6 @@ namespace FileCabinetApp
         public IEnumerable<FileCabinetRecord> GetRecords()
         {
             var recordBuffer = new byte[MaxRecordLength];
-            int index = default;
 
             this.fileStream.Position = default;
             while (this.fileStream.Position != this.fileStream.Length)
@@ -296,6 +275,86 @@ namespace FileCabinetApp
             return $"Data file processing is completed: {purgedCount} of {initialStat.DeletedRecords + initialStat.AliveRecords} records were purged.";
         }
 
+        /// <summary>
+        /// Convert <see cref="FileCabinetRecord"/> to byte representation.
+        /// </summary>
+        /// <param name="record">Record for conversion.</param>
+        /// <returns>The byte array with byte representation of record.</returns>
+        private static byte[] RecordToByteConverter(FileCabinetRecord record)
+        {
+            byte[] recordByteArray = new byte[MaxRecordLength];
+            using var memoryStream = new MemoryStream(recordByteArray);
+            using var binaryWriter = new BinaryWriter(memoryStream);
+
+            var byteName = StringToBytes(record.FirstName);
+            var byteLastName = StringToBytes(record.LastName);
+
+            binaryWriter.Write(record.Id);
+            binaryWriter.Write(byteName);
+            binaryWriter.Write(byteLastName);
+            binaryWriter.Write(record.DateOfBirth.Day);
+            binaryWriter.Write(record.DateOfBirth.Month);
+            binaryWriter.Write(record.DateOfBirth.Year);
+            binaryWriter.Write(record.Height);
+            binaryWriter.Write(record.Money);
+            binaryWriter.Write(record.Gender);
+            binaryWriter.Write(false);
+
+            return recordByteArray;
+        }
+
+        private static FileCabinetRecord FromByteToRecord(byte[] bytes, out RecordState state)
+        {
+            using MemoryStream memStream = new MemoryStream(bytes);
+            using BinaryReader binaryReader = new BinaryReader(memStream);
+
+            var result = new FileCabinetRecord()
+            {
+                Id = binaryReader.ReadInt32(),
+                FirstName = BytesToString(binaryReader.ReadBytes(MaxStringLength)),
+                LastName = BytesToString(binaryReader.ReadBytes(MaxStringLength)),
+                DateOfBirth = new DateTime(day: binaryReader.ReadInt32(), month: binaryReader.ReadInt32(), year: binaryReader.ReadInt32()),
+                Height = binaryReader.ReadInt16(),
+                Money = binaryReader.ReadDecimal(),
+                Gender = binaryReader.ReadChar(),
+            };
+
+            bool isDeleted = binaryReader.ReadBoolean();
+            state = isDeleted ? RecordState.Deleted : RecordState.Alive;
+            return result;
+        }
+
+        /// <summary>
+        /// Convert string to bytes representation.
+        /// </summary>
+        /// <param name="text">String to convert.</param>
+        /// <returns>Byte array of string.</returns>
+        private static byte[] StringToBytes(string text)
+        {
+            var result = new byte[MaxStringLength];
+            var textASCII = Encoding.ASCII.GetBytes(text);
+            int textLength = text.Length;
+
+            if (textLength > MaxStringLength)
+            {
+                textLength = MaxStringLength;
+            }
+
+            Array.Copy(textASCII, result, textLength);
+            return result;
+        }
+
+        /// <summary>
+        /// Convert byte array to to string representation.
+        /// </summary>
+        /// <param name="byteName">Source array.</param>
+        /// <returns>String result.</returns>
+        private static string BytesToString(byte[] byteName)
+        {
+            var result = Encoding.ASCII.GetString(byteName);
+            return result.TrimEnd('\0');
+        }
+
         private (int index, int position) FindDeletedRecord()
         {
             this.fileStream.Position = default;
@@ -395,7 +454,7 @@ namespace FileCabinetApp
             return (null, RecordState.Deleted, -1);
         }
 
-        private void AnalyseDatabase()
+        private void AnalyzeDatabase()
         {
             var recordBuffer = new byte[MaxRecordLength];
 
@@ -437,6 +496,17 @@ namespace FileCabinetApp
 
                     this.idOffsetDictionary[record.Id] = position;
                 }
+            }
+        }
+
+        private IEnumerable<FileCabinetRecord> FindByDayOfBirthEnumerable(DateTime dateOfBirth)
+        {
+            var recordBuffer = new byte[MaxRecordLength];
+            foreach (var position in this.dateTimeOffsetDictionary[dateOfBirth])
+            {
+                this.fileStream.Position = position;
+                this.fileStream.Read(recordBuffer);
+                yield return FromByteToRecord(recordBuffer, out _);
             }
         }
 
@@ -486,86 +556,6 @@ namespace FileCabinetApp
             this.AddToIndexTable(record, newPosition);
         }
 
-        /// <summary>
-        /// Convert <see cref="FileCabinetRecord"/> to byte representation.
-        /// </summary>
-        /// <param name="record">Record for conversion.</param>
-        /// <returns>The byte array with byte representation of record.</returns>
-        private static byte[] RecordToByteConverter(FileCabinetRecord record)
-        {
-            byte[] recordByteArray = new byte[MaxRecordLength];
-            using var memoryStream = new MemoryStream(recordByteArray);
-            using var binaryWriter = new BinaryWriter(memoryStream);
-
-            var byteName = StringToBytes(record.FirstName);
-            var byteLastName = StringToBytes(record.LastName);
-
-            binaryWriter.Write(record.Id);
-            binaryWriter.Write(byteName);
-            binaryWriter.Write(byteLastName);
-            binaryWriter.Write(record.DateOfBirth.Day);
-            binaryWriter.Write(record.DateOfBirth.Month);
-            binaryWriter.Write(record.DateOfBirth.Year);
-            binaryWriter.Write(record.Height);
-            binaryWriter.Write(record.Money);
-            binaryWriter.Write(record.Gender);
-            binaryWriter.Write(false);
-
-            return recordByteArray;
-        }
-
-        private static FileCabinetRecord FromByteToRecord(byte[] bytes, out RecordState state)
-        {
-            using MemoryStream memStream = new MemoryStream(bytes);
-            using BinaryReader binaryReader = new BinaryReader(memStream);
-
-            var result = new FileCabinetRecord()
-            {
-                Id = binaryReader.ReadInt32(),
-                FirstName = BytesToString(binaryReader.ReadBytes(MaxStringLength)),
-                LastName = BytesToString(binaryReader.ReadBytes(MaxStringLength)),
-                DateOfBirth = new DateTime(day: binaryReader.ReadInt32(), month: binaryReader.ReadInt32(), year: binaryReader.ReadInt32()),
-                Height = binaryReader.ReadInt16(),
-                Money = binaryReader.ReadDecimal(),
-                Gender = binaryReader.ReadChar(),
-            };
-
-            bool isDeleted = binaryReader.ReadBoolean();
-            state = isDeleted ? RecordState.Deleted : RecordState.Alive;
-            return result;
-        }
-
-        /// <summary>
-        /// Convert string to bytes representation.
-        /// </summary>
-        /// <param name="text">String to convert.</param>
-        /// <returns>Byte array of string.</returns>
-        private static byte[] StringToBytes(string text)
-        {
-            var result = new byte[MaxStringLength];
-            var textASCII = Encoding.ASCII.GetBytes(text);
-            int textLength = text.Length;
-
-            if (textLength > MaxStringLength)
-            {
-                textLength = MaxStringLength;
-            }
-
-            Array.Copy(textASCII, result, textLength);
-            return result;
-        }
-
-        /// <summary>
-        /// Convert byte array to to string representation.
-        /// </summary>
-        /// <param name="byteName">Source array.</param>
-        /// <returns>String result.</returns>
-        private static string BytesToString(byte[] byteName)
-        {
-            var result = Encoding.ASCII.GetString(byteName);
-            return result.TrimEnd('\0');
-        }
-
         private void ValidateInputRecord(FileCabinetRecord record)
         {
             if (record is null)
@@ -576,6 +566,17 @@ namespace FileCabinetApp
             if (!this.ValidateRecord(record))
             {
                 throw new ArgumentException("Record doesn't satisfy validation rules");
+            }
+        }
+
+        private IEnumerable<FileCabinetRecord> FindByFirstNameEnumerable(string firstName)
+        {
+            var recordBuffer = new byte[MaxRecordLength];
+            foreach (var position in this.firstNameOffsetDictionary[firstName])
+            {
+                this.fileStream.Position = position;
+                this.fileStream.Read(recordBuffer);
+                yield return FromByteToRecord(recordBuffer, out _);
             }
         }
     }

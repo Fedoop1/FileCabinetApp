@@ -11,18 +11,23 @@ namespace FileCabinetApp.DataTransfer
     /// <summary>
     /// Class for deserializing <see cref="FileCabinetRecord"/> information from XML file.
     /// </summary>
-    public class FileCabinetXMLReader : IRecordDataLoader
+    public class FileCabinetXmlReader : IRecordDataLoader
     {
         private readonly string filepath;
         private TextReader reader;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileCabinetXMLReader"/> class.
+        /// Initializes a new instance of the <see cref="FileCabinetXmlReader"/> class.
         /// </summary>
         /// <param name="reader"><see cref="TextReader"/> with information about XML format file.</param>
-        public FileCabinetXMLReader(TextReader reader) => this.reader = reader ?? throw new ArgumentNullException(nameof(reader), "Reader can't be null");
+        public FileCabinetXmlReader(TextReader reader) => this.reader = reader ?? throw new ArgumentNullException(nameof(reader), "Reader can't be null");
 
-        public FileCabinetXMLReader(string filepath) => this.filepath =
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileCabinetXmlReader"/> class.
+        /// </summary>
+        /// <param name="filepath">Path to destination file.</param>
+        /// <exception cref="ArgumentNullException">Throws when path to destination file is null.</exception>
+        public FileCabinetXmlReader(string filepath) => this.filepath =
             filepath ?? throw new ArgumentNullException(nameof(filepath), "File path can't be null");
 
         /// <summary>
@@ -37,13 +42,13 @@ namespace FileCabinetApp.DataTransfer
             {
                 yield return new FileCabinetRecord()
                 {
-                    Id = int.Parse(record.Attribute("Id").Value, CultureInfo.CurrentCulture),
-                    FirstName = record.XPathSelectElement("Name").Attribute("First").Value,
-                    LastName = record.XPathSelectElement("Name").Attribute("Last").Value,
-                    DateOfBirth = DateTime.Parse(record.XPathSelectElement("DateOfBirth").Value, CultureInfo.CurrentCulture),
-                    Height = short.Parse(record.XPathSelectElement("Height").Value, CultureInfo.CurrentCulture),
-                    Gender = char.Parse(record.XPathSelectElement("Gender").Value),
-                    Money = decimal.Parse(record.XPathSelectElement("Money").Value, CultureInfo.CurrentCulture),
+                    Id = int.Parse(record?.Attribute("Id")?.Value, CultureInfo.CurrentCulture),
+                    FirstName = record.XPathSelectElement("Name")?.Attribute("First")?.Value,
+                    LastName = record?.XPathSelectElement("Name")?.Attribute("Last")?.Value,
+                    DateOfBirth = DateTime.Parse(record.XPathSelectElement("DateOfBirth")?.Value, CultureInfo.CurrentCulture),
+                    Height = short.Parse(record.XPathSelectElement("Height")?.Value, CultureInfo.CurrentCulture),
+                    Gender = char.Parse(record.XPathSelectElement("Gender")?.Value),
+                    Money = decimal.Parse(record.XPathSelectElement("Money")?.Value, CultureInfo.CurrentCulture),
                 };
             }
         }

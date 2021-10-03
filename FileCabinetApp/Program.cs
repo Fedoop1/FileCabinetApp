@@ -11,11 +11,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+#pragma warning disable SA1600 // Elements should be documented
+
 namespace FileCabinetApp
 {
-    /// <summary>
-    /// The main class from where all available functions are called.
-    /// </summary>
     public static class Program
     {
         private const string DeveloperName = "Nikita Malukov";
@@ -28,6 +27,12 @@ namespace FileCabinetApp
 
         private static void DefaultRecordPrint(IEnumerable<FileCabinetRecord> records)
         {
+            if (records is null)
+            {
+                Console.WriteLine("Null records sequence.");
+                return;
+            }
+
             foreach (var item in records)
             {
                 Console.WriteLine(item);
@@ -41,7 +46,7 @@ namespace FileCabinetApp
                 new InsertCommandHandler(services.GetService<IFileCabinetService>()),
                 new UpdateCommandHandler(services.GetService<IFileCabinetService>()),
                 new ExitCommandHandler(services.GetService<IFileCabinetService>(), UpdateApplicationStatus),
-                new ExportCommandHandler(services.GetService<IFileCabinetService>(), services),
+                new ExportCommandHandler(services.GetService<IFileCabinetService>(), services.GetService<IRecordSnapshotService>()),
                 new FindCommandHandler(services.GetService<IFileCabinetService>(), DefaultRecordPrint),
                 new HelpCommandHandler(),
                 new ImportCommandHandler(services.GetService<IFileCabinetService>(), services.GetService<IRecordSnapshotService>()),
@@ -68,6 +73,7 @@ namespace FileCabinetApp
                     source[index].SetNext(source[index + 1]);
                 }
             }
+
             static IEnumerable<string> GetAvailableCommands(IEnumerable<CommandHandlerBase> source)
             {
                 foreach (var handler in source.OfType<ServiceCommandHandlerBase>())
@@ -94,8 +100,8 @@ namespace FileCabinetApp
                 .AddCommandLine(parameters, new Dictionary<string, string>
                 {
                     ["--validation-rules"] = "validation-rules",
-                    ["-v"] = "v",
-                    ["-s"] = "s",
+                    ["-v"] = "validation-rules",
+                    ["-s"] = "storage",
                     ["--storage"] = "storage",
                 })
                 .Build();
@@ -109,7 +115,7 @@ namespace FileCabinetApp
                     config.AddConsole();
                     config.SetMinimumLevel(LogLevel.Information);
                 }))
-                .AddTransient(typeof(ILogger), service => service.GetService<ILoggerFactory>().CreateLogger("FileCabinetLogger"))
+                .AddTransient(typeof(ILogger), service => service.GetService<ILoggerFactory>() !.CreateLogger("FileCabinetLogger"))
                 .AddSingleton(typeof(IValidationSettings), _ =>
                 {
                     return configuration["validation-rules"] == "custom" || configuration["v"] == "custom"
@@ -135,13 +141,13 @@ namespace FileCabinetApp
 
                     return fileService;
                 })
-                .AddTransient(typeof(IRecordSnapshotService),
+                .AddSingleton(typeof(IRecordSnapshotService),
                     service =>
                     {
                         var result = new FileCabinetSnapshotService(service.GetService<IFileCabinetService>());
                         result.AddDataSaver("xml", filepath => new FileCabinetRecordXmlLWriter(filepath));
-                        result.AddDataSaver("csv", filepath => new FileCabinetRecordCSVWriter(filepath));
-                        result.AddDataLoader("xml", filepath => new FileCabinetXMLReader(filepath));
+                        result.AddDataSaver("csv", filepath => new FileCabinetRecordCsvWriter(filepath));
+                        result.AddDataLoader("xml", filepath => new FileCabinetXmlReader(filepath));
                         result.AddDataLoader("csv", filepath => new FileCabinetCsvReader(filepath));
 
                         return result;
@@ -150,10 +156,6 @@ namespace FileCabinetApp
             return result.BuildServiceProvider();
         }
 
-        /// <summary>
-        /// The main application method from which the user interacts with all available methods.
-        /// </summary>
-        /// <param name="args">Command line arguments required to control check parameters.</param>
         private static void Main(string[] args)
         {
             Configure(args);

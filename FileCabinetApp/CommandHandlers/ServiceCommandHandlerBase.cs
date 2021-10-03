@@ -1,5 +1,8 @@
 ﻿using FileCabinetApp.Interfaces;
 
+#pragma warning disable CA1051 // Do not declare visible instance fields
+#pragma warning disable SA1401 // Fields should be private
+
 namespace FileCabinetApp.CommandHandlers
 {
     /// <summary>
@@ -13,8 +16,6 @@ namespace FileCabinetApp.CommandHandlers
         /// </summary>
         protected readonly IFileCabinetService Service;
 
-        public abstract string Command { get; }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceCommandHandlerBase"/> class.
         /// </summary>
@@ -23,5 +24,13 @@ namespace FileCabinetApp.CommandHandlers
         {
             this.Service = service;
         }
+
+        /// <summary>
+        /// Gets the command processed by the handler.
+        /// </summary>
+        /// <value>
+        /// The processed command.
+        /// </value>
+        public abstract string Command { get; }
     }
 }

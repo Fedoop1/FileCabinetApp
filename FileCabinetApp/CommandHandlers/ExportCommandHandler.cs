@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using FileCabinetApp.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -10,20 +9,25 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class ExportCommandHandler : ServiceCommandHandlerBase
     {
-        private readonly IServiceProvider provider;
         private const int FileTypeIndex = 0;
         private const int FilePathIndex = 1;
         private const int ParametersCount = 2;
+
+        private readonly IRecordSnapshotService snapshotService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExportCommandHandler"/> class.
         /// </summary>
         /// <param name="service"><see cref="IFileCabinetService"/> context required for the correct operation of the methods.</param>
-        public ExportCommandHandler(IFileCabinetService service, IServiceProvider provider)
+        /// <param name="snapshot">Snapshot service.</param>
+        public ExportCommandHandler(IFileCabinetService service, IRecordSnapshotService snapshot)
             : base(service)
         {
-            this.provider = provider;
+            this.snapshotService = snapshot;
         }
+
+        /// <inheritdoc/>
+        public override string Command => "export";
 
         /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
@@ -34,9 +38,9 @@ namespace FileCabinetApp.CommandHandlers
                 return;
             }
 
-            if (this.nextHandle != null)
+            if (this.NextHandle != null)
             {
-                this.nextHandle.Handle(commandRequest);
+                this.NextHandle.Handle(commandRequest);
             }
         }
 
@@ -71,7 +75,7 @@ namespace FileCabinetApp.CommandHandlers
                     }
                 }
 
-                this.provider.GetService<IRecordSnapshotService>()?.SaveTo(parametersArray[FileTypeIndex], parametersArray[FilePathIndex], append);
+                this.snapshotService.SaveTo(parametersArray[FileTypeIndex], parametersArray[FilePathIndex], append);
                 Console.WriteLine($"\nAll records are exported to file {parametersArray[FilePathIndex]}.");
             }
             catch (Exception exception)
@@ -79,7 +83,5 @@ namespace FileCabinetApp.CommandHandlers
                 Console.WriteLine($"During saving an error was happened. Error message: {exception.Message}.");
             }
         }
-
-        public override string Command => "export";
     }
 }

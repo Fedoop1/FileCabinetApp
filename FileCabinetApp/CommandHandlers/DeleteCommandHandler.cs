@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using FileCabinetApp.Interfaces;
 
+#pragma warning disable CA1308 // Normalize strings to uppercase
+#pragma warning disable CA1031 // Do not catch general exception types
+
 namespace FileCabinetApp.CommandHandlers
 {
     /// <summary>
@@ -24,6 +27,9 @@ namespace FileCabinetApp.CommandHandlers
         }
 
         /// <inheritdoc/>
+        public override string Command => "delete";
+
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command.Contains("delete", StringComparison.CurrentCultureIgnoreCase))
@@ -32,10 +38,32 @@ namespace FileCabinetApp.CommandHandlers
                 return;
             }
 
-            if (this.nextHandle != null)
+            this.NextHandle?.Handle(commandRequest);
+        }
+
+        private static (string key, string value) ExtractKeyValuePair(string parameter)
+        {
+            var pair = parameter.Split('=', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            if (pair.Length != 2)
             {
-                this.nextHandle.Handle(commandRequest);
+                throw new ArgumentException("Invalid key-value pair");
             }
+
+            return (pair[KeyIndex], pair[ValueIndex].Trim('\u0027'));
+        }
+
+        private static Predicate<FileCabinetRecord> GeneratePredicate(string key, string value)
+        {
+            var property =
+                typeof(FileCabinetRecord).GetProperties().FirstOrDefault(property => property.Name.Contains(key, StringComparison.CurrentCultureIgnoreCase));
+
+            if (property is null)
+            {
+                throw new ArgumentNullException(nameof(key), "Property with this name doesn't exists");
+            }
+
+            return (record) => property.GetValue(record) !.ToString() !.Equals(value);
         }
 
         /// <summary>
@@ -52,7 +80,8 @@ namespace FileCabinetApp.CommandHandlers
                     return;
                 }
 
-                var parametersArray = parameters.ToLowerInvariant().Split(new[] { "where" },
+                var parametersArray = parameters.ToLowerInvariant().Split(
+                    new[] { "where" },
                     StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
                 if (parametersArray.Length != ParametersCount)
@@ -83,32 +112,5 @@ namespace FileCabinetApp.CommandHandlers
                 Console.WriteLine($"During deleting an error was happened. Error message: {exception.Message}.");
             }
         }
-
-        private static (string key, string value) ExtractKeyValuePair(string parameter)
-        {
-            var pair = parameter.Split('=', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-            if (pair.Length != 2)
-            {
-                throw new ArgumentException("Invalid key-value pair");
-            }
-
-            return (pair[KeyIndex], pair[ValueIndex].Trim('\u0027'));
-        }
-
-        private static Predicate<FileCabinetRecord> GeneratePredicate(string key, string value)
-        {
-            var property =
-                typeof(FileCabinetRecord).GetProperties().FirstOrDefault(property => property.Name.Contains(key, StringComparison.CurrentCultureIgnoreCase));
-
-            if (property is null)
-            {
-                throw new ArgumentNullException(nameof(key), "Property with this name doesn't exists");
-            }
-
-            return (record) => property.GetValue(record) !.ToString() !.Equals(value);
-        }
-
-        public override string Command => "delete";
     }
 }

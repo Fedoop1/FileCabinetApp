@@ -1,5 +1,9 @@
 ﻿using FileCabinetApp.Interfaces;
 
+#pragma warning disable CA1051 // Do not declare visible instance fields
+#pragma warning disable SA1306 // Field names should begin with lower-case letter
+#pragma warning disable SA1401 // Fields should be private
+
 namespace FileCabinetApp.CommandHandlers
 {
     /// <summary>
@@ -10,7 +14,7 @@ namespace FileCabinetApp.CommandHandlers
         /// <summary>
         /// Pointer for the next <see cref="ICommandHandler"/>.
         /// </summary>
-        protected ICommandHandler nextHandle;
+        protected ICommandHandler NextHandle;
 
         /// <inheritdoc/>
         public abstract void Handle(AppCommandRequest commandRequest);
@@ -18,7 +22,7 @@ namespace FileCabinetApp.CommandHandlers
         /// <inheritdoc/>
         public void SetNext(ICommandHandler commandHandler)
         {
-            this.nextHandle = commandHandler;
+            this.NextHandle = commandHandler;
         }
     }
 }

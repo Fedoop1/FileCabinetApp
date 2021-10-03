@@ -4,6 +4,9 @@ using System.Linq;
 using System.Reflection;
 using FileCabinetApp.Interfaces;
 
+#pragma warning disable CA1308 // Normalize strings to uppercase
+#pragma warning disable CA1031 // Do not catch general exception types
+
 namespace FileCabinetApp.CommandHandlers
 {
     /// <summary>
@@ -32,6 +35,9 @@ namespace FileCabinetApp.CommandHandlers
         }
 
         /// <inheritdoc/>
+        public override string Command => "update";
+
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command.Contains("update", StringComparison.CurrentCultureIgnoreCase))
@@ -40,59 +46,9 @@ namespace FileCabinetApp.CommandHandlers
                 return;
             }
 
-            if (this.nextHandle != null)
+            if (this.NextHandle != null)
             {
-                this.nextHandle.Handle(commandRequest);
-            }
-        }
-
-        /// <summary>
-        /// A method that edits information about a specific record.
-        /// </summary>
-        /// <param name="parameters">A parameter consisting of a unique identifier required to search for a record.</param>
-        private void Update(string parameters)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(parameters))
-                {
-                    Console.WriteLine("Parameters can't be null or empty");
-                    return;
-                }
-
-                var parametersArray = parameters.ToLowerInvariant().Split(new[] { "set", "where" },
-                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-                if (parametersArray.Length < UpdateWithoutPredicate)
-                {
-                    Console.WriteLine("Invalid parameters count");
-                    return;
-                }
-
-                string setString = parameters.Substring(SetKeyWordOffset, parametersArray[SetItemsIndex].Length);
-                string whereString = parametersArray.Length is UpdateWithPredicate ? parameters[^parametersArray[WhereItemsIndex].Length..] : null;
-
-                Dictionary<string, string> whereKeyValuePair = whereString is not null ? ExtractKeyValuePair(whereString.ToLowerInvariant(), new[] { "and" }) : null;
-                Dictionary<string, string> setKeyValuePair = ExtractKeyValuePair(setString, new[] { "," });
-                Dictionary<PropertyInfo, object> propertyKeyValuePair = BindPropertyAndValue(setKeyValuePair);
-
-                var predicate = GeneratePredicate(whereKeyValuePair);
-
-                List<int> updatedRecords = new ();
-                foreach (var record in this.Service.GetRecords().Where(record => predicate(record)))
-                {
-                    UpdateRecord(record, propertyKeyValuePair);
-                    this.Service.EditRecord(record);
-                    updatedRecords.Add(record.Id);
-                }
-
-                Console.WriteLine(updatedRecords.Count > 0
-                    ? $"Record(s) {string.Join(", ", updatedRecords.Select(record => $"#{record}")).TrimEnd(new[] { ',', ' ' })} were updated."
-                    : "There isn't record to update");
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine($"During updating an error was happened. Error message: {exception.Message}.");
+                this.NextHandle.Handle(commandRequest);
             }
         }
 
@@ -100,7 +56,7 @@ namespace FileCabinetApp.CommandHandlers
         {
             if (keyValuePair is null)
             {
-                return record => true;
+                return _ => true;
             }
 
             Predicate<FileCabinetRecord> intermediateResult = null;
@@ -109,7 +65,7 @@ namespace FileCabinetApp.CommandHandlers
             {
                 var property =
                     typeof(FileCabinetRecord).GetProperties().FirstOrDefault(property => property.Name.Contains(pair.Key, StringComparison.CurrentCultureIgnoreCase));
-                intermediateResult += record => property.GetValue(record).ToString() == pair.Value;
+                intermediateResult += record => property!.GetValue(record)?.ToString() == pair.Value;
             }
 
             return intermediateResult!.GetInvocationList().Length > 0 ? CombinePredicateIntoOneMethod(intermediateResult) : intermediateResult;
@@ -172,6 +128,54 @@ namespace FileCabinetApp.CommandHandlers
             return result;
         }
 
-        public override string Command => "update";
+        /// <summary>
+        /// A method that edits information about a specific record.
+        /// </summary>
+        /// <param name="parameters">A parameter consisting of a unique identifier required to search for a record.</param>
+        private void Update(string parameters)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(parameters))
+                {
+                    Console.WriteLine("Parameters can't be null or empty");
+                    return;
+                }
+
+                var parametersArray = parameters.ToLowerInvariant().Split(new[] { "set", "where" },
+                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+                if (parametersArray.Length < UpdateWithoutPredicate)
+                {
+                    Console.WriteLine("Invalid parameters count");
+                    return;
+                }
+
+                string setString = parameters.Substring(SetKeyWordOffset, parametersArray[SetItemsIndex].Length);
+                string whereString = parametersArray.Length is UpdateWithPredicate ? parameters[^parametersArray[WhereItemsIndex].Length..] : null;
+
+                Dictionary<string, string> whereKeyValuePair = whereString is not null ? ExtractKeyValuePair(whereString.ToLowerInvariant(), new[] { "and" }) : null;
+                Dictionary<string, string> setKeyValuePair = ExtractKeyValuePair(setString, new[] { "," });
+                Dictionary<PropertyInfo, object> propertyKeyValuePair = BindPropertyAndValue(setKeyValuePair);
+
+                var predicate = GeneratePredicate(whereKeyValuePair);
+
+                List<int> updatedRecords = new ();
+                foreach (var record in this.Service.GetRecords().Where(record => predicate(record)))
+                {
+                    UpdateRecord(record, propertyKeyValuePair);
+                    this.Service.EditRecord(record);
+                    updatedRecords.Add(record.Id);
+                }
+
+                Console.WriteLine(updatedRecords.Count > 0
+                    ? $"Record(s) {string.Join(", ", updatedRecords.Select(record => $"#{record}")).TrimEnd(new[] { ',', ' ' })} were updated."
+                    : "There isn't record to update");
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"During updating an error was happened. Error message: {exception.Message}.");
+            }
+        }
     }
 }

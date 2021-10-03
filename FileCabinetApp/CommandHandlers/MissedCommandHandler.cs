@@ -20,9 +20,9 @@ namespace FileCabinetApp.CommandHandlers
         /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
-            if (this.nextHandle != null)
+            if (this.NextHandle != null)
             {
-                this.nextHandle.Handle(commandRequest);
+                this.NextHandle.Handle(commandRequest);
                 return;
             }
 

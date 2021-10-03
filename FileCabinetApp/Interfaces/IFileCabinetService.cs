@@ -37,12 +37,13 @@ namespace FileCabinetApp.Interfaces
         /// <summary>
         /// A method for editing data in a particular record.
         /// </summary>
+        /// <param name="record">Updated record.</param>
         public void EditRecord(FileCabinetRecord record);
 
         /// <summary>
         /// A method that returns a collection of records (read-only).
         /// </summary>
-        /// <returns>Collection of records (read-only).</returns>
+        /// <returns>Sequence of records.</returns>
         public IEnumerable<FileCabinetRecord> GetRecords();
 
         /// <summary>
@@ -55,6 +56,7 @@ namespace FileCabinetApp.Interfaces
         /// Restore information from <see cref="FileCabinetSnapshotService"/> instance.
         /// </summary>
         /// <param name="restoreSnapshot">Snapshot with information about records.</param>
+        /// <returns>Count of affected records.</returns>
         public int Restore(RecordShapshot restoreSnapshot);
 
         /// <summary>
@@ -66,7 +68,7 @@ namespace FileCabinetApp.Interfaces
         /// <summary>
         /// Removes a record from a data source.
         /// </summary>
-        /// <param name="index">The identifier of the record to be deleted.</param>
+        /// <param name="record">Record to delete.</param>
         public void DeleteRecord(FileCabinetRecord record);
 
         /// <summary>

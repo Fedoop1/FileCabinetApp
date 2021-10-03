@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using FileCabinetApp;
 
 namespace FileCabinetGenerator
 {
@@ -7,35 +9,30 @@ namespace FileCabinetGenerator
     /// </summary>
     public static class RecordGenerator
     {
-        private static readonly char[] validGenderValue = new[] { 'f', 'F', 'M', 'm' };
-        private static readonly string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        private static readonly char[] validGenderValue = { 'f', 'F', 'M', 'm' };
+        private static readonly string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         private static readonly Random random = new ();
 
         /// <summary>
-        /// Generate <see cref="FileCabinetRecord"/> instances by use <see cref="System.Random"/> and <see cref="Guid"/> classes for generate data.
+        /// Generate <see cref="FileCabinetRecord"/> instances.
         /// </summary>
-        /// <param name="startId">Start id for the first record in the iteration.</param>
-        /// <param name="recordAmount">Count of records to generate.</param>
-        /// <returns>Array of generated <see cref="FileCabinetRecord"/>'s.</returns>
-        public static FileCabinetRecord[] GenerateRecord(int startId, int recordAmount)
+        /// <returns>Sequence of generated <see cref="FileCabinetRecord"/>'s.</returns>
+        public static IEnumerable<FileCabinetRecord> GenerateRecord(GenerationSettings settings)
         {
-            var resultRecordArray = new FileCabinetRecord[recordAmount];
 
-            for (int recordCount = 0; recordCount < recordAmount; recordCount++)
+            for (var recordCount = 0; recordCount < settings.RecordsAmount; recordCount++)
             {
-                resultRecordArray[recordCount] = new FileCabinetRecord()
+                yield return new FileCabinetRecord()
                 {
-                    Id = startId++,
+                    Id = settings.StartId++,
                     FirstName = GenerateString(),
                     LastName = GenerateString(),
-                    DateOfBirth = new DateTime(random.Next(31), random.Next(13), random.Next(DateTime.Now.Year)),
-                    Height = (short)random.Next(),
+                    DateOfBirth = new DateTime(random.Next(1950, DateTime.Now.Year), random.Next(1, 13), random.Next(1, 31)),
+                    Height = (short)random.Next(0, 250),
                     Money = random.Next(0, int.MaxValue),
                     Gender = validGenderValue[random.Next(0, validGenderValue.Length)],
                 };
             }
-
-            return resultRecordArray;
         }
 
         private static string GenerateString()

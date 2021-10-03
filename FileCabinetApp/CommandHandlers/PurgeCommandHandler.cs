@@ -18,6 +18,9 @@ namespace FileCabinetApp.CommandHandlers
         }
 
         /// <inheritdoc/>
+        public override string Command => "purge";
+
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "purge")
@@ -26,9 +29,9 @@ namespace FileCabinetApp.CommandHandlers
                 return;
             }
 
-            if (this.nextHandle != null)
+            if (this.NextHandle != null)
             {
-                this.nextHandle.Handle(commandRequest);
+                this.NextHandle.Handle(commandRequest);
             }
         }
 
@@ -40,7 +43,5 @@ namespace FileCabinetApp.CommandHandlers
             string result = this.Service.Purge();
             Console.WriteLine(result);
         }
-
-        public override string Command => "purge";
     }
 }

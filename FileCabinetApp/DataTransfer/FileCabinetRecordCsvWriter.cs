@@ -8,25 +8,25 @@ namespace FileCabinetApp.DataTransfer
     /// <summary>
     /// Create CSV document serialize records data to it.
     /// </summary>
-    public class FileCabinetRecordCSVWriter : IRecordDataSaver
+    public class FileCabinetRecordCsvWriter : IRecordDataSaver
     {
         private readonly string filepath;
         private TextWriter writer;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileCabinetRecordCSVWriter"/> class.
+        /// Initializes a new instance of the <see cref="FileCabinetRecordCsvWriter"/> class.
         /// </summary>
         /// <param name="writer"><see cref="TextWriter"/>Stream to destination file.</param>
-        public FileCabinetRecordCSVWriter(TextWriter writer)
+        public FileCabinetRecordCsvWriter(TextWriter writer)
         {
             this.writer = writer;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileCabinetRecordCSVWriter"/> class.
+        /// Initializes a new instance of the <see cref="FileCabinetRecordCsvWriter"/> class.
         /// </summary>
         /// <param name="filepath">File path to destination file.</param>
-        public FileCabinetRecordCSVWriter(string filepath) => this.filepath = filepath ?? throw new ArgumentNullException(nameof(filepath), "File path can't be null");
+        public FileCabinetRecordCsvWriter(string filepath) => this.filepath = filepath ?? throw new ArgumentNullException(nameof(filepath), "File path can't be null");
 
         /// <summary>
         /// Write <see cref="FileCabinetRecord"/> sequence to CSV file and save it.

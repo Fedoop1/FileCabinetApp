@@ -1,6 +1,8 @@
 ﻿using System;
 using FileCabinetApp.Interfaces;
 
+#pragma warning disable CA1031 // Do not catch general exception types
+
 namespace FileCabinetApp.CommandHandlers
 {
     /// <summary>
@@ -18,11 +20,15 @@ namespace FileCabinetApp.CommandHandlers
         /// Initializes a new instance of the <see cref="ImportCommandHandler"/> class.
         /// </summary>
         /// <param name="service">The <see cref="IFileCabinetService"/> context is necessary for the correct execution of the methods.</param>
+        /// <param name="snapshotService">Snapshot service.</param>
         public ImportCommandHandler(IFileCabinetService service, IRecordSnapshotService snapshotService)
             : base(service)
         {
             this.snapshotService = snapshotService;
         }
+
+        /// <inheritdoc/>
+        public override string Command => "import";
 
         /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
@@ -33,9 +39,9 @@ namespace FileCabinetApp.CommandHandlers
                 return;
             }
 
-            if (this.nextHandle != null)
+            if (this.NextHandle != null)
             {
-                this.nextHandle.Handle(commandRequest);
+                this.NextHandle.Handle(commandRequest);
             }
         }
 
@@ -70,7 +76,5 @@ namespace FileCabinetApp.CommandHandlers
                 Console.WriteLine($"During saving an error was happened. Error message: {exception.Message}.");
             }
         }
-
-        public override string Command => "import";
     }
 }

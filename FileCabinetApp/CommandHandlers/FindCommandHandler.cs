@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using FileCabinetApp.Interfaces;
 
+#pragma warning disable CA1308 // Normalize strings to uppercase
+
 namespace FileCabinetApp.CommandHandlers
 {
     /// <summary>
@@ -23,18 +25,21 @@ namespace FileCabinetApp.CommandHandlers
         }
 
         /// <inheritdoc/>
+        public override string Command => "find";
+
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
-            if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "find")
+            if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command.Contains("find", StringComparison.CurrentCultureIgnoreCase))
             {
                 var records = this.Find(commandRequest.Parameters);
                 this.printer.Invoke(records);
                 return;
             }
 
-            if (this.nextHandle != null)
+            if (this.NextHandle != null)
             {
-                this.nextHandle.Handle(commandRequest);
+                this.NextHandle.Handle(commandRequest);
             }
         }
 
@@ -44,21 +49,33 @@ namespace FileCabinetApp.CommandHandlers
         /// <param name="parameters">Parameter line including 1.search criterion 2.unique information.</param>
         private IEnumerable<FileCabinetRecord> Find(string parameters)
         {
-            const int FindParam = 0;
-            const int FindData = 1;
-            string[] arrayParameters = parameters.Split(" ", 2);
+            const int findParam = 0;
+            const int findData = 1;
+            const int parametersCount = 2;
 
-            IEnumerable<FileCabinetRecord> records = arrayParameters[FindParam] switch
+            if (string.IsNullOrEmpty(parameters))
             {
-                "firstname" => this.Service.FindByFirstName(arrayParameters[FindData]),
-                "lastname" => this.Service.FindByLastName(arrayParameters[FindData]),
-                "dateofbirth" => this.Service.FindByDayOfBirth(arrayParameters[FindData]),
-                _ => Array.Empty<FileCabinetRecord>()
+                Console.WriteLine("Parameters can't be null or empty");
+                return null;
+            }
+
+            string[] arrayParameters = parameters.Split(" ", parametersCount);
+
+            if (arrayParameters.Length != parametersCount)
+            {
+                Console.WriteLine("Invalid parameters count.");
+                return null;
+            }
+
+            IEnumerable<FileCabinetRecord> records = arrayParameters[findParam].ToLowerInvariant() switch
+            {
+                "firstname" => this.Service.FindByFirstName(arrayParameters[findData]),
+                "lastname" => this.Service.FindByLastName(arrayParameters[findData]),
+                "dateofbirth" => this.Service.FindByDayOfBirth(arrayParameters[findData]),
+                _ => null,
             };
 
             return records;
         }
-
-        public override string Command => "find";
     }
 }

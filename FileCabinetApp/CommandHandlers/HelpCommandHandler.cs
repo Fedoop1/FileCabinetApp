@@ -34,9 +34,9 @@ namespace FileCabinetApp.CommandHandlers
                 return;
             }
 
-            if (this.nextHandle != null)
+            if (this.NextHandle != null)
             {
-                this.nextHandle.Handle(commandRequest);
+                this.NextHandle.Handle(commandRequest);
             }
         }
 
@@ -46,16 +46,16 @@ namespace FileCabinetApp.CommandHandlers
         /// <param name="parameters">Parameter with the choice of a specific command to display help about it.</param>
         private static void PrintHelp(string parameters)
         {
-            const int CommandHelpIndex = 0;
-            const int DescriptionHelpIndex = 1;
-            const int ExplanationHelpIndex = 2;
+            const int commandHelpIndex = 0;
+            const int descriptionHelpIndex = 1;
+            const int explanationHelpIndex = 2;
 
             if (!string.IsNullOrEmpty(parameters))
             {
-                var index = Array.FindIndex(HelpMessages, 0, HelpMessages.Length, i => string.Equals(i[CommandHelpIndex], parameters, StringComparison.InvariantCultureIgnoreCase));
+                var index = Array.FindIndex(HelpMessages, 0, HelpMessages.Length, i => string.Equals(i[commandHelpIndex], parameters, StringComparison.InvariantCultureIgnoreCase));
                 if (index >= 0)
                 {
-                    Console.WriteLine(HelpMessages[index][ExplanationHelpIndex]);
+                    Console.WriteLine(HelpMessages[index][explanationHelpIndex]);
                 }
                 else
                 {
@@ -68,7 +68,7 @@ namespace FileCabinetApp.CommandHandlers
 
                 foreach (var helpMessage in HelpMessages)
                 {
-                    Console.WriteLine("\t{0}\t- {1}", helpMessage[CommandHelpIndex], helpMessage[DescriptionHelpIndex]);
+                    Console.WriteLine("\t{0}\t- {1}", helpMessage[commandHelpIndex], helpMessage[descriptionHelpIndex]);
                 }
             }
         }

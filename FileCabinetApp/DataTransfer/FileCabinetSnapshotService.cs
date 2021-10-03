@@ -20,8 +20,8 @@ namespace FileCabinetApp.DataTransfer
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetSnapshotService"/> class.
         /// </summary>
-        /// <param name="snapshot">The snapshot.</param>
-        /// <exception cref="System.ArgumentNullException">Throws when snapshot is null.</exception>
+        /// <param name="service">Observable record service.</param>
+        /// <exception cref="ArgumentNullException">Throws when service is null.</exception>
         public FileCabinetSnapshotService(IFileCabinetService service) => this.service = service ??
             throw new ArgumentNullException(nameof(service), "Service can't be null");
 
