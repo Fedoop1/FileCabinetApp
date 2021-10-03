@@ -1,142 +1,72 @@
-﻿namespace FileCabinetGenerator
-{
-    using System;
-    using System.Globalization;
-    using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Microsoft.Extensions.Configuration;
 
-    /// <summary>
-    /// The main root class of the application from where all processes are managed.
-    /// </summary>
+namespace FileCabinetGenerator
+{
     public static class Program
     {
-        /// <summary>
-        /// Fields containing the culture of the user, which is necessary for the correct operation of the application.
-        /// </summary>
-        public static readonly CultureInfo Culture = CultureInfo.CurrentCulture;
-        private static GeneratorCommandLineArgs commandLineArgs;
+        private static IConfiguration configuration;
 
-        private static GeneratorCommandLineArgs HandlingCommandLineArgs(string[] parameters)
+        private static void Configure(string[] commandLineArgs)
         {
-            string outputType = string.Empty;
-            string filePath = string.Empty;
-            int recordAmount = 0;
-            int startId = 0;
-
-            Console.Write("$FileCabinetGenerator.exe");
-
-            for (int parameterIndex = 0; parameterIndex < parameters.Length; parameterIndex++)
-            {
-                Console.Write(" " + parameters[parameterIndex]);
-                switch (parameters[parameterIndex])
+            configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("generation-settings.json")
+                .AddCommandLine(commandLineArgs, new Dictionary<string, string>
                 {
-                    case string attribute when attribute.Contains("output-type"):
-                        attribute = attribute[(attribute.LastIndexOf("=", StringComparison.InvariantCulture) + 1) ..];
-                        if (attribute.ToUpperInvariant() == "CSV")
-                        {
-                            outputType = "CSV";
-                            break;
-                        }
-                        else if (attribute.ToUpperInvariant() == "XML")
-                        {
-                            outputType = "XML";
-                            break;
-                        }
-
-                        throw new ArgumentException("Output-type is incorrect.");
-                    case "-t":
-                        if (parameterIndex + 1 != parameters.Length)
-                        {
-                            outputType = parameters[parameterIndex + 1].ToUpperInvariant();
-                            break;
-                        }
-
-                        throw new ArgumentException("Output-type is incorrect.");
-                    case "-o":
-                        if (parameterIndex + 1 != parameters.Length)
-                        {
-                            filePath = parameters[parameterIndex + 1];
-                            break;
-                        }
-
-                        throw new ArgumentException("Output file name is incorrect.");
-                    case string atribute when atribute.Contains("output"):
-                        filePath = atribute[(atribute.LastIndexOf("=", StringComparison.InvariantCulture) + 1) ..];
-                        break;
-                    case string atribute when atribute.Contains("records-amount"):
-                        atribute = atribute[(atribute.LastIndexOf("=", StringComparison.InvariantCulture) + 1) ..];
-                        if (!int.TryParse(atribute, out recordAmount))
-                        {
-                            throw new ArgumentException("Records amout is incorrect.");
-                        }
-
-                        break;
-                    case "-a":
-                        if (parameterIndex + 1 != parameters.Length)
-                        {
-                            if (int.TryParse(parameters[parameterIndex] + 1, out recordAmount))
-                            {
-                                break;
-                            }
-                        }
-
-                        throw new ArgumentException("Records amount is incorrect.");
-                    case string atribute when atribute.Contains("start-id"):
-                        atribute = atribute[(atribute.LastIndexOf("=", StringComparison.InvariantCulture) + 1) ..];
-                        if (!int.TryParse(atribute, out startId))
-                        {
-                            throw new ArgumentException("Start id is incorrect.");
-                        }
-
-                        break;
-                    case "-i":
-                        if (parameterIndex + 1 != parameters.Length)
-                        {
-                            if (int.TryParse(parameters[parameterIndex] + 1, out startId))
-                            {
-                                break;
-                            }
-                        }
-
-                        throw new ArgumentException("Records amount is incorrect.");
-                    default: throw new ArgumentException("Command line arg doesn't exists!");
-                }
-            }
-
-            return new GeneratorCommandLineArgs(outputType, filePath, recordAmount, startId);
+                    ["-t"] = "OutputType",
+                    ["-o"] = "FilePath",
+                    ["-a"] = "RecordsAmount",
+                    ["-i"] = "StartId",
+                    ["--output-type"] = "OutputType",
+                    ["--output"] = "FilePath",
+                    ["--records-amount"] = "RecordsAmount",
+                    ["--start-id"] = "StartId"
+                })
+                .Build();
         }
 
-        private static void Export(GeneratorCommandLineArgs commandLineArgs, FileCabinetRecord[] fileCabinetRecords)
+        private static ExportService ConfigureExportService(GenerationSettings settings)
         {
-            try
-            {
-                using (var fileStream = new FileStream(commandLineArgs.FilePath, FileMode.Create))
-                {
-                    switch (commandLineArgs.OutputType)
-                    {
-                        case "CSV":
-                            CSVRecordExport.Export(fileStream, fileCabinetRecords);
-                            break;
-                        case "XML":
-                            XMLRecordExport.Export(fileStream, fileCabinetRecords);
-                            break;
-                        default: throw new ArgumentException("Output type is doesn't exists.");
-                    }
-                }
+            var result = new ExportService(settings);
 
-                Console.WriteLine($"\n{commandLineArgs.RecordAmount} records were written to {commandLineArgs.FilePath}.");
-            }
-            catch (IOException)
+            result.AddExportProvider("xml", filepath => new XmlRecordExporter(filepath));
+            result.AddExportProvider("csv", filepath => new CsvRecordExporter(filepath));
+
+            return result;
+        }
+
+        private static GenerationSettings SetupGenerationSettings() => configuration.Get<GenerationSettings>();
+
+        private static void DisplayCommandLineData(string[] args)
+        {
+            foreach (var commandLineArg in args)
             {
-                Console.WriteLine($"\nCan't open file {commandLineArgs.FilePath}");
-                return;
+                Console.Write(commandLineArg + " ");
             }
         }
+
 
         private static void Main(string[] args)
         {
-            commandLineArgs = HandlingCommandLineArgs(args);
-            FileCabinetRecord[] recordGeneratedArray = RecordGenerator.GenerateRecord(commandLineArgs.StartId, commandLineArgs.RecordAmount);
-            Export(commandLineArgs, recordGeneratedArray);
+            try
+            {
+                Console.WriteLine("$FileCabinetGenerator");
+                DisplayCommandLineData(args);
+                Configure(args);
+                var settings = SetupGenerationSettings();
+                var generatedRecords = RecordGenerator.GenerateRecord(settings);
+                var exportService = ConfigureExportService(settings);
+                exportService.Export(generatedRecords);
+
+                Console.WriteLine($"Export complete. {settings.RecordsAmount} record(s) were exported in {settings.OutputType} format to {settings.FilePath} with start id = {settings.StartId}.");
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"An exception happened during generator work:\nException message: {exception.Message}");
+            }
         }
     }
 }

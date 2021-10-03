@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using FileCabinetApp.DataTransfer;
+using FileCabinetApp.Interfaces;
 
-namespace FileCabinetApp
+namespace FileCabinetApp.Decorators
 {
     public sealed class ServiceMeter : IFileCabinetService
     {
@@ -13,25 +15,15 @@ namespace FileCabinetApp
         public ServiceMeter(IFileCabinetService service) => this.service =
             service ?? throw new ArgumentNullException(nameof(service), "Service can't be null");
 
-        public IRecordValidator CreateValidator()
+        public void AddRecord(FileCabinetRecord record)
         {
             this.stopwatch.Restart();
-            var result = this.service.CreateValidator();
+            this.service.AddRecord(record);
             this.stopwatch.Stop();
             WriteResult(this.stopwatch.ElapsedTicks);
-            return result;
         }
 
-        public int CreateRecord()
-        {
-            this.stopwatch.Restart();
-            var result = this.service.CreateRecord();
-            this.stopwatch.Stop();
-            WriteResult(this.stopwatch.ElapsedTicks);
-            return result;
-        }
-
-        public FileCabinetRecord[] FindByFirstName(string firstName)
+        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
             this.stopwatch.Restart();
             var result = this.service.FindByFirstName(firstName);
@@ -40,7 +32,7 @@ namespace FileCabinetApp
             return result;
         }
 
-        public FileCabinetRecord[] FindByLastName(string lastName)
+        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
         {
             this.stopwatch.Restart();
             var result = this.service.FindByLastName(lastName);
@@ -49,7 +41,7 @@ namespace FileCabinetApp
             return result;
         }
 
-        public FileCabinetRecord[] FindByDayOfBirth(string dateOfBirth)
+        public IEnumerable<FileCabinetRecord> FindByDayOfBirth(string dateOfBirth)
         {
             this.stopwatch.Restart();
             var result = this.service.FindByDayOfBirth(dateOfBirth);
@@ -58,15 +50,15 @@ namespace FileCabinetApp
             return result;
         }
 
-        public void EditRecord(int id)
+        public void EditRecord(FileCabinetRecord record)
         {
             this.stopwatch.Restart();
-            this.service.EditRecord(id);
+            this.service.EditRecord(record);
             this.stopwatch.Stop();
             WriteResult(this.stopwatch.ElapsedTicks);
         }
 
-        public IReadOnlyCollection<FileCabinetRecord> GetRecords()
+        public IEnumerable<FileCabinetRecord> GetRecords()
         {
             this.stopwatch.Restart();
             var result = this.service.GetRecords();
@@ -75,7 +67,7 @@ namespace FileCabinetApp
             return result;
         }
 
-        public FileCabinetServiceSnapshot MakeSnapshot()
+        public RecordShapshot MakeSnapshot()
         {
             this.stopwatch.Restart();
             var result = this.service.MakeSnapshot();
@@ -84,15 +76,16 @@ namespace FileCabinetApp
             return result;
         }
 
-        public void Restore(FileCabinetServiceSnapshot restoreSnapshot)
+        public int Restore(RecordShapshot restoreSnapshot)
         {
             this.stopwatch.Restart();
-            this.service.Restore(restoreSnapshot);
+            var result = this.service.Restore(restoreSnapshot);
             this.stopwatch.Stop();
             WriteResult(this.stopwatch.ElapsedTicks);
+            return result;
         }
 
-        public (int RecordsCount, int DeletedRecords) GetStat()
+        public (int AliveRecords, int DeletedRecords) GetStat()
         {
             this.stopwatch.Restart();
             var result = this.service.GetStat();
@@ -101,13 +94,12 @@ namespace FileCabinetApp
             return result;
         }
 
-        public bool RemoveRecord(int index)
+        public void DeleteRecord(FileCabinetRecord record)
         {
             this.stopwatch.Restart();
-            var result = this.service.RemoveRecord(index);
+            this.service.DeleteRecord(record);
             this.stopwatch.Stop();
             WriteResult(this.stopwatch.ElapsedTicks);
-            return result;
         }
 
         public string Purge()

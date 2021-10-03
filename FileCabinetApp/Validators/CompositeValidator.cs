@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.Validators
 {
@@ -20,12 +20,18 @@ namespace FileCabinetApp.Validators
         }
 
         /// <inheritdoc/>
-        public void ValidateParameters(FileCabinetRecordData recordData)
+        public bool ValidateRecord(FileCabinetRecord record)
         {
+            bool isValid = true;
             foreach (var validator in this.validators)
             {
-                validator.ValidateParameters(recordData);
+                if (!validator.ValidateRecord(record))
+                {
+                    return false;
+                }
             }
+
+            return isValid;
         }
     }
 }

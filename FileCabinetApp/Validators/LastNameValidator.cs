@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.Validators
 {
@@ -30,17 +31,15 @@ namespace FileCabinetApp.Validators
         }
 
         /// <inheritdoc/>
-        public void ValidateParameters(FileCabinetRecordData recordData)
+        public bool ValidateRecord(FileCabinetRecord record)
         {
-            if (recordData is null)
+            if (record is null)
             {
-                throw new ArgumentNullException(nameof(recordData), "Record data is null");
+                throw new ArgumentNullException(nameof(record), "Record data is null");
             }
 
-            if (recordData.FirstName.Length < this.minNameLength || recordData.FirstName.Length > this.maxNameLength || recordData.FirstName.Any(symbol => char.IsNumber(symbol)))
-            {
-                throw new ArgumentException("Last name is incorrect.");
-            }
+            return record.FirstName.Length > this.minNameLength && record.FirstName.Length < this.maxNameLength &&
+                   !record.FirstName.Any(char.IsNumber);
         }
     }
 }

@@ -1,4 +1,9 @@
-﻿namespace FileCabinetApp.CommandHandlers
+﻿using FileCabinetApp.Interfaces;
+
+#pragma warning disable CA1051 // Do not declare visible instance fields
+#pragma warning disable SA1401 // Fields should be private
+
+namespace FileCabinetApp.CommandHandlers
 {
     /// <summary>
     /// Abstract class implementing the <see cref="ICommandHandler"/>
@@ -9,7 +14,7 @@
         /// <summary>
         /// <see cref="IFileCabinetService"/> context required for the correct operation of the methods.
         /// </summary>
-        protected readonly IFileCabinetService service;
+        protected readonly IFileCabinetService Service;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceCommandHandlerBase"/> class.
@@ -17,7 +22,15 @@
         /// <param name="service">A context that will be passed to all inheritors from the abstract class for the correct execution of commands.</param>
         protected ServiceCommandHandlerBase(IFileCabinetService service)
         {
-            this.service = service;
+            this.Service = service;
         }
+
+        /// <summary>
+        /// Gets the command processed by the handler.
+        /// </summary>
+        /// <value>
+        /// The processed command.
+        /// </value>
+        public abstract string Command { get; }
     }
 }

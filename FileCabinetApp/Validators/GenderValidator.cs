@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.Validators
 {
@@ -26,17 +24,14 @@ namespace FileCabinetApp.Validators
         }
 
         /// <inheritdoc/>
-        public void ValidateParameters(FileCabinetRecordData recordData)
+        public bool ValidateRecord(FileCabinetRecord record)
         {
-            if (recordData is null)
+            if (record is null)
             {
-                throw new ArgumentNullException(nameof(recordData), "Record data is null");
+                throw new ArgumentNullException(nameof(record), "Record data can't be null");
             }
 
-            if (!this.validGenderArray.Contains(recordData.Gender))
-            {
-                throw new ArgumentException("Gender is incorrect.");
-            }
+            return this.validGenderArray.Contains(record.Gender);
         }
     }
 }

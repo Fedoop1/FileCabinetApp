@@ -1,5 +1,7 @@
 ﻿using System;
-using System.IO;
+using FileCabinetApp.Interfaces;
+
+#pragma warning disable CA1031 // Do not catch general exception types
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -8,14 +10,25 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class ImportCommandHandler : ServiceCommandHandlerBase
     {
+        private const int ImportTypeIndex = 0;
+        private const int FilePathIndex = 1;
+        private const int ParametersCount = 2;
+
+        private readonly IRecordSnapshotService snapshotService;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ImportCommandHandler"/> class.
         /// </summary>
         /// <param name="service">The <see cref="IFileCabinetService"/> context is necessary for the correct execution of the methods.</param>
-        public ImportCommandHandler(IFileCabinetService service)
+        /// <param name="snapshotService">Snapshot service.</param>
+        public ImportCommandHandler(IFileCabinetService service, IRecordSnapshotService snapshotService)
             : base(service)
         {
+            this.snapshotService = snapshotService;
         }
+
+        /// <inheritdoc/>
+        public override string Command => "import";
 
         /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
@@ -23,11 +36,12 @@ namespace FileCabinetApp.CommandHandlers
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "import")
             {
                 this.Import(commandRequest.Parameters);
+                return;
             }
 
-            if (this.nextHandle != null)
+            if (this.NextHandle != null)
             {
-                this.nextHandle.Handle(commandRequest);
+                this.NextHandle.Handle(commandRequest);
             }
         }
 
@@ -37,40 +51,29 @@ namespace FileCabinetApp.CommandHandlers
         /// <param name="parameters">Includes the data type of the imported file and its path.</param>
         private void Import(string parameters)
         {
-            const int ImportTypeIndex = 0;
-            const int FilePathIndex = 1;
-            var parametersArray = parameters.Split(" ", 2);
-            if (parametersArray.Length < 2)
+            if (string.IsNullOrEmpty(parameters))
             {
-                Console.WriteLine("Import parameters are incorrect.");
+                Console.WriteLine("Parameters is null or empty");
+                return;
+            }
+
+            string[] parametersArray = parameters.Split(" ", 2, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+            if (parametersArray.Length != ParametersCount)
+            {
+                Console.WriteLine("Invalid parameters count");
                 return;
             }
 
             try
             {
-                using var fileStream = new FileStream(parametersArray[FilePathIndex], FileMode.Open, FileAccess.Read);
-                FileCabinetServiceSnapshot snapshot = this.service.MakeSnapshot();
-                switch (parametersArray[ImportTypeIndex].ToUpperInvariant())
-                {
-                    case "CSV":
-                        snapshot.LoadFromCSV(new StreamReader(fileStream));
-                        break;
-                    case "XML":
-                        snapshot.LoadFromXML(fileStream);
-                        break;
-                    default:
-                        Console.WriteLine("Unknown import format.");
-                        break;
-                }
-
-                Console.WriteLine($"{snapshot.Records.Count} records were imported from {parametersArray[FilePathIndex]}");
-                this.service.Restore(snapshot);
-                return;
+                var snapshot = this.snapshotService.LoadFrom(parametersArray[ImportTypeIndex], parametersArray[FilePathIndex]);
+                var restoreResult = this.Service.Restore(snapshot);
+                Console.WriteLine($"{restoreResult} records were imported from {parametersArray[FilePathIndex]}");
             }
-            catch (IOException)
+            catch (Exception exception)
             {
-                Console.WriteLine($"Can't open file {parametersArray[FilePathIndex]}");
-                return;
+                Console.WriteLine($"During saving an error was happened. Error message: {exception.Message}.");
             }
         }
     }

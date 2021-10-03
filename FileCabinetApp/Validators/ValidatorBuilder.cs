@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.Validators
 {
@@ -13,10 +14,7 @@ namespace FileCabinetApp.Validators
         /// <summary>
         /// Initializes a new instance of the <see cref="ValidatorBuilder"/> class.
         /// </summary>
-        private ValidatorBuilder()
-        {
-            this.validators = new List<IRecordValidator>();
-        }
+        private ValidatorBuilder() => this.validators = new List<IRecordValidator>();
 
         /// <summary>
         /// Extension method which create <see cref="CompositeValidator"/> with the custom rules.

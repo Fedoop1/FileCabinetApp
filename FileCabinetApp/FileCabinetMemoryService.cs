@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Globalization;
-using System.Linq;
-using FileCabinetApp.Validators;
+using FileCabinetApp.DataTransfer;
+using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp
 {
@@ -12,167 +10,126 @@ namespace FileCabinetApp
     /// </summary>
     public class FileCabinetMemoryService : IRecordValidator, IFileCabinetService
     {
-        private readonly List<FileCabinetRecord> list = new ();
-        private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new ();
-        private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new ();
+        private readonly HashSet<FileCabinetRecord> recordList = new ();
+        private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new (StringComparer.CurrentCultureIgnoreCase);
+        private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new (StringComparer.CurrentCultureIgnoreCase);
         private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new ();
 
-        // ReSharper disable once MemberCanBePrivate.Global
-        private readonly IValidationSettings validationSettings;
+        private readonly IRecordValidator validator;
 
-        public FileCabinetMemoryService(IValidationSettings settings) => this.validationSettings = settings ?? throw new ArgumentNullException(nameof(settings), "Validation settings can't be null");
+        public FileCabinetMemoryService(IRecordValidator validator) => this.validator = validator ?? throw new ArgumentNullException(nameof(validator), "Validator can't be null");
 
         /// <summary>
-        /// Initialize a new <see cref="FileCabinetServiceSnapshot"/> which contains <see cref="FileCabinetRecord"/> array.
+        /// Initialize a new <see cref="FileCabinetSnapshotService"/> which contains <see cref="FileCabinetRecord"/> array.
         /// </summary>
-        /// <returns>Returns <see cref="FileCabinetServiceSnapshot"/> with data about existing records.</returns>
-        public FileCabinetServiceSnapshot MakeSnapshot()
-        {
-            return new FileCabinetServiceSnapshot(this.list.ToArray());
-        }
+        /// <returns>Returns <see cref="FileCabinetSnapshotService"/> with data about existing records.</returns>
+        public RecordShapshot MakeSnapshot() => new (this.GetRecords());
 
         /// <inheritdoc/>
-        public void ValidateParameters(FileCabinetRecordData recordData)
-        {
-            this.CreateValidator().ValidateParameters(recordData);
-        }
-
-        /// <summary>
-        /// Create an instance of <see cref="IRecordValidator"/> and return it.
-        /// </summary>
-        /// <returns>Class which realize <see cref="IRecordValidator"/> for calling .ValidateParameters() method.</returns>
-        public IRecordValidator CreateValidator() => ValidatorBuilder.CreateValidator(this.validationSettings);
+        public bool ValidateRecord(FileCabinetRecord record) => this.validator.ValidateRecord(record);
 
         /// <summary>
         /// Create a new instance of <see cref="FileCabinetRecord"/> and save it to storage.
         /// </summary>
-        /// <returns>Returns the unique identifier of the record.</returns>
-        public int CreateRecord()
+        public void AddRecord(FileCabinetRecord record)
         {
-            var dataContainer = new FileCabinetRecordData(this.validationSettings);
-            dataContainer.InputData();
-            this.ValidateParameters(dataContainer);
+            this.ValidateInputRecord(record);
 
-            var record = new FileCabinetRecord
+            if (this.isExist(record.Id))
             {
-                Id = this.list.Count + 1,
-                FirstName = dataContainer.FirstName,
-                LastName = dataContainer.LastName,
-                DateOfBirth = dataContainer.DateOfBirth,
-                Height = dataContainer.Height,
-                Money = dataContainer.Money,
-                Gender = dataContainer.Gender,
-            };
+                throw new ArgumentException("Record with this Id already exists");
+            }
 
-            this.list.Add(record);
-            this.DictionaryAdd(dataContainer.FirstName, dataContainer.LastName, dataContainer.DateOfBirth, record);
-
-            return record.Id;
+            this.recordList.Add(record);
+            this.DictionaryAdd(record);
         }
 
         /// <inheritdoc/>
-        public FileCabinetRecord[] FindByFirstName(string firstName)
+        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
-            if (this.firstNameDictionary.TryGetValue(firstName?.ToLower(CultureInfo.CurrentCulture), out List<FileCabinetRecord> recordList))
+            if (this.firstNameDictionary.TryGetValue(firstName ?? string.Empty, out List<FileCabinetRecord> recordList))
             {
-                return recordList.ToArray();
-            }
-            else
-            {
-                return Array.Empty<FileCabinetRecord>();
-            }
-        }
-
-        /// <inheritdoc/>
-        public FileCabinetRecord[] FindByLastName(string lastName)
-        {
-            if (this.lastNameDictionary.TryGetValue(lastName?.ToLower(CultureInfo.CurrentCulture), out List<FileCabinetRecord> recordList))
-            {
-                return recordList.ToArray();
-            }
-            else
-            {
-                return Array.Empty<FileCabinetRecord>();
-            }
-        }
-
-        /// <inheritdoc/>
-        public FileCabinetRecord[] FindByDayOfBirth(string dateOfBirth)
-        {
-            if (DateTime.TryParse(dateOfBirth, out DateTime birthDate))
-            {
-                if (this.dateOfBirthDictionary.TryGetValue(birthDate, out List<FileCabinetRecord> recordList))
-                {
-                    return recordList.ToArray();
-                }
+                return RecordsIterator(recordList);
             }
 
             return Array.Empty<FileCabinetRecord>();
         }
 
         /// <inheritdoc/>
-        public void EditRecord(int id)
+        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
         {
-            var dataContainer = new FileCabinetRecordData(this.validationSettings);
-            dataContainer.InputData();
-            this.ValidateParameters(dataContainer);
-
-            if (!this.RemoveRecord(id))
+            if (this.lastNameDictionary.TryGetValue(lastName ?? string.Empty, out List<FileCabinetRecord> recordList))
             {
-                return;
+                return RecordsIterator(recordList);
             }
 
-            var newRecord = new FileCabinetRecord()
+            return Array.Empty<FileCabinetRecord>();
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<FileCabinetRecord> FindByDayOfBirth(string dateOfBirth)
+        {
+            if (DateTime.TryParse(dateOfBirth, out DateTime birthDate) && this.dateOfBirthDictionary.TryGetValue(birthDate, out List<FileCabinetRecord> recordList))
             {
-                Id = id,
-                FirstName = dataContainer.FirstName,
-                LastName = dataContainer.LastName,
-                DateOfBirth = dataContainer.DateOfBirth,
-                Height = dataContainer.Height,
-                Money = dataContainer.Money,
-                Gender = dataContainer.Gender,
-            };
-
-            this.list.Add(newRecord);
-            this.DictionaryAdd(dataContainer.FirstName, dataContainer.LastName, dataContainer.DateOfBirth, newRecord);
-
-            Console.WriteLine($"Record #{id} is updated.");
-        }
-
-        /// <inheritdoc/>
-        public IReadOnlyCollection<FileCabinetRecord> GetRecords()
-        {
-            return this.list.AsReadOnly();
-        }
-
-        /// <inheritdoc/>
-        public (int RecordsCount, int DeletedRecords) GetStat()
-        {
-            return (this.list.Count, 0);
-        }
-
-        /// <inheritdoc/>
-        public void Restore(FileCabinetServiceSnapshot restoreSnapshot)
-        {
-            if (restoreSnapshot is null)
-            {
-                throw new ArgumentNullException(nameof(restoreSnapshot), "Restore snapshot is null");
+                return RecordsIterator(recordList);
             }
 
-            var restoreRecordList = restoreSnapshot.Records;
-            foreach (var restoreRecord in restoreRecordList)
+            return Array.Empty<FileCabinetRecord>();
+        }
+
+        /// <inheritdoc/>
+        public void EditRecord(FileCabinetRecord record)
+        {
+            this.ValidateInputRecord(record);
+
+            if (!this.isExist(record.Id))
             {
-                if (this.list.Any(record => record.Id == restoreRecord.Id))
+                throw new ArgumentException("Record with this Id already exists");
+            }
+
+            this.ValidateRecord(record);
+            this.recordList.Add(record);
+            this.DictionaryAdd(record);
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<FileCabinetRecord> GetRecords()
+        {
+            foreach (var record in this.recordList)
+            {
+                yield return record;
+            }
+        }
+
+        /// <inheritdoc/>
+        public (int AliveRecords, int DeletedRecords) GetStat()
+        {
+            return (this.recordList.Count, 0);
+        }
+
+        /// <inheritdoc/>
+        public int Restore(RecordShapshot snapshot)
+        {
+            if (snapshot is null)
+            {
+                throw new ArgumentNullException(nameof(snapshot), "Restore snapshot is null");
+            }
+
+            int affectedRecordsCount = default;
+            foreach (var restoreRecord in snapshot.Records)
+            {
+                if (this.recordList.TryGetValue(restoreRecord, out var oldValue))
                 {
-                    var oldRecord = this.list.First(record => record.Id == restoreRecord.Id);
-                    this.list.Remove(oldRecord);
-                    this.DictionaryRemove(oldRecord);
-                    Console.WriteLine($"Record #{restoreRecord.Id} was updated!");
+                    this.recordList.Remove(oldValue);
+                    this.DictionaryRemove(oldValue);
                 }
 
-                this.list.Add(restoreRecord);
-                this.DictionaryAdd(restoreRecord.FirstName, restoreRecord.LastName, restoreRecord.DateOfBirth, restoreRecord);
+                this.recordList.Add(restoreRecord);
+                this.DictionaryAdd(restoreRecord);
+                affectedRecordsCount++;
             }
+
+            return affectedRecordsCount;
         }
 
         /// <inheritdoc/>
@@ -182,57 +139,51 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public bool RemoveRecord(int index)
+        public void DeleteRecord(FileCabinetRecord record)
         {
-            var record = this.list.FirstOrDefault(rec => rec.Id == index);
-
             if (record is null)
             {
-                return false;
+                throw new ArgumentNullException(nameof(record), "Record can't be null");
             }
 
-            this.list.Remove(record);
-            this.DictionaryRemove(record);
-            return true;
+            if (this.recordList.TryGetValue(record, out var actualValue))
+            {
+                this.recordList.Remove(actualValue);
+                this.DictionaryRemove(actualValue);
+            }
         }
 
         /// <summary>
         /// An internal method that calls data updates in dictionaries.
         /// </summary>
-        /// <param name="firstName">New name.</param>
-        /// <param name="lastName">New surname.</param>
-        /// <param name="dateOfBirth">New date of birth.</param>
-        /// <param name="record">A record corresponding to these parameters.</param>
-        private void DictionaryAdd(string firstName, string lastName, DateTime dateOfBirth, FileCabinetRecord record)
+        /// <param name="record">Record to add.</param>
+        private void DictionaryAdd(FileCabinetRecord record)
         {
-            firstName = firstName?.ToLower(CultureInfo.CurrentCulture);
-            lastName = lastName?.ToLower(CultureInfo.CurrentCulture);
-
-            if (this.firstNameDictionary.TryGetValue(firstName, out List<FileCabinetRecord> firstNamefList))
+            if (this.firstNameDictionary.TryGetValue(record.FirstName, out List<FileCabinetRecord> firstNameList))
             {
-                firstNamefList.Add(record);
+                firstNameList.Add(record);
             }
             else
             {
-                this.firstNameDictionary.Add(firstName, new List<FileCabinetRecord>() { record });
+                this.firstNameDictionary.Add(record.FirstName, new List<FileCabinetRecord> { record });
             }
 
-            if (this.lastNameDictionary.TryGetValue(lastName, out List<FileCabinetRecord> lastNameList))
+            if (this.lastNameDictionary.TryGetValue(record.LastName, out List<FileCabinetRecord> lastNameList))
             {
                 lastNameList.Add(record);
             }
             else
             {
-                this.lastNameDictionary.Add(lastName, new List<FileCabinetRecord>() { record });
+                this.lastNameDictionary.Add(record.LastName, new List<FileCabinetRecord> { record });
             }
 
-            if (this.dateOfBirthDictionary.TryGetValue(dateOfBirth, out List<FileCabinetRecord> dateOfBirthList))
+            if (this.dateOfBirthDictionary.TryGetValue(record.DateOfBirth, out List<FileCabinetRecord> dateOfBirthList))
             {
                 dateOfBirthList.Add(record);
             }
             else
             {
-                this.dateOfBirthDictionary.Add(dateOfBirth, new List<FileCabinetRecord>() { record });
+                this.dateOfBirthDictionary.Add(record.DateOfBirth, new List<FileCabinetRecord> { record });
             }
         }
 
@@ -242,13 +193,32 @@ namespace FileCabinetApp
         /// <param name="record">The record to be removed from the dictionaries.</param>
         private void DictionaryRemove(FileCabinetRecord record)
         {
-            this.firstNameDictionary.TryGetValue(record.FirstName.ToLower(CultureInfo.CurrentCulture), out List<FileCabinetRecord> firstNameList);
-            this.lastNameDictionary.TryGetValue(record.LastName.ToLower(CultureInfo.CurrentCulture), out List<FileCabinetRecord> lastNameList);
-            this.dateOfBirthDictionary.TryGetValue(record.DateOfBirth, out List<FileCabinetRecord> dateOfBirthList);
+            this.firstNameDictionary[record.FirstName].Remove(record);
+            this.lastNameDictionary[record.LastName].Remove(record);
+            this.dateOfBirthDictionary[record.DateOfBirth].Remove(record);
+        }
 
-            firstNameList.Remove(record);
-            lastNameList.Remove(record);
-            dateOfBirthList.Remove(record);
+        private static IEnumerable<FileCabinetRecord> RecordsIterator(IEnumerable<FileCabinetRecord> source)
+        {
+            foreach (var record in source)
+            {
+                yield return record;
+            }
+        }
+
+        private bool isExist(int id) => this.recordList.Contains(new FileCabinetRecord { Id = id });
+
+        private void ValidateInputRecord(FileCabinetRecord record)
+        {
+            if (record is null)
+            {
+                throw new ArgumentNullException(nameof(record), "Record can't be null");
+            }
+
+            if (!this.ValidateRecord(record))
+            {
+                throw new ArgumentException("Record data doesn't according validation rules");
+            }
         }
     }
 }

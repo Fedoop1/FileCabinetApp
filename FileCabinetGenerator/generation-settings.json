@@ -1,0 +1,6 @@
+{
+  "OutputType": "XML",
+    "FilePath": "destination.xml",
+    "RecordsAmount": "10",
+    "StartId": "0"
+}

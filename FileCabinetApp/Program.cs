@@ -3,63 +3,84 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FileCabinetApp.CommandHandlers;
+using FileCabinetApp.DataTransfer;
 using FileCabinetApp.Decorators;
+using FileCabinetApp.Interfaces;
 using FileCabinetApp.Validators;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
+#pragma warning disable SA1600 // Elements should be documented
 
 namespace FileCabinetApp
 {
-    /// <summary>
-    /// The main class from where all available functions are called.
-    /// </summary>
     public static class Program
     {
         private const string DeveloperName = "Nikita Malukov";
         private const string HintMessage = "Enter your command, or enter 'help' to get help.";
 
         private static IConfiguration configuration;
+        private static IServiceProvider services;
 
         private static bool isRunning = true;
-        private static IFileCabinetService service;
-        private static IValidationSettings settings;
 
         private static void DefaultRecordPrint(IEnumerable<FileCabinetRecord> records)
         {
-            foreach (var item in records ?? Array.Empty<FileCabinetRecord>())
+            if (records is null)
+            {
+                Console.WriteLine("Null records sequence.");
+                return;
+            }
+
+            foreach (var item in records)
             {
                 Console.WriteLine(item);
             }
         }
 
-        private static ICommandHandler CreateCommandHandler()
+        private static ICommandHandler CreateAndSetCommandHandlers()
         {
-            var createHandler = new CreateCommandHandler(service);
-            var editHandler = new EditCommandHandler(service);
-            var exitHandler = new ExitCommandHandler(service, UpdateApplicationStatus);
-            var exportHandler = new ExportCommandHandler(service);
-            var findHandler = new FindCommandHandler(service, DefaultRecordPrint);
-            var helpHandler = new HelpCommandHandler();
-            var importHandler = new ImportCommandHandler(service);
-            var listHandler = new ListCommandHandler(service, DefaultRecordPrint);
-            var missedHandler = new MissedCommandHandler();
-            var purgeHandler = new PurgeCommandHandler(service);
-            var removeHandler = new RemoveCommandHanlder(service);
-            var statHandler = new StatCommandHandler(service);
+            CommandHandlerBase[] handlers =
+            {
+                new InsertCommandHandler(services.GetService<IFileCabinetService>()),
+                new UpdateCommandHandler(services.GetService<IFileCabinetService>()),
+                new ExitCommandHandler(services.GetService<IFileCabinetService>(), UpdateApplicationStatus),
+                new ExportCommandHandler(services.GetService<IFileCabinetService>(), services.GetService<IRecordSnapshotService>()),
+                new FindCommandHandler(services.GetService<IFileCabinetService>(), DefaultRecordPrint),
+                new HelpCommandHandler(),
+                new ImportCommandHandler(services.GetService<IFileCabinetService>(), services.GetService<IRecordSnapshotService>()),
+                new ListCommandHandler(services.GetService<IFileCabinetService>(), DefaultRecordPrint),
+                new PurgeCommandHandler(services.GetService<IFileCabinetService>()),
+                new DeleteCommandHandler(services.GetService<IFileCabinetService>()),
+                new StatCommandHandler(services.GetService<IFileCabinetService>()),
 
-            createHandler.SetNext(editHandler);
-            editHandler.SetNext(exitHandler);
-            exitHandler.SetNext(exportHandler);
-            exportHandler.SetNext(findHandler);
-            findHandler.SetNext(helpHandler);
-            helpHandler.SetNext(importHandler);
-            importHandler.SetNext(listHandler);
-            listHandler.SetNext(purgeHandler);
-            purgeHandler.SetNext(removeHandler);
-            removeHandler.SetNext(statHandler);
-            statHandler.SetNext(missedHandler);
+                // Additional cell to MissedCommandHandler, it's always last.
+                null,
+            };
 
-            return createHandler;
+            handlers[^1] = new MissedCommandHandler(GetAvailableCommands(handlers));
+
+            SetupHandlersChain(handlers);
+
+            const int firstHandlerInChain = 0;
+            return handlers[firstHandlerInChain];
+
+            static void SetupHandlersChain(IList<CommandHandlerBase> source)
+            {
+                for (int index = 0; index < source.Count - 1; index++)
+                {
+                    source[index].SetNext(source[index + 1]);
+                }
+            }
+
+            static IEnumerable<string> GetAvailableCommands(IEnumerable<CommandHandlerBase> source)
+            {
+                foreach (var handler in source.OfType<ServiceCommandHandlerBase>())
+                {
+                    yield return handler.Command;
+                }
+            }
         }
 
         private static void UpdateApplicationStatus(bool status)
@@ -71,66 +92,82 @@ namespace FileCabinetApp
         /// A method that accepts command line parameters to control the check rules depending on the passed argument.
         /// </summary>
         /// <param name="parameters">An array of arguments passed to the Main method.</param>
-        private static (IFileCabinetService service, IValidationSettings settings) Configure(string[] parameters)
+        private static void Configure(string[] parameters)
         {
-            Console.Write("$FileCabinetApp.exe");
-
             configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("validation-rules.json")
                 .AddCommandLine(parameters, new Dictionary<string, string>
                 {
                     ["--validation-rules"] = "validation-rules",
-                    ["-v"] = "v",
-                    ["-s"] = "s",
+                    ["-v"] = "validation-rules",
+                    ["-s"] = "storage",
                     ["--storage"] = "storage",
                 })
                 .Build();
+        }
 
-            IValidationSettings settings = configuration.GetSection("Default").Get<ValidationSettings>();
-            IFileCabinetService service = new FileCabinetMemoryService(settings);
+        private static IServiceProvider ConfigureServices()
+        {
+            IServiceCollection result = new ServiceCollection()
+                .AddSingleton(typeof(ILoggerFactory), LoggerFactory.Create(config =>
+                {
+                    config.AddConsole();
+                    config.SetMinimumLevel(LogLevel.Information);
+                }))
+                .AddTransient(typeof(ILogger), service => service.GetService<ILoggerFactory>() !.CreateLogger("FileCabinetLogger"))
+                .AddSingleton(typeof(IValidationSettings), _ =>
+                {
+                    return configuration["validation-rules"] == "custom" || configuration["v"] == "custom"
+                        ? configuration.GetSection("Custom").Get<ValidationSettings>() : configuration.GetSection("Default").Get<ValidationSettings>();
+                })
+                .AddSingleton(typeof(IRecordValidator), service => ValidatorBuilder.CreateValidator(service.GetService<IValidationSettings>()))
+                .AddSingleton(typeof(IFileCabinetService), service =>
+                {
+                    var validator = service.GetService<IRecordValidator>();
+                    IFileCabinetService fileService = configuration["storage"] == "file" || configuration["s"] == "file"
+                        ? new FileCabinetFilesystemService("cabinet-records.db", validator)
+                        : new FileCabinetMemoryService(validator);
 
-            foreach (var parameter in parameters)
+                    if (bool.TryParse(configuration["use-stopwatch"], out var useServiceMeter) && useServiceMeter)
+                    {
+                        fileService = new ServiceMeter(fileService);
+                    }
+
+                    if (bool.TryParse(configuration["use-logger"], out bool useLogger) && useLogger)
+                    {
+                        fileService = new ServiceLogger(fileService, service.GetService<ILogger>());
+                    }
+
+                    return fileService;
+                })
+                .AddSingleton(typeof(IRecordSnapshotService),
+                    service =>
+                    {
+                        var result = new FileCabinetSnapshotService(service.GetService<IFileCabinetService>());
+                        result.AddDataSaver("xml", filepath => new FileCabinetRecordXmlLWriter(filepath));
+                        result.AddDataSaver("csv", filepath => new FileCabinetRecordCsvWriter(filepath));
+                        result.AddDataLoader("xml", filepath => new FileCabinetXmlReader(filepath));
+                        result.AddDataLoader("csv", filepath => new FileCabinetCsvReader(filepath));
+
+                        return result;
+                    });
+
+            return result.BuildServiceProvider();
+        }
+
+        private static void Main(string[] args)
+        {
+            Configure(args);
+            services = ConfigureServices();
+            var firstCommandHandler = CreateAndSetCommandHandlers();
+            Console.Write("$FileCabinetApp.exe");
+
+            foreach (var parameter in args)
             {
                 Console.WriteLine(parameter);
             }
 
-            if (configuration["validation-rules"] == "custom" || configuration["v"] == "custom")
-            {
-                settings = configuration.GetSection("Custom").Get<ValidationSettings>();
-                service = new FileCabinetMemoryService(settings);
-            }
-
-            if (configuration["storage"] == "file" || configuration["s"] == "file")
-            {
-                service = new FileCabinetFilesystemService("cabinet-records.db", settings);
-            }
-
-            if (parameters.Contains("use-stopwatch"))
-            {
-                service = new ServiceMeter(service);
-            }
-
-            if (parameters.Contains("use-logger"))
-            {
-                service = new ServiceLogger(service, new Logger<ServiceLogger>(LoggerFactory.Create(config =>
-                {
-                    config.AddConsole();
-                    config.SetMinimumLevel(LogLevel.Information);
-                })));
-            }
-
-            return (service, settings);
-        }
-
-        /// <summary>
-        /// The main application method from which the user interacts with all available methods.
-        /// </summary>
-        /// <param name="args">Command line arguments required to control check parameters.</param>
-        private static void Main(string[] args)
-        {
-            (service, settings) = Configure(args);
-            var commandHandler = CreateCommandHandler();
             Console.WriteLine($"\nFile Cabinet Application, developed by {DeveloperName}");
             Console.WriteLine(HintMessage);
             Console.WriteLine();
@@ -143,7 +180,7 @@ namespace FileCabinetApp
                 const int commandIndex = 0;
                 const int parametersIndex = 1;
                 string parameters = inputs.Length > parametersIndex ? inputs[parametersIndex] : string.Empty;
-                commandHandler.Handle(new AppCommandRequest(inputs[commandIndex], parameters));
+                firstCommandHandler.Handle(new AppCommandRequest(inputs[commandIndex], parameters));
             }
             while (isRunning);
         }

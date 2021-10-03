@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -16,31 +12,31 @@ namespace FileCabinetApp.CommandHandlers
         /// </summary>
         private static readonly string[][] HelpMessages = new string[][]
         {
-            new[] { "help", "prints the help screen", "The 'help' command prints the help screen." },
-            new[] { "exit", "exits the application", "The 'exit' command exits the application." },
-            new[] { "stat", "prints the count if records", "The 'stat' command prints the count of the records." },
-            new[] { "create", "create the record in file cabinet", "The 'create' command create the record in file cabinet." },
-            new[] { "list", "prints the list if records", "The 'list' command prints the list of the records." },
-            new[] { "edit", "edits the record", "The 'edit' command edits the value of the record." },
-            new[] { "find", "finds a record", "The 'find' command find a record by the specified parameter. Example '>find [param] [data]." },
-            new[] { "export", "Make snapshot and save it to file.", "The export command make snapshot of you record list and save it to special file." },
-            new[] { "import", "Import records from external storage.", "The import command imports records from a file in two possible formats XML and CSV." },
-            new[] { "remove", "Remove selected record.", "The command remove record at the selected index." },
-            new[] { "purge", "Defragment the db file.", "The command invokes an algorithm that destroys deleted records from the file." },
+            new[] { "help", "Prints the help screen", "The 'help' command prints the help screen." },
+            new[] { "exit", "Exits the application", "The 'exit' command close the application." },
+            new[] { "stat", "Prints the stat of records", "The 'stat' command prints the stat of the file cabinet service." },
+            new[] { "insert", "Insert a new record", "The 'insert' command insert a new record to the file cabinet service. Example '>insert (id, firstname, lastname, dateofbirth) values ('1', 'John', 'Doe', '5/18/1986').'" },
+            new[] { "list", "Prints the list if records", "The 'list' command prints the list of the records." },
+            new[] { "update", "Update the record", "The 'update' command updates the value of the record. Example 'update set firstname = 'John', lastname = 'Doe' , dateofbirth = '5/18/1986' where id = '1'\r\n'" },
+            new[] { "find", "Finds a record", "The 'find' command find a record by the specified parameter. Example '>find [param] [data]." },
+            new[] { "export", "Make snapshot and save it to file.", "The export command makes a snapshot of you records and saves it to a special file." },
+            new[] { "import", "Import records from the external storage.", "The import command imports records from a destination file according by specified format." },
+            new[] { "delete", "Delete selected record.", "The command delete record by the specified parameter. Example >delete where id = '1'." },
+            new[] { "purge", "Fragmentate database file.", "The command invokes an algorithm that removes deleted records from the destination file and clear the space." },
         };
 
         /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
-            if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "help")
+            if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command.Contains("help", StringComparison.CurrentCultureIgnoreCase))
             {
                 PrintHelp(commandRequest.Parameters);
                 return;
             }
 
-            if (this.nextHandle != null)
+            if (this.NextHandle != null)
             {
-                this.nextHandle.Handle(commandRequest);
+                this.NextHandle.Handle(commandRequest);
             }
         }
 
@@ -50,16 +46,16 @@ namespace FileCabinetApp.CommandHandlers
         /// <param name="parameters">Parameter with the choice of a specific command to display help about it.</param>
         private static void PrintHelp(string parameters)
         {
-            const int CommandHelpIndex = 0;
-            const int DescriptionHelpIndex = 1;
-            const int ExplanationHelpIndex = 2;
+            const int commandHelpIndex = 0;
+            const int descriptionHelpIndex = 1;
+            const int explanationHelpIndex = 2;
 
             if (!string.IsNullOrEmpty(parameters))
             {
-                var index = Array.FindIndex(HelpMessages, 0, HelpMessages.Length, i => string.Equals(i[CommandHelpIndex], parameters, StringComparison.InvariantCultureIgnoreCase));
+                var index = Array.FindIndex(HelpMessages, 0, HelpMessages.Length, i => string.Equals(i[commandHelpIndex], parameters, StringComparison.InvariantCultureIgnoreCase));
                 if (index >= 0)
                 {
-                    Console.WriteLine(HelpMessages[index][ExplanationHelpIndex]);
+                    Console.WriteLine(HelpMessages[index][explanationHelpIndex]);
                 }
                 else
                 {
@@ -72,7 +68,7 @@ namespace FileCabinetApp.CommandHandlers
 
                 foreach (var helpMessage in HelpMessages)
                 {
-                    Console.WriteLine("\t{0}\t- {1}", helpMessage[CommandHelpIndex], helpMessage[DescriptionHelpIndex]);
+                    Console.WriteLine("\t{0}\t- {1}", helpMessage[commandHelpIndex], helpMessage[descriptionHelpIndex]);
                 }
             }
         }
