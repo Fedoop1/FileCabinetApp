@@ -41,18 +41,6 @@ namespace FileCabinetApp.CommandHandlers
             this.NextHandle?.Handle(commandRequest);
         }
 
-        private static (string key, string value) ExtractKeyValuePair(string parameter)
-        {
-            var pair = parameter.Split('=', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-            if (pair.Length != 2)
-            {
-                throw new ArgumentException("Invalid key-value pair");
-            }
-
-            return (pair[KeyIndex], pair[ValueIndex].Trim('\u0027'));
-        }
-
         private static Predicate<FileCabinetRecord> GeneratePredicate(string key, string value)
         {
             var property =
@@ -89,8 +77,8 @@ namespace FileCabinetApp.CommandHandlers
                     Console.WriteLine("Invalid parameters count");
                 }
 
-                var pair = ExtractKeyValuePair(parametersArray[0]);
-                var predicate = GeneratePredicate(pair.key, pair.value);
+                var pair = CommandHandlerExtensions.ExtractKeyValuePair(parametersArray[0], new[] { "=" });
+                var predicate = CommandHandlerExtensions.GeneratePredicate(pair);
 
                 List<int> deletedRecordsId = new ();
                 foreach (var record in this.Service.GetRecords().Where(record => predicate(record)))

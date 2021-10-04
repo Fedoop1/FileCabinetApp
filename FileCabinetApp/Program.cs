@@ -6,6 +6,7 @@ using FileCabinetApp.CommandHandlers;
 using FileCabinetApp.DataTransfer;
 using FileCabinetApp.Decorators;
 using FileCabinetApp.Interfaces;
+using FileCabinetApp.RecordPrinters;
 using FileCabinetApp.Validators;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,20 +26,6 @@ namespace FileCabinetApp
 
         private static bool isRunning = true;
 
-        private static void DefaultRecordPrint(IEnumerable<FileCabinetRecord> records)
-        {
-            if (records is null)
-            {
-                Console.WriteLine("Null records sequence.");
-                return;
-            }
-
-            foreach (var item in records)
-            {
-                Console.WriteLine(item);
-            }
-        }
-
         private static ICommandHandler CreateAndSetCommandHandlers()
         {
             CommandHandlerBase[] handlers =
@@ -47,13 +34,14 @@ namespace FileCabinetApp
                 new UpdateCommandHandler(services.GetService<IFileCabinetService>()),
                 new ExitCommandHandler(services.GetService<IFileCabinetService>(), UpdateApplicationStatus),
                 new ExportCommandHandler(services.GetService<IFileCabinetService>(), services.GetService<IRecordSnapshotService>()),
-                new FindCommandHandler(services.GetService<IFileCabinetService>(), DefaultRecordPrint),
+                new FindCommandHandler(services.GetService<IFileCabinetService>(), services.GetService<IRecordPrinter>()),
                 new HelpCommandHandler(),
                 new ImportCommandHandler(services.GetService<IFileCabinetService>(), services.GetService<IRecordSnapshotService>()),
-                new ListCommandHandler(services.GetService<IFileCabinetService>(), DefaultRecordPrint),
+                new ListCommandHandler(services.GetService<IFileCabinetService>(), services.GetService<IRecordPrinter>()),
                 new PurgeCommandHandler(services.GetService<IFileCabinetService>()),
                 new DeleteCommandHandler(services.GetService<IFileCabinetService>()),
                 new StatCommandHandler(services.GetService<IFileCabinetService>()),
+                new SelectCommandHandler(services.GetService<IFileCabinetService>()),
 
                 // Additional cell to MissedCommandHandler, it's always last.
                 null,
@@ -116,6 +104,7 @@ namespace FileCabinetApp
                     config.SetMinimumLevel(LogLevel.Information);
                 }))
                 .AddTransient(typeof(ILogger), service => service.GetService<ILoggerFactory>() !.CreateLogger("FileCabinetLogger"))
+                .AddSingleton(typeof(IRecordPrinter), typeof(DefaultPrinter))
                 .AddSingleton(typeof(IValidationSettings), _ =>
                 {
                     return configuration["validation-rules"] == "custom" || configuration["v"] == "custom"

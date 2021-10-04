@@ -11,17 +11,17 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class FindCommandHandler : ServiceCommandHandlerBase
     {
-        private readonly Action<IEnumerable<FileCabinetRecord>> printer;
+        private readonly IRecordPrinter printer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FindCommandHandler"/> class.
         /// </summary>
         /// <param name="service"><see cref="IFileCabinetService"/> context required for the correct operation of the methods.</param>
         /// <param name="printer">A delegate to a method that print data to the console according to a certain rule.</param>
-        public FindCommandHandler(IFileCabinetService service, Action<IEnumerable<FileCabinetRecord>> printer)
+        public FindCommandHandler(IFileCabinetService service, IRecordPrinter printer)
             : base(service)
         {
-            this.printer = printer;
+            this.printer = printer ?? throw new ArgumentNullException(nameof(printer), "Printer can't be null");
         }
 
         /// <inheritdoc/>
@@ -33,7 +33,7 @@ namespace FileCabinetApp.CommandHandlers
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command.Contains("find", StringComparison.CurrentCultureIgnoreCase))
             {
                 var records = this.Find(commandRequest.Parameters);
-                this.printer.Invoke(records);
+                this.printer.Print(records);
                 return;
             }
 

@@ -9,17 +9,17 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class ListCommandHandler : ServiceCommandHandlerBase
     {
-        private readonly Action<IEnumerable<FileCabinetRecord>> printer;
+        private readonly IRecordPrinter printer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ListCommandHandler"/> class.
         /// </summary>
         /// <param name="service"><see cref="IFileCabinetService"/> context required for the correct operation of the methods.</param>
         /// <param name="printer">A delegate to a method that print data to the console according to a certain rule.</param>
-        public ListCommandHandler(IFileCabinetService service, Action<IEnumerable<FileCabinetRecord>> printer)
+        public ListCommandHandler(IFileCabinetService service, IRecordPrinter printer)
             : base(service)
         {
-            this.printer = printer;
+            this.printer = printer ?? throw new ArgumentNullException(nameof(printer), "Printer can't be null");
         }
 
         /// <inheritdoc/>
@@ -30,7 +30,7 @@ namespace FileCabinetApp.CommandHandlers
         {
             if (!string.IsNullOrEmpty(commandRequest?.Command) && commandRequest.Command == "list")
             {
-                this.printer.Invoke(this.List());
+                this.printer.Print(this.List());
                 return;
             }
 

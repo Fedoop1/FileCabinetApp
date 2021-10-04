@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using FileCabinetApp.Interfaces;
+using static FileCabinetApp.CommandHandlers.CommandHandlerExtensions;
 
 #pragma warning disable CA1308 // Normalize strings to uppercase
 #pragma warning disable CA1031 // Do not catch general exception types
@@ -16,9 +17,6 @@ namespace FileCabinetApp.CommandHandlers
     {
         private const int SetItemsIndex = 0;
         private const int WhereItemsIndex = 1;
-
-        private const int KeyIndex = 0;
-        private const int ValuesIndex = 1;
 
         private const int UpdateWithoutPredicate = 1;
         private const int UpdateWithPredicate = 2;
@@ -46,50 +44,20 @@ namespace FileCabinetApp.CommandHandlers
                 return;
             }
 
-            if (this.NextHandle != null)
-            {
-                this.NextHandle.Handle(commandRequest);
-            }
+            this.NextHandle?.Handle(commandRequest);
         }
 
-        private static Predicate<FileCabinetRecord> GeneratePredicate(Dictionary<string, string> keyValuePair)
+        private static void UpdateRecord(FileCabinetRecord record, Dictionary<PropertyInfo, object> source)
         {
-            if (keyValuePair is null)
+            foreach (KeyValuePair<PropertyInfo, object> propertyValuePair in source)
             {
-                return _ => true;
-            }
-
-            Predicate<FileCabinetRecord> intermediateResult = null;
-
-            foreach (var pair in keyValuePair)
-            {
-                var property =
-                    typeof(FileCabinetRecord).GetProperties().FirstOrDefault(property => property.Name.Contains(pair.Key, StringComparison.CurrentCultureIgnoreCase));
-                intermediateResult += record => property!.GetValue(record)?.ToString() == pair.Value;
-            }
-
-            return intermediateResult!.GetInvocationList().Length > 0 ? CombinePredicateIntoOneMethod(intermediateResult) : intermediateResult;
-
-            static Predicate<FileCabinetRecord> CombinePredicateIntoOneMethod(Predicate<FileCabinetRecord> predicate)
-            {
-                return record =>
-                {
-                    foreach (var method in predicate.GetInvocationList())
-                    {
-                        if (((Predicate<FileCabinetRecord>)method).Invoke(record) is false)
-                        {
-                            return false;
-                        }
-                    }
-
-                    return true;
-                };
+                propertyValuePair.Key.SetValue(record, propertyValuePair.Value);
             }
         }
 
         private static Dictionary<PropertyInfo, object> BindPropertyAndValue(Dictionary<string, string> source)
         {
-            Dictionary<PropertyInfo, object> result = new ();
+            Dictionary<PropertyInfo, object> result = new();
 
             foreach (var keyValuePair in source)
             {
@@ -102,27 +70,6 @@ namespace FileCabinetApp.CommandHandlers
                 {
                     Console.WriteLine("An exception happened during 'SET' initialization");
                 }
-            }
-
-            return result;
-        }
-
-        private static void UpdateRecord(FileCabinetRecord record, Dictionary<PropertyInfo, object> source)
-        {
-            foreach (KeyValuePair<PropertyInfo, object> propertyValuePair in source)
-            {
-                propertyValuePair.Key.SetValue(record, propertyValuePair.Value);
-            }
-        }
-
-        private static Dictionary<string, string> ExtractKeyValuePair(string source, string[] separator)
-        {
-            var result = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
-            var parameterPairs = source.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            var parameterValuePair = parameterPairs.Select(x => x.Split('=', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
-            foreach (var pair in parameterValuePair)
-            {
-                result.Add(pair[KeyIndex], pair[ValuesIndex].Trim('\u0027'));
             }
 
             return result;
