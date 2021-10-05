@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -35,7 +34,7 @@ namespace FileCabinetApp.CommandHandlers
             {
                 var property =
                     typeof(FileCabinetRecord).GetProperties().FirstOrDefault(property => property.Name.Contains(pair.Key, StringComparison.CurrentCultureIgnoreCase));
-                intermediateResult += record => property!.GetValue(record)?.ToString() == pair.Value;
+                intermediateResult += record => property.GetValue(record).ToString().Contains(pair.Value, StringComparison.CurrentCultureIgnoreCase);
             }
 
             return intermediateResult!.GetInvocationList().Length > 0 ? CombinePredicateIntoOneMethod(intermediateResult) : intermediateResult;

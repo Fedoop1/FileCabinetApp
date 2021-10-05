@@ -41,7 +41,7 @@ namespace FileCabinetApp
                 new PurgeCommandHandler(services.GetService<IFileCabinetService>()),
                 new DeleteCommandHandler(services.GetService<IFileCabinetService>()),
                 new StatCommandHandler(services.GetService<IFileCabinetService>()),
-                new SelectCommandHandler(services.GetService<IFileCabinetService>()),
+                new SelectCommandHandler(services.GetService<IFileCabinetService>(), services.GetService<IRecordPrinter>()),
 
                 // Additional cell to MissedCommandHandler, it's always last.
                 null,
@@ -104,7 +104,7 @@ namespace FileCabinetApp
                     config.SetMinimumLevel(LogLevel.Information);
                 }))
                 .AddTransient(typeof(ILogger), service => service.GetService<ILoggerFactory>() !.CreateLogger("FileCabinetLogger"))
-                .AddSingleton(typeof(IRecordPrinter), typeof(DefaultPrinter))
+                .AddSingleton(typeof(IRecordPrinter), _ => new DefaultPrinter(Console.Out))
                 .AddSingleton(typeof(IValidationSettings), _ =>
                 {
                     return configuration["validation-rules"] == "custom" || configuration["v"] == "custom"

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FileCabinetApp.Interfaces;
+using static FileCabinetApp.CommandHandlers.CommandHandlerExtensions;
 
 #pragma warning disable CA1308 // Normalize strings to uppercase
 #pragma warning disable CA1031 // Do not catch general exception types
@@ -13,8 +14,6 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class DeleteCommandHandler : ServiceCommandHandlerBase
     {
-        private const int KeyIndex = 0;
-        private const int ValueIndex = 1;
         private const int ParametersCount = 1;
 
         /// <summary>
@@ -41,19 +40,6 @@ namespace FileCabinetApp.CommandHandlers
             this.NextHandle?.Handle(commandRequest);
         }
 
-        private static Predicate<FileCabinetRecord> GeneratePredicate(string key, string value)
-        {
-            var property =
-                typeof(FileCabinetRecord).GetProperties().FirstOrDefault(property => property.Name.Contains(key, StringComparison.CurrentCultureIgnoreCase));
-
-            if (property is null)
-            {
-                throw new ArgumentNullException(nameof(key), "Property with this name doesn't exists");
-            }
-
-            return (record) => property.GetValue(record) !.ToString() !.Equals(value);
-        }
-
         /// <summary>
         /// Removes a record from a data source.
         /// </summary>
@@ -77,8 +63,8 @@ namespace FileCabinetApp.CommandHandlers
                     Console.WriteLine("Invalid parameters count");
                 }
 
-                var pair = CommandHandlerExtensions.ExtractKeyValuePair(parametersArray[0], new[] { "=" });
-                var predicate = CommandHandlerExtensions.GeneratePredicate(pair);
+                var pair = ExtractKeyValuePair(parametersArray[0], new[] { "=" });
+                var predicate = GeneratePredicate(pair);
 
                 List<int> deletedRecordsId = new ();
                 foreach (var record in this.Service.GetRecords().Where(record => predicate(record)))

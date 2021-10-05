@@ -89,6 +89,8 @@ namespace FileCabinetApp.DataTransfer
                     Gender = recordDataArray[GenderIndex][0],
                 };
             }
+
+            this.reader.Dispose();
         }
     }
 }

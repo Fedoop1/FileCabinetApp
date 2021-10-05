@@ -39,10 +39,7 @@ namespace FileCabinetApp.CommandHandlers
                 return;
             }
 
-            if (this.NextHandle != null)
-            {
-                this.NextHandle.Handle(commandRequest);
-            }
+            this.NextHandle?.Handle(commandRequest);
         }
 
         /// <summary>

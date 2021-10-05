@@ -72,7 +72,7 @@ namespace FileCabinetApp.CommandHandlers
         }
 
         private static string[] ParseValueTuple(string values) => values.Trim(' ', '(', ')').Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Distinct(StringComparer.CurrentCultureIgnoreCase).Select(value => value.Trim('\u0027')).ToArray();
+            .Select(value => value.Trim('\u0027')).ToArray();
 
         /// <summary>
         /// Create a new <see cref="FileCabinetRecord"/>.
@@ -115,7 +115,7 @@ namespace FileCabinetApp.CommandHandlers
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"During inserting an error was happened. Error message: {exception.Message}.");
+                Console.WriteLine($"During inserting an error was happened. Error message: {exception.Message}");
             }
         }
     }
