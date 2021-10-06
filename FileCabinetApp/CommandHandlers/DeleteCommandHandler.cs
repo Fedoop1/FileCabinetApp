@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FileCabinetApp.Interfaces;
+using static FileCabinetApp.CommandHandlers.CommandHandlerExtensions;
 
 #pragma warning disable CA1308 // Normalize strings to uppercase
 #pragma warning disable CA1031 // Do not catch general exception types
@@ -13,8 +14,6 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class DeleteCommandHandler : ServiceCommandHandlerBase
     {
-        private const int KeyIndex = 0;
-        private const int ValueIndex = 1;
         private const int ParametersCount = 1;
 
         /// <summary>
@@ -41,31 +40,6 @@ namespace FileCabinetApp.CommandHandlers
             this.NextHandle?.Handle(commandRequest);
         }
 
-        private static (string key, string value) ExtractKeyValuePair(string parameter)
-        {
-            var pair = parameter.Split('=', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-            if (pair.Length != 2)
-            {
-                throw new ArgumentException("Invalid key-value pair");
-            }
-
-            return (pair[KeyIndex], pair[ValueIndex].Trim('\u0027'));
-        }
-
-        private static Predicate<FileCabinetRecord> GeneratePredicate(string key, string value)
-        {
-            var property =
-                typeof(FileCabinetRecord).GetProperties().FirstOrDefault(property => property.Name.Contains(key, StringComparison.CurrentCultureIgnoreCase));
-
-            if (property is null)
-            {
-                throw new ArgumentNullException(nameof(key), "Property with this name doesn't exists");
-            }
-
-            return (record) => property.GetValue(record) !.ToString() !.Equals(value);
-        }
-
         /// <summary>
         /// Removes a record from a data source.
         /// </summary>
@@ -87,13 +61,14 @@ namespace FileCabinetApp.CommandHandlers
                 if (parametersArray.Length != ParametersCount)
                 {
                     Console.WriteLine("Invalid parameters count");
+                    return;
                 }
 
-                var pair = ExtractKeyValuePair(parametersArray[0]);
-                var predicate = GeneratePredicate(pair.key, pair.value);
+                var pair = ExtractKeyValuePair(parametersArray[0], new[] { "and" });
+                var predicate = GeneratePredicate(pair);
 
                 List<int> deletedRecordsId = new ();
-                foreach (var record in this.Service.GetRecords().Where(record => predicate(record)))
+                foreach (var record in this.Service.GetRecords(new RecordQuery(predicate, parameters)))
                 {
                     this.Service.DeleteRecord(record);
                     deletedRecordsId.Add(record.Id);

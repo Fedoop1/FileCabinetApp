@@ -116,30 +116,6 @@
             </summary>
             <param name="parameters">Contain type of export document and filename to save document.</param>
         </member>
-        <member name="T:FileCabinetApp.CommandHandlers.FindCommandHandler">
-            <summary>
-            Handle "find" command from user input.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.FindCommandHandler.#ctor(FileCabinetApp.Interfaces.IFileCabinetService,System.Action{System.Collections.Generic.IEnumerable{FileCabinetApp.FileCabinetRecord}})">
-            <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.CommandHandlers.FindCommandHandler"/> class.
-            </summary>
-            <param name="service"><see cref="T:FileCabinetApp.Interfaces.IFileCabinetService"/> context required for the correct operation of the methods.</param>
-            <param name="printer">A delegate to a method that print data to the console according to a certain rule.</param>
-        </member>
-        <member name="P:FileCabinetApp.CommandHandlers.FindCommandHandler.Command">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.FindCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.FindCommandHandler.Find(System.String)">
-            <summary>
-            A method that searches for records by a specific parameter with output to the console.
-            </summary>
-            <param name="parameters">Parameter line including 1.search criterion 2.unique information.</param>
-        </member>
         <member name="T:FileCabinetApp.CommandHandlers.HelpCommandHandler">
             <summary>
             Handle "help" command from user input.
@@ -203,29 +179,6 @@
         <member name="M:FileCabinetApp.CommandHandlers.InsertCommandHandler.Insert(System.String)">
             <summary>
             Create a new <see cref="T:FileCabinetApp.FileCabinetRecord"/>.
-            </summary>
-        </member>
-        <member name="T:FileCabinetApp.CommandHandlers.ListCommandHandler">
-            <summary>
-            Handle "list" command from user input.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.ListCommandHandler.#ctor(FileCabinetApp.Interfaces.IFileCabinetService,System.Action{System.Collections.Generic.IEnumerable{FileCabinetApp.FileCabinetRecord}})">
-            <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.CommandHandlers.ListCommandHandler"/> class.
-            </summary>
-            <param name="service"><see cref="T:FileCabinetApp.Interfaces.IFileCabinetService"/> context required for the correct operation of the methods.</param>
-            <param name="printer">A delegate to a method that print data to the console according to a certain rule.</param>
-        </member>
-        <member name="P:FileCabinetApp.CommandHandlers.ListCommandHandler.Command">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.ListCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.ListCommandHandler.List">
-            <summary>
-            A method that returns all available records in the application, outputting from the console.
             </summary>
         </member>
         <member name="T:FileCabinetApp.CommandHandlers.MissedCommandHandler">
@@ -515,6 +468,9 @@
         <member name="M:FileCabinetApp.Decorators.ServiceLogger.GetRecords">
             <inheritdoc/>
         </member>
+        <member name="M:FileCabinetApp.Decorators.ServiceLogger.GetRecords(FileCabinetApp.Interfaces.IRecordQuery)">
+            <inheritdoc/>
+        </member>
         <member name="M:FileCabinetApp.Decorators.ServiceLogger.MakeSnapshot">
             <inheritdoc/>
         </member>
@@ -640,6 +596,9 @@
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.GetRecords">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.GetRecords(FileCabinetApp.Interfaces.IRecordQuery)">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.GetStat">
@@ -815,8 +774,15 @@
         </member>
         <member name="M:FileCabinetApp.Interfaces.IFileCabinetService.GetRecords">
             <summary>
-            A method that returns a collection of records (read-only).
+            A method that returns a collection of records.
             </summary>
+            <returns>Sequence of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.Interfaces.IFileCabinetService.GetRecords(FileCabinetApp.Interfaces.IRecordQuery)">
+            <summary>
+            A method that return the collection of records selected by <see cref="T:FileCabinetApp.Interfaces.IRecordQuery"/>.
+            </summary>
+            <param name="query">The query.</param>
             <returns>Sequence of records.</returns>
         </member>
         <member name="M:FileCabinetApp.Interfaces.IFileCabinetService.MakeSnapshot">
@@ -849,6 +815,39 @@
             Find and remove record from data source file by index.
             </summary>
             <returns>Removal result.</returns>
+        </member>
+        <member name="T:FileCabinetApp.Interfaces.IRecordPrinter">
+            <summary>
+            Interface provides method to printer providers which write sequence of <see cref="T:FileCabinetApp.FileCabinetRecord"/> to destination stream.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.Interfaces.IRecordPrinter.Print(System.Collections.Generic.IEnumerable{FileCabinetApp.FileCabinetRecord},System.Collections.Generic.IEnumerable{System.Reflection.PropertyInfo})">
+            <summary>
+            Prints source to destination file with using specified select method according to selected fields.
+            </summary>
+            <param name="source">Records source.</param>
+            <param name="selectedFields">Collection of selected fields.</param>
+        </member>
+        <member name="T:FileCabinetApp.Interfaces.IRecordQuery">
+            <summary>
+            Expose record query contract.
+            </summary>
+        </member>
+        <member name="P:FileCabinetApp.Interfaces.IRecordQuery.Predicate">
+            <summary>
+            Gets the predicate according to select query.
+            </summary>
+            <value>
+            Predicate instance.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.Interfaces.IRecordQuery.QueryHashCode">
+            <summary>
+            Gets the hash code of the query.
+            </summary>
+            <value>
+            Query's hash code.
+            </value>
         </member>
         <member name="T:FileCabinetApp.Interfaces.IRecordSnapshotService">
             <summary>
@@ -938,22 +937,55 @@
             Get's or set's max amount of money to <see cref="T:FileCabinetApp.FileCabinetRecord"/>.
             </summary>
         </member>
-        <member name="T:FileCabinetApp.Program">
-            <summary>
-            The main class from where all available functions are called.
-            </summary>
-        </member>
         <member name="M:FileCabinetApp.Program.Configure(System.String[])">
             <summary>
             A method that accepts command line parameters to control the check rules depending on the passed argument.
             </summary>
             <param name="parameters">An array of arguments passed to the Main method.</param>
         </member>
-        <member name="M:FileCabinetApp.Program.Main(System.String[])">
+        <member name="M:FileCabinetApp.RecordPrinters.DefaultPrinter.#ctor(System.IO.TextWriter)">
             <summary>
-            The main application method from which the user interacts with all available methods.
+            Initializes a new instance of the <see cref="T:FileCabinetApp.RecordPrinters.DefaultPrinter"/> class.
             </summary>
-            <param name="args">Command line arguments required to control check parameters.</param>
+            <param name="destinationStream">Destination stream.</param>
+            <exception cref="T:System.ArgumentNullException">Throws when destination source is null.</exception>
+        </member>
+        <member name="M:FileCabinetApp.RecordPrinters.DefaultPrinter.Print(System.Collections.Generic.IEnumerable{FileCabinetApp.FileCabinetRecord},System.Collections.Generic.IEnumerable{System.Reflection.PropertyInfo})">
+            <summary>
+            Prints source to destination file with using specified select method according to selected fields in ToString() format.
+            </summary>
+            <param name="source">Records source.</param>
+            <param name="selectedFields">Collection of selected fields.</param>
+            <exception cref="T:System.ArgumentNullException">
+            Throws when source is null
+            or
+            Collection of selected fields is null.
+            </exception>
+        </member>
+        <member name="T:FileCabinetApp.RecordQuery">
+            <summary>
+            Represent a instance of record query.
+            </summary>
+            <seealso cref="T:FileCabinetApp.Interfaces.IRecordQuery" />
+            <seealso cref="T:FileCabinetApp.RecordQuery" />
+        </member>
+        <member name="M:FileCabinetApp.RecordQuery.#ctor(System.Predicate{FileCabinetApp.FileCabinetRecord},System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.RecordQuery"/> class.
+            </summary>
+            <param name="predicate">Predicate.</param>
+            <param name="queryString">Hash code.</param>
+            <exception cref="T:System.ArgumentNullException">
+            Throws when predicate is null
+            or
+            Throws when hash code is null.
+            </exception>
+        </member>
+        <member name="P:FileCabinetApp.RecordQuery.Predicate">
+            <inheritdoc/>
+        </member>
+        <member name="P:FileCabinetApp.RecordQuery.QueryHashCode">
+            <inheritdoc/>
         </member>
         <member name="T:FileCabinetApp.Validators.CompositeValidator">
             <summary>

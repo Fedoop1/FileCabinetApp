@@ -51,6 +51,8 @@ namespace FileCabinetApp.DataTransfer
                     Money = decimal.Parse(record.XPathSelectElement("Money")?.Value, CultureInfo.CurrentCulture),
                 };
             }
+
+            this.reader.Dispose();
         }
     }
 }

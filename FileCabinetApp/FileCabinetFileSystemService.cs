@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using FileCabinetApp.DataTransfer;
 using FileCabinetApp.Interfaces;
@@ -96,8 +95,6 @@ namespace FileCabinetApp
             return this.FindByDayOfBirthEnumerable(birthDate);
         }
 
-        
-
         /// <inheritdoc/>
         public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
@@ -144,7 +141,19 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public IEnumerable<FileCabinetRecord> GetRecords()
+        public IEnumerable<FileCabinetRecord> GetRecords() => this.GetRecords(new RecordQuery(_ => true, string.Empty)); // HashCode omitted cause FileStream service doesn't use caching mechanism.
+
+        public IEnumerable<FileCabinetRecord> GetRecords(IRecordQuery query)
+        {
+            if (query is null)
+            {
+                throw new ArgumentNullException(nameof(query), "Records query can't be null");
+            }
+
+            return this.GetRecordsIterator(query);
+        }
+
+        private IEnumerable<FileCabinetRecord> GetRecordsIterator(IRecordQuery query)
         {
             var recordBuffer = new byte[MaxRecordLength];
 
@@ -154,7 +163,7 @@ namespace FileCabinetApp
                 this.fileStream.Read(recordBuffer);
                 var record = FromByteToRecord(recordBuffer, out RecordState state);
 
-                if (state == RecordState.Alive)
+                if (state == RecordState.Alive && query.Predicate(record))
                 {
                     yield return record;
                 }
@@ -389,38 +398,6 @@ namespace FileCabinetApp
             }
 
             return (-1, -1);
-        }
-
-        private int FindNextIndex()
-        {
-            using var binaryReader = new BinaryReader(this.fileStream, Encoding.Default, true);
-            this.fileStream.Position = default;
-            while (this.fileStream.Position < this.fileStream.Length)
-            {
-                this.fileStream.Position += MaxRecordLength - sizeof(bool);
-                if (binaryReader.ReadBoolean())
-                {
-                    this.fileStream.Position -= MaxRecordLength;
-                    var id = binaryReader.ReadInt32();
-
-                    if (!this.idOffsetDictionary.ContainsKey(id))
-                    {
-                        return id;
-                    }
-
-                    this.fileStream.Position += MaxRecordLength - sizeof(int);
-                }
-            }
-
-            return this.idOffsetDictionary.Count > 0 ? this.GenerateNewIndex() : 1;
-        }
-
-        private int GenerateNewIndex()
-        {
-            var result = Enumerable.Range(1, this.idOffsetDictionary.Keys.Max()).Except(this.idOffsetDictionary.Keys)
-                .FirstOrDefault();
-
-            return result == default ? this.idOffsetDictionary.Keys.Max() + 1 : result;
         }
 
         private (FileCabinetRecord actualRecord, RecordState state, int position) TryFindRecordById(int id)

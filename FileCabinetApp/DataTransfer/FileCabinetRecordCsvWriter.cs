@@ -41,6 +41,8 @@ namespace FileCabinetApp.DataTransfer
             {
                 this.writer.WriteLine($"{record.Id},{record.FirstName},{record.LastName},{record.DateOfBirth.ToShortDateString()},{record.Height},{record.Money},{record.Gender}.");
             }
+
+            this.writer.Dispose();
         }
     }
 }

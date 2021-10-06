@@ -84,6 +84,15 @@ namespace FileCabinetApp.Decorators
         }
 
         /// <inheritdoc/>
+        public IEnumerable<FileCabinetRecord> GetRecords(IRecordQuery query)
+        {
+            this.logger.LogInformation($"{DateTime.Now} - Calling GetRecords(IRecordQuery query)");
+            var result = this.service.GetRecords(query);
+            this.logger.LogInformation($"{DateTime.Now} - GetRecords(IRecordQuery query) return {result.Count()} record(s)");
+            return result;
+        }
+
+        /// <inheritdoc/>
         public RecordShapshot MakeSnapshot()
         {
             this.logger.LogInformation($"{DateTime.Now} - Calling MakeSnapshot()");

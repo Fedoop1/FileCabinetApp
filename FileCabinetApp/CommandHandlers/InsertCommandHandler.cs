@@ -39,10 +39,7 @@ namespace FileCabinetApp.CommandHandlers
                 return;
             }
 
-            if (this.NextHandle != null)
-            {
-                this.NextHandle.Handle(commandRequest);
-            }
+            this.NextHandle?.Handle(commandRequest);
         }
 
         private static Dictionary<string, string> InitializeDictionary(string[] keys, string[] values)
@@ -72,7 +69,7 @@ namespace FileCabinetApp.CommandHandlers
         }
 
         private static string[] ParseValueTuple(string values) => values.Trim(' ', '(', ')').Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Distinct(StringComparer.CurrentCultureIgnoreCase).Select(value => value.Trim('\u0027')).ToArray();
+            .Select(value => value.Trim('\u0027')).ToArray();
 
         /// <summary>
         /// Create a new <see cref="FileCabinetRecord"/>.
@@ -88,12 +85,6 @@ namespace FileCabinetApp.CommandHandlers
                 }
 
                 var parametersArray = parameters.ToLowerInvariant().Split(new[] { "values" }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-                if (parametersArray.Length != ParametersCount)
-                {
-                    Console.WriteLine("Invalid parameters count");
-                    return;
-                }
 
                 var parametersString = parameters[..parametersArray[FieldsIndex].Length];
                 var valuesString = parameters[^parametersArray[ValuesIndex].Length..];
@@ -115,7 +106,7 @@ namespace FileCabinetApp.CommandHandlers
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"During inserting an error was happened. Error message: {exception.Message}.");
+                Console.WriteLine($"During inserting an error was happened. Error message: {exception.Message}");
             }
         }
     }

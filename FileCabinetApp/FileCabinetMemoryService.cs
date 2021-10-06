@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FileCabinetApp.DataTransfer;
 using FileCabinetApp.Interfaces;
 
@@ -14,6 +15,7 @@ namespace FileCabinetApp
         private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new (StringComparer.CurrentCultureIgnoreCase);
         private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new (StringComparer.CurrentCultureIgnoreCase);
         private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new ();
+        private readonly Dictionary<string, IEnumerable<FileCabinetRecord>> cache = new (StringComparer.CurrentCultureIgnoreCase);
 
         private readonly IRecordValidator validator;
 
@@ -42,14 +44,21 @@ namespace FileCabinetApp
 
             this.recordList.Add(record);
             this.DictionaryAdd(record);
+            this.cache.Clear();
         }
 
         /// <inheritdoc/>
         public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
-            if (this.firstNameDictionary.TryGetValue(firstName ?? string.Empty, out List<FileCabinetRecord> recordList))
+            if (this.cache.TryGetValue(firstName, out var result))
             {
-                return RecordsIterator(recordList);
+                return result;
+            }
+
+            if (this.firstNameDictionary.TryGetValue(firstName, out List<FileCabinetRecord> recordList))
+            {
+                this.cache[firstName] = recordList;
+                return RecordsIterator(this.cache[firstName]);
             }
 
             return Array.Empty<FileCabinetRecord>();
@@ -58,9 +67,15 @@ namespace FileCabinetApp
         /// <inheritdoc/>
         public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
         {
-            if (this.lastNameDictionary.TryGetValue(lastName ?? string.Empty, out List<FileCabinetRecord> recordList))
+            if (this.cache.TryGetValue(lastName, out var result))
             {
-                return RecordsIterator(recordList);
+                return result;
+            }
+
+            if (this.lastNameDictionary.TryGetValue(lastName, out List<FileCabinetRecord> recordList))
+            {
+                this.cache[lastName] = recordList;
+                return RecordsIterator(this.cache[lastName]);
             }
 
             return Array.Empty<FileCabinetRecord>();
@@ -69,9 +84,15 @@ namespace FileCabinetApp
         /// <inheritdoc/>
         public IEnumerable<FileCabinetRecord> FindByDayOfBirth(string dateOfBirth)
         {
+            if (this.cache.TryGetValue(dateOfBirth, out var result))
+            {
+                return result;
+            }
+
             if (DateTime.TryParse(dateOfBirth, out DateTime birthDate) && this.dateOfBirthDictionary.TryGetValue(birthDate, out List<FileCabinetRecord> recordList))
             {
-                return RecordsIterator(recordList);
+                this.cache[dateOfBirth] = recordList;
+                return RecordsIterator(this.cache[dateOfBirth]);
             }
 
             return Array.Empty<FileCabinetRecord>();
@@ -90,15 +111,24 @@ namespace FileCabinetApp
             this.ValidateRecord(record);
             this.recordList.Add(record);
             this.DictionaryAdd(record);
+            this.cache.Clear();
         }
 
         /// <inheritdoc/>
-        public IEnumerable<FileCabinetRecord> GetRecords()
+        public IEnumerable<FileCabinetRecord> GetRecords() => this.GetRecords(new RecordQuery(_ => true, string.Empty));
+
+        /// <inheritdoc/>
+        public IEnumerable<FileCabinetRecord> GetRecords(IRecordQuery query)
         {
-            foreach (var record in this.recordList)
+            query ??= new RecordQuery(_ => true, string.Empty);
+
+            if (this.cache.TryGetValue(query.QueryHashCode, out var result))
             {
-                yield return record;
+                return RecordsIterator(result);
             }
+
+            this.cache[query.QueryHashCode] = this.recordList.Where(record => query.Predicate(record));
+            return RecordsIterator(this.cache[query.QueryHashCode]);
         }
 
         /// <inheritdoc/>
@@ -150,6 +180,7 @@ namespace FileCabinetApp
             {
                 this.recordList.Remove(actualValue);
                 this.DictionaryRemove(actualValue);
+                this.cache.Clear();
             }
         }
 

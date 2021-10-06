@@ -54,6 +54,7 @@ namespace FileCabinetApp.DataTransfer
                     new XElement("Money", record.Money))));
 
             document.Save(this.writer);
+            this.writer.Dispose();
         }
     }
 }
