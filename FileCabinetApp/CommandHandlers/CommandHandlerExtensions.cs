@@ -4,8 +4,17 @@ using System.Linq;
 
 namespace FileCabinetApp.CommandHandlers
 {
+    /// <summary>
+    /// Provides extenstion methods to command handlers classes.
+    /// </summary>
     internal static class CommandHandlerExtensions
     {
+        /// <summary>
+        /// Extracts the key value pair from specified string in two steps, first by split string by separator, last by '=' character.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="separator">The separator.</param>
+        /// <returns>Sorted dictionary from source string.</returns>
         internal static SortedDictionary<string, string> ExtractKeyValuePair(string source, string[] separator)
         {
             const int KeyIndex = 0;
@@ -21,6 +30,11 @@ namespace FileCabinetApp.CommandHandlers
             return result;
         }
 
+        /// <summary>
+        /// Generates the predicate to <see cref="FileCabinetRecord"/> according to key-value pair, where key = property name and value = required value in string format.
+        /// </summary>
+        /// <param name="keyValuePair">The key value pair in property-value format.</param>
+        /// <returns>Predicate with target according to key-value pair.</returns>
         internal static Predicate<FileCabinetRecord> GeneratePredicate(IDictionary<string, string> keyValuePair)
         {
             if (keyValuePair is null)
@@ -55,8 +69,5 @@ namespace FileCabinetApp.CommandHandlers
                 };
             }
         }
-
-        internal static string GenerateHashCode(SortedDictionary<string, string> keyValuePair) =>
-            string.Join(string.Empty, keyValuePair.Select(pair => (pair.Key + pair.Value).ToUpperInvariant()));
     }
 }

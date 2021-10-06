@@ -64,11 +64,11 @@ namespace FileCabinetApp.CommandHandlers
                     return;
                 }
 
-                var pair = ExtractKeyValuePair(parametersArray[0], new[] { "=" });
+                var pair = ExtractKeyValuePair(parametersArray[0], new[] { "and" });
                 var predicate = GeneratePredicate(pair);
 
                 List<int> deletedRecordsId = new ();
-                foreach (var record in this.Service.GetRecords(new RecordQuery(predicate, GenerateHashCode(pair))))
+                foreach (var record in this.Service.GetRecords(new RecordQuery(predicate, parameters)))
                 {
                     this.Service.DeleteRecord(record);
                     deletedRecordsId.Add(record.Id);

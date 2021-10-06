@@ -106,12 +106,9 @@ namespace FileCabinetApp.CommandHandlers
                 var propertyKeyValuePair = BindPropertyAndValue(setKeyValuePair);
 
                 var predicate = GeneratePredicate(whereKeyValuePair);
-                var query = whereKeyValuePair is null
-                    ? null
-                    : new RecordQuery(predicate, GenerateHashCode(whereKeyValuePair));
 
                 List<int> updatedRecords = new ();
-                foreach (var record in this.Service.GetRecords(query))
+                foreach (var record in this.Service.GetRecords(new RecordQuery(predicate, parameters)))
                 {
                     UpdateRecord(record, propertyKeyValuePair);
                     this.Service.EditRecord(record);

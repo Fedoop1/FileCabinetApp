@@ -69,10 +69,10 @@ namespace FileCabinetApp.CommandHandlers
                 throw new ArgumentNullException(nameof(parameters), "Parameters can't be null or empty");
             }
 
-            if (!parameters.Contains("where", StringComparison.CurrentCultureIgnoreCase) ||
-                !parameters.Contains(SelectAllColumns))
+            if (!parameters.Contains("where", StringComparison.CurrentCultureIgnoreCase) &&
+                !parameters.StartsWith('*'))
             {
-                throw new ArgumentException("Invalid parameters");
+                throw new ArgumentException("Invalid parameters. Check your query to for availability of 'where' or '*' ");
             }
 
             var parametersArray = parameters.ToLowerInvariant().Split("where",
@@ -93,11 +93,7 @@ namespace FileCabinetApp.CommandHandlers
                 ? typeof(FileCabinetRecord).GetProperties()
                 : ExtractProperties(arrayOfColumns);
 
-            RecordQuery query = whereKeyValuePair is null ? null : new (predicate, GenerateHashCode(whereKeyValuePair));
-
-            return (this.Service.GetRecords(query), propertiesToSelect);
+            return (this.Service.GetRecords(new RecordQuery(predicate, parameters)), propertiesToSelect);
         }
-
-
     }
 }

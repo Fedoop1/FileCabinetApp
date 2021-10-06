@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using FileCabinetApp.CommandHandlers;
 using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp
@@ -10,25 +13,62 @@ namespace FileCabinetApp
     /// <seealso cref="RecordQuery" />
     public record RecordQuery : IRecordQuery
     {
+        private string hashCode;
+        private string queryString;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RecordQuery"/> class.
         /// </summary>
         /// <param name="predicate">Predicate.</param>
-        /// <param name="hashCode">Hash code.</param>
+        /// <param name="queryString">Hash code.</param>
         /// <exception cref="System.ArgumentNullException">
         /// Throws when predicate is null
         /// or
         /// Throws when hash code is null.
         /// </exception>
-        public RecordQuery(Predicate<FileCabinetRecord> predicate, string hashCode) =>
-            (this.Predicate, this.QueryHashCode) = (
-                predicate ?? throw new ArgumentNullException(nameof(predicate), "Predicate can't be null"),
-                hashCode ?? throw new ArgumentNullException(nameof(hashCode), "Hash code can't be null"));
+        public RecordQuery(Predicate<FileCabinetRecord> predicate, string queryString)
+        {
+            this.Predicate = predicate ?? throw new ArgumentNullException(nameof(predicate), "Predicate can't be null");
+            this.queryString = queryString ?? throw new ArgumentNullException(nameof(queryString), "Query string can't be null");
+        }
 
         /// <inheritdoc/>
         public Predicate<FileCabinetRecord> Predicate { get; }
 
         /// <inheritdoc/>
-        public string QueryHashCode { get; }
+        public string QueryHashCode
+        {
+            get
+            {
+                if (this.hashCode == default)
+                {
+                    this.hashCode = CalculateHashCode(this.queryString);
+                }
+
+                return this.hashCode;
+            }
+        }
+
+        private static string CalculateHashCode(string queryString)
+        {
+            if (!queryString.Contains("where", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return string.Empty;
+            }
+
+            var whereArray = queryString.ToLowerInvariant().Split("where",
+                StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+            const int whereQuery = 1;
+            var whereString = queryString[^whereArray[whereQuery].Length..];
+
+            var keyValuePair =
+                CommandHandlerExtensions.ExtractKeyValuePair(whereString.ToLowerInvariant(), new[] { "and" });
+
+            return GenerateHashCode(keyValuePair);
+        }
+
+        private static string GenerateHashCode(SortedDictionary<string, string> keyValuePair) =>
+            string.Join(string.Empty, keyValuePair.Select(pair => (pair.Key + pair.Value).ToUpperInvariant()));
     }
 }
