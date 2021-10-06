@@ -116,30 +116,6 @@
             </summary>
             <param name="parameters">Contain type of export document and filename to save document.</param>
         </member>
-        <member name="T:FileCabinetApp.CommandHandlers.FindCommandHandler">
-            <summary>
-            Handle "find" command from user input.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.FindCommandHandler.#ctor(FileCabinetApp.Interfaces.IFileCabinetService,FileCabinetApp.Interfaces.IRecordPrinter)">
-            <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.CommandHandlers.FindCommandHandler"/> class.
-            </summary>
-            <param name="service"><see cref="T:FileCabinetApp.Interfaces.IFileCabinetService"/> context required for the correct operation of the methods.</param>
-            <param name="printer">A delegate to a method that print data to the console according to a certain rule.</param>
-        </member>
-        <member name="P:FileCabinetApp.CommandHandlers.FindCommandHandler.Command">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.FindCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.FindCommandHandler.Find(System.String)">
-            <summary>
-            A method that searches for records by a specific parameter with output to the console.
-            </summary>
-            <param name="parameters">Parameter line including 1.search criterion 2.unique information.</param>
-        </member>
         <member name="T:FileCabinetApp.CommandHandlers.HelpCommandHandler">
             <summary>
             Handle "help" command from user input.
@@ -203,29 +179,6 @@
         <member name="M:FileCabinetApp.CommandHandlers.InsertCommandHandler.Insert(System.String)">
             <summary>
             Create a new <see cref="T:FileCabinetApp.FileCabinetRecord"/>.
-            </summary>
-        </member>
-        <member name="T:FileCabinetApp.CommandHandlers.ListCommandHandler">
-            <summary>
-            Handle "list" command from user input.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.ListCommandHandler.#ctor(FileCabinetApp.Interfaces.IFileCabinetService,FileCabinetApp.Interfaces.IRecordPrinter)">
-            <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.CommandHandlers.ListCommandHandler"/> class.
-            </summary>
-            <param name="service"><see cref="T:FileCabinetApp.Interfaces.IFileCabinetService"/> context required for the correct operation of the methods.</param>
-            <param name="printer">A delegate to a method that print data to the console according to a certain rule.</param>
-        </member>
-        <member name="P:FileCabinetApp.CommandHandlers.ListCommandHandler.Command">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.ListCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.ListCommandHandler.List">
-            <summary>
-            A method that returns all available records in the application, outputting from the console.
             </summary>
         </member>
         <member name="T:FileCabinetApp.CommandHandlers.MissedCommandHandler">
@@ -850,6 +803,18 @@
             </summary>
             <returns>Removal result.</returns>
         </member>
+        <member name="T:FileCabinetApp.Interfaces.IRecordPrinter">
+            <summary>
+            Interface provides method to printer providers which write sequence of <see cref="T:FileCabinetApp.FileCabinetRecord"/> to destination stream.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.Interfaces.IRecordPrinter.Print(System.Collections.Generic.IEnumerable{FileCabinetApp.FileCabinetRecord},System.Collections.Generic.IEnumerable{System.Reflection.PropertyInfo})">
+            <summary>
+            Prints source to destination file with using specified select method according to selected fields.
+            </summary>
+            <param name="source">Records source.</param>
+            <param name="selectedFields">Collection of selected fields.</param>
+        </member>
         <member name="T:FileCabinetApp.Interfaces.IRecordSnapshotService">
             <summary>
             Interface for services which work with <see cref="T:FileCabinetApp.FileCabinetRecord"/> and process IO operations with them.
@@ -943,6 +908,25 @@
             A method that accepts command line parameters to control the check rules depending on the passed argument.
             </summary>
             <param name="parameters">An array of arguments passed to the Main method.</param>
+        </member>
+        <member name="M:FileCabinetApp.RecordPrinters.DefaultPrinter.#ctor(System.IO.TextWriter)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.RecordPrinters.DefaultPrinter"/> class.
+            </summary>
+            <param name="destinationStream">Destination stream.</param>
+            <exception cref="T:System.ArgumentNullException">Throws when destination source is null.</exception>
+        </member>
+        <member name="M:FileCabinetApp.RecordPrinters.DefaultPrinter.Print(System.Collections.Generic.IEnumerable{FileCabinetApp.FileCabinetRecord},System.Collections.Generic.IEnumerable{System.Reflection.PropertyInfo})">
+            <summary>
+            Prints source to destination file with using specified select method according to selected fields in ToString() format.
+            </summary>
+            <param name="source">Records source.</param>
+            <param name="selectedFields">Collection of selected fields.</param>
+            <exception cref="T:System.ArgumentNullException">
+            Throws when source is null
+            or
+            Collection of selected fields is null.
+            </exception>
         </member>
         <member name="T:FileCabinetApp.Validators.CompositeValidator">
             <summary>

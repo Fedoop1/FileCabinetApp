@@ -19,18 +19,6 @@ namespace FileCabinetApp.RecordPrinters
             throw new ArgumentNullException(nameof(destinationStream), "Destination stream can't be null");
 
         /// <summary>
-        /// Prints source to destination stream in ToString() format.
-        /// </summary>
-        /// <param name="source">Records source.</param>
-        public void Print(IEnumerable<FileCabinetRecord> source)
-        {
-            foreach (var record in source ?? throw new ArgumentNullException(nameof(source), "Source of records can't be null"))
-            {
-                this.destinationStream.WriteLine(record);
-            }
-        }
-
-        /// <summary>
         /// Prints source to destination file with using specified select method according to selected fields in ToString() format.
         /// </summary>
         /// <param name="source">Records source.</param>

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -17,7 +16,6 @@ namespace FileCabinetApp.CommandHandlers
         private const int PredicateIndex = 1;
         private const int SelectWithWhere = 2;
         private const char SelectAllColumns = '*';
-        private static readonly int FileCabinetRecordFieldsCount = typeof(FileCabinetRecord).GetProperties().Length;
 
         private readonly IRecordPrinter printer;
 
@@ -33,16 +31,14 @@ namespace FileCabinetApp.CommandHandlers
         {
             if (commandRequest is not null && commandRequest.Command.Contains("select", StringComparison.CurrentCultureIgnoreCase))
             {
-                var result = this.SelectRecords(commandRequest.Parameters);
-
-                if (result.selectedFields is ICollection collection &&
-                    collection.Count == FileCabinetRecordFieldsCount)
+                try
                 {
-                    this.printer.Print(result.source);
-                }
-                else
-                {
+                    var result = this.SelectRecords(commandRequest.Parameters);
                     this.printer.Print(result.source, result.selectedFields);
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine($"An exception happened during selection. Exception message: {exception.Message}");
                 }
 
                 return;
@@ -57,8 +53,10 @@ namespace FileCabinetApp.CommandHandlers
 
             foreach (var column in source)
             {
-                result.Add(typeof(FileCabinetRecord).GetProperties().First(property =>
-                    property.Name.Contains(column, StringComparison.CurrentCultureIgnoreCase)));
+                var property = typeof(FileCabinetRecord).GetProperties().FirstOrDefault(property =>
+                    property.Name.Contains(column, StringComparison.CurrentCultureIgnoreCase));
+
+                result.Add(property ?? throw new ArgumentException("One of selected properties doesn't exists"));
             }
 
             return result;
@@ -69,7 +67,7 @@ namespace FileCabinetApp.CommandHandlers
             if (string.IsNullOrEmpty(parameters))
             {
                 Console.WriteLine("Parameters can't be null or empty");
-                return (this.Service.GetRecords(), typeof(FileCabinetRecord).GetProperties());
+                return (null, null);
             }
 
             var parametersArray = parameters.ToLowerInvariant().Split("where",
@@ -90,7 +88,7 @@ namespace FileCabinetApp.CommandHandlers
                 ? typeof(FileCabinetRecord).GetProperties()
                 : ExtractProperties(arrayOfColumns);
 
-            return (this.Service.GetRecords().Where(rec => predicate(rec)), propertiesToSelect);
+            return (this.Service.GetRecords().Where(rec => predicate(rec)).ToArray(), propertiesToSelect);
         }
     }
 }

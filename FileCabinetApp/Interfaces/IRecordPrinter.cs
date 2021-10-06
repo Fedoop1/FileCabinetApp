@@ -9,12 +9,6 @@ namespace FileCabinetApp.Interfaces
     public interface IRecordPrinter
     {
         /// <summary>
-        /// Prints source to destination stream.
-        /// </summary>
-        /// <param name="source">Records source.</param>
-        public void Print(IEnumerable<FileCabinetRecord> source);
-
-        /// <summary>
         /// Prints source to destination file with using specified select method according to selected fields.
         /// </summary>
         /// <param name="source">Records source.</param>

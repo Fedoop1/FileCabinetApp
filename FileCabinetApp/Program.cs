@@ -34,10 +34,8 @@ namespace FileCabinetApp
                 new UpdateCommandHandler(services.GetService<IFileCabinetService>()),
                 new ExitCommandHandler(services.GetService<IFileCabinetService>(), UpdateApplicationStatus),
                 new ExportCommandHandler(services.GetService<IFileCabinetService>(), services.GetService<IRecordSnapshotService>()),
-                new FindCommandHandler(services.GetService<IFileCabinetService>(), services.GetService<IRecordPrinter>()),
                 new HelpCommandHandler(),
                 new ImportCommandHandler(services.GetService<IFileCabinetService>(), services.GetService<IRecordSnapshotService>()),
-                new ListCommandHandler(services.GetService<IFileCabinetService>(), services.GetService<IRecordPrinter>()),
                 new PurgeCommandHandler(services.GetService<IFileCabinetService>()),
                 new DeleteCommandHandler(services.GetService<IFileCabinetService>()),
                 new StatCommandHandler(services.GetService<IFileCabinetService>()),
@@ -104,7 +102,7 @@ namespace FileCabinetApp
                     config.SetMinimumLevel(LogLevel.Information);
                 }))
                 .AddTransient(typeof(ILogger), service => service.GetService<ILoggerFactory>() !.CreateLogger("FileCabinetLogger"))
-                .AddSingleton(typeof(IRecordPrinter), _ => new DefaultPrinter(Console.Out))
+                .AddSingleton(typeof(IRecordPrinter), _ => new TablePrinter(Console.Out))
                 .AddSingleton(typeof(IValidationSettings), _ =>
                 {
                     return configuration["validation-rules"] == "custom" || configuration["v"] == "custom"
