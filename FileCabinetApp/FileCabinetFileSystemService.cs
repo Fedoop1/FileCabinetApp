@@ -96,8 +96,6 @@ namespace FileCabinetApp
             return this.FindByDayOfBirthEnumerable(birthDate);
         }
 
-        
-
         /// <inheritdoc/>
         public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
