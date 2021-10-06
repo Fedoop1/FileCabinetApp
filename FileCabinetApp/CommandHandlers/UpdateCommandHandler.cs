@@ -47,7 +47,7 @@ namespace FileCabinetApp.CommandHandlers
             this.NextHandle?.Handle(commandRequest);
         }
 
-        private static void UpdateRecord(FileCabinetRecord record, Dictionary<PropertyInfo, object> source)
+        private static void UpdateRecord(FileCabinetRecord record, IDictionary<PropertyInfo, object> source)
         {
             foreach (KeyValuePair<PropertyInfo, object> propertyValuePair in source)
             {
@@ -55,7 +55,7 @@ namespace FileCabinetApp.CommandHandlers
             }
         }
 
-        private static Dictionary<PropertyInfo, object> BindPropertyAndValue(Dictionary<string, string> source)
+        private static Dictionary<PropertyInfo, object> BindPropertyAndValue(IDictionary<string, string> source)
         {
             Dictionary<PropertyInfo, object> result = new();
 
@@ -101,14 +101,17 @@ namespace FileCabinetApp.CommandHandlers
                 string setString = parameters.Substring(SetKeyWordOffset, parametersArray[SetItemsIndex].Length);
                 string whereString = parametersArray.Length is UpdateWithPredicate ? parameters[^parametersArray[WhereItemsIndex].Length..] : null;
 
-                Dictionary<string, string> whereKeyValuePair = whereString is not null ? ExtractKeyValuePair(whereString.ToLowerInvariant(), new[] { "and" }) : null;
-                Dictionary<string, string> setKeyValuePair = ExtractKeyValuePair(setString, new[] { "," });
-                Dictionary<PropertyInfo, object> propertyKeyValuePair = BindPropertyAndValue(setKeyValuePair);
+                var whereKeyValuePair = whereString is not null ? ExtractKeyValuePair(whereString.ToLowerInvariant(), new[] { "and" }) : null;
+                var setKeyValuePair = ExtractKeyValuePair(setString, new[] { "," });
+                var propertyKeyValuePair = BindPropertyAndValue(setKeyValuePair);
 
                 var predicate = GeneratePredicate(whereKeyValuePair);
+                var query = whereKeyValuePair is null
+                    ? null
+                    : new RecordQuery(predicate, GenerateHashCode(whereKeyValuePair));
 
                 List<int> updatedRecords = new ();
-                foreach (var record in this.Service.GetRecords().Where(record => predicate(record)))
+                foreach (var record in this.Service.GetRecords(query))
                 {
                     UpdateRecord(record, propertyKeyValuePair);
                     this.Service.EditRecord(record);

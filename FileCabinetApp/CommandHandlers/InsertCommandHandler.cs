@@ -39,10 +39,7 @@ namespace FileCabinetApp.CommandHandlers
                 return;
             }
 
-            if (this.NextHandle != null)
-            {
-                this.NextHandle.Handle(commandRequest);
-            }
+            this.NextHandle?.Handle(commandRequest);
         }
 
         private static Dictionary<string, string> InitializeDictionary(string[] keys, string[] values)
@@ -88,12 +85,6 @@ namespace FileCabinetApp.CommandHandlers
                 }
 
                 var parametersArray = parameters.ToLowerInvariant().Split(new[] { "values" }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-                if (parametersArray.Length != ParametersCount)
-                {
-                    Console.WriteLine("Invalid parameters count");
-                    return;
-                }
 
                 var parametersString = parameters[..parametersArray[FieldsIndex].Length];
                 var valuesString = parameters[^parametersArray[ValuesIndex].Length..];

@@ -468,6 +468,9 @@
         <member name="M:FileCabinetApp.Decorators.ServiceLogger.GetRecords">
             <inheritdoc/>
         </member>
+        <member name="M:FileCabinetApp.Decorators.ServiceLogger.GetRecords(FileCabinetApp.Interfaces.IRecordQuery)">
+            <inheritdoc/>
+        </member>
         <member name="M:FileCabinetApp.Decorators.ServiceLogger.MakeSnapshot">
             <inheritdoc/>
         </member>
@@ -593,6 +596,9 @@
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.GetRecords">
+            <inheritdoc/>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.GetRecords(FileCabinetApp.Interfaces.IRecordQuery)">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.GetStat">
@@ -768,8 +774,15 @@
         </member>
         <member name="M:FileCabinetApp.Interfaces.IFileCabinetService.GetRecords">
             <summary>
-            A method that returns a collection of records (read-only).
+            A method that returns a collection of records.
             </summary>
+            <returns>Sequence of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.Interfaces.IFileCabinetService.GetRecords(FileCabinetApp.Interfaces.IRecordQuery)">
+            <summary>
+            A method that return the collection of records selected by <see cref="T:FileCabinetApp.Interfaces.IRecordQuery"/>.
+            </summary>
+            <param name="query">The query.</param>
             <returns>Sequence of records.</returns>
         </member>
         <member name="M:FileCabinetApp.Interfaces.IFileCabinetService.MakeSnapshot">
@@ -814,6 +827,27 @@
             </summary>
             <param name="source">Records source.</param>
             <param name="selectedFields">Collection of selected fields.</param>
+        </member>
+        <member name="T:FileCabinetApp.Interfaces.IRecordQuery">
+            <summary>
+            Expose record query contract.
+            </summary>
+        </member>
+        <member name="P:FileCabinetApp.Interfaces.IRecordQuery.Predicate">
+            <summary>
+            Gets the predicate according to select query.
+            </summary>
+            <value>
+            Predicate instance.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.Interfaces.IRecordQuery.QueryHashCode">
+            <summary>
+            Gets the hash code of the query.
+            </summary>
+            <value>
+            Query's hash code.
+            </value>
         </member>
         <member name="T:FileCabinetApp.Interfaces.IRecordSnapshotService">
             <summary>
@@ -927,6 +961,31 @@
             or
             Collection of selected fields is null.
             </exception>
+        </member>
+        <member name="T:FileCabinetApp.RecordQuery">
+            <summary>
+            Represent a instance of record query.
+            </summary>
+            <seealso cref="T:FileCabinetApp.Interfaces.IRecordQuery" />
+            <seealso cref="T:FileCabinetApp.RecordQuery" />
+        </member>
+        <member name="M:FileCabinetApp.RecordQuery.#ctor(System.Predicate{FileCabinetApp.FileCabinetRecord},System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.RecordQuery"/> class.
+            </summary>
+            <param name="predicate">Predicate.</param>
+            <param name="hashCode">Hash code.</param>
+            <exception cref="T:System.ArgumentNullException">
+            Throws when predicate is null
+            or
+            Throws when hash code is null.
+            </exception>
+        </member>
+        <member name="P:FileCabinetApp.RecordQuery.Predicate">
+            <inheritdoc/>
+        </member>
+        <member name="P:FileCabinetApp.RecordQuery.QueryHashCode">
+            <inheritdoc/>
         </member>
         <member name="T:FileCabinetApp.Validators.CompositeValidator">
             <summary>

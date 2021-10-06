@@ -56,7 +56,7 @@ namespace FileCabinetApp.CommandHandlers
                 var property = typeof(FileCabinetRecord).GetProperties().FirstOrDefault(property =>
                     property.Name.Contains(column, StringComparison.CurrentCultureIgnoreCase));
 
-                result.Add(property ?? throw new ArgumentException("One of selected properties doesn't exists"));
+                result.Add(property ?? throw new ArgumentException($"Property with name {column} doesn't exists"));
             }
 
             return result;
@@ -66,8 +66,13 @@ namespace FileCabinetApp.CommandHandlers
         {
             if (string.IsNullOrEmpty(parameters))
             {
-                Console.WriteLine("Parameters can't be null or empty");
-                return (null, null);
+                throw new ArgumentNullException(nameof(parameters), "Parameters can't be null or empty");
+            }
+
+            if (!parameters.Contains("where", StringComparison.CurrentCultureIgnoreCase) ||
+                !parameters.Contains(SelectAllColumns))
+            {
+                throw new ArgumentException("Invalid parameters");
             }
 
             var parametersArray = parameters.ToLowerInvariant().Split("where",
@@ -88,7 +93,11 @@ namespace FileCabinetApp.CommandHandlers
                 ? typeof(FileCabinetRecord).GetProperties()
                 : ExtractProperties(arrayOfColumns);
 
-            return (this.Service.GetRecords().Where(rec => predicate(rec)).ToArray(), propertiesToSelect);
+            RecordQuery query = whereKeyValuePair is null ? null : new (predicate, GenerateHashCode(whereKeyValuePair));
+
+            return (this.Service.GetRecords(query), propertiesToSelect);
         }
+
+
     }
 }

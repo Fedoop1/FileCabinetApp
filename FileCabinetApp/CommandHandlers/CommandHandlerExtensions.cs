@@ -6,11 +6,11 @@ namespace FileCabinetApp.CommandHandlers
 {
     internal static class CommandHandlerExtensions
     {
-        internal static Dictionary<string, string> ExtractKeyValuePair(string source, string[] separator)
+        internal static SortedDictionary<string, string> ExtractKeyValuePair(string source, string[] separator)
         {
             const int KeyIndex = 0;
             const int ValuesIndex = 1;
-            var result = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
+            var result = new SortedDictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
             var parameterPairs = source.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             var parameterValuePair = parameterPairs.Select(x => x.Split('=', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
             foreach (var pair in parameterValuePair)
@@ -21,7 +21,7 @@ namespace FileCabinetApp.CommandHandlers
             return result;
         }
 
-        internal static Predicate<FileCabinetRecord> GeneratePredicate(Dictionary<string, string> keyValuePair)
+        internal static Predicate<FileCabinetRecord> GeneratePredicate(IDictionary<string, string> keyValuePair)
         {
             if (keyValuePair is null)
             {
@@ -34,7 +34,7 @@ namespace FileCabinetApp.CommandHandlers
             {
                 var property =
                     typeof(FileCabinetRecord).GetProperties().FirstOrDefault(property => property.Name.Contains(pair.Key, StringComparison.CurrentCultureIgnoreCase));
-                intermediateResult += record => property.GetValue(record).ToString().Contains(pair.Value, StringComparison.CurrentCultureIgnoreCase);
+                intermediateResult += record => property?.GetValue(record)?.ToString()?.Contains(pair.Value, StringComparison.CurrentCultureIgnoreCase) ?? throw new ArgumentNullException(nameof(property), $"Property with name {pair.Key} doesn't exists");
             }
 
             return intermediateResult!.GetInvocationList().Length > 0 ? CombinePredicateIntoOneMethod(intermediateResult) : intermediateResult;
@@ -55,5 +55,8 @@ namespace FileCabinetApp.CommandHandlers
                 };
             }
         }
+
+        internal static string GenerateHashCode(SortedDictionary<string, string> keyValuePair) =>
+            string.Join(string.Empty, keyValuePair.Select(pair => (pair.Key + pair.Value).ToUpperInvariant()));
     }
 }

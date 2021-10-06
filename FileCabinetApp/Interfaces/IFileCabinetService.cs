@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FileCabinetApp.DataTransfer;
 
 namespace FileCabinetApp.Interfaces
@@ -41,10 +42,17 @@ namespace FileCabinetApp.Interfaces
         public void EditRecord(FileCabinetRecord record);
 
         /// <summary>
-        /// A method that returns a collection of records (read-only).
+        /// A method that returns a collection of records.
         /// </summary>
         /// <returns>Sequence of records.</returns>
         public IEnumerable<FileCabinetRecord> GetRecords();
+
+        /// <summary>
+        /// A method that return the collection of records selected by <see cref="IRecordQuery"/>.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <returns>Sequence of records.</returns>
+        public IEnumerable<FileCabinetRecord> GetRecords(IRecordQuery query);
 
         /// <summary>
         /// A method that returns actual records.

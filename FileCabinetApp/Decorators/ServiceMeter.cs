@@ -10,7 +10,7 @@ namespace FileCabinetApp.Decorators
     public sealed class ServiceMeter : IFileCabinetService
     {
         private readonly IFileCabinetService service;
-        private readonly Stopwatch stopwatch = new();
+        private readonly Stopwatch stopwatch = new ();
 
         public ServiceMeter(IFileCabinetService service) => this.service =
             service ?? throw new ArgumentNullException(nameof(service), "Service can't be null");
@@ -64,6 +64,15 @@ namespace FileCabinetApp.Decorators
             var result = this.service.GetRecords();
             this.stopwatch.Stop();
             WriteResult(this.stopwatch.ElapsedTicks);
+            return result;
+        }
+
+        public IEnumerable<FileCabinetRecord> GetRecords(IRecordQuery query)
+        {
+            this.stopwatch.Restart();
+            var result = this.service.GetRecords(query);
+            this.stopwatch.Stop();
+            WriteResult(this.stopwatch.ElapsedMilliseconds);
             return result;
         }
 

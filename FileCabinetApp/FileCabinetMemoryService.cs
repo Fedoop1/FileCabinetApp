@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FileCabinetApp.DataTransfer;
 using FileCabinetApp.Interfaces;
 
@@ -114,12 +115,20 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public IEnumerable<FileCabinetRecord> GetRecords()
+        public IEnumerable<FileCabinetRecord> GetRecords() => this.GetRecords(new RecordQuery(_ => true, string.Empty));
+
+        /// <inheritdoc/>
+        public IEnumerable<FileCabinetRecord> GetRecords(IRecordQuery query)
         {
-            foreach (var record in this.recordList)
+            query ??= new RecordQuery(_ => true, string.Empty);
+
+            if (this.cache.TryGetValue(query.QueryHashCode, out var result))
             {
-                yield return record;
+                return RecordsIterator(result);
             }
+
+            this.cache[query.QueryHashCode] = this.recordList.Where(record => query.Predicate(record));
+            return RecordsIterator(this.cache[query.QueryHashCode]);
         }
 
         /// <inheritdoc/>

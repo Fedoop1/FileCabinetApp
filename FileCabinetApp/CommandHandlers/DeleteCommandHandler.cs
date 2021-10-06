@@ -61,13 +61,14 @@ namespace FileCabinetApp.CommandHandlers
                 if (parametersArray.Length != ParametersCount)
                 {
                     Console.WriteLine("Invalid parameters count");
+                    return;
                 }
 
                 var pair = ExtractKeyValuePair(parametersArray[0], new[] { "=" });
                 var predicate = GeneratePredicate(pair);
 
                 List<int> deletedRecordsId = new ();
-                foreach (var record in this.Service.GetRecords().Where(record => predicate(record)))
+                foreach (var record in this.Service.GetRecords(new RecordQuery(predicate, GenerateHashCode(pair))))
                 {
                     this.Service.DeleteRecord(record);
                     deletedRecordsId.Add(record.Id);
