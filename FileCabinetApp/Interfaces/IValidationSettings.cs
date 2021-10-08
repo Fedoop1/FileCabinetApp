@@ -1,5 +1,7 @@
 ﻿using System;
 
+#pragma warning disable CA1707 // Identifiers should not contain underscores
+
 namespace FileCabinetApp.Interfaces
 {
     /// <summary>
@@ -8,54 +10,63 @@ namespace FileCabinetApp.Interfaces
     public interface IValidationSettings
     {
         /// <summary>
-        /// Get's or set's max length of first name to <see cref="FileCabinetRecord"/>.
+        /// Gets or sets max length of first name to <see cref="FileCabinetRecord"/>.
         /// </summary>
-        /// <value>Max length of first name.</value>
+        /// <value>Maximum length of first name.</value>
         public int FirstName_Max { get; set; }
 
         /// <summary>
-        /// Get's or set's min length of first name to <see cref="FileCabinetRecord"/>.
+        /// Gets or sets min length of first name to <see cref="FileCabinetRecord"/>.
         /// </summary>
+        /// <value>Minimum first name length.</value>
         public int FirstName_Min { get; set; }
 
         /// <summary>
-        /// Get's or set's max length of last name to <see cref="FileCabinetRecord"/>.
+        /// Gets or sets max length of last name to <see cref="FileCabinetRecord"/>.
         /// </summary>
+        /// <value>Maximum last name length.</value>
         public int LastName_Max { get; set; }
 
         /// <summary>
-        /// Get's or set's min length of last name to <see cref="FileCabinetRecord"/>.
+        /// Gets or sets min length of last name to <see cref="FileCabinetRecord"/>.
         /// </summary>
+        /// <value>Minimum last name length.</value>
         public int LastName_Min { get; set; }
 
         /// <summary>
-        /// Get's or set's minimal date of date of birth to <see cref="FileCabinetRecord"/>.
+        /// Gets or sets minimal date of date of birth to <see cref="FileCabinetRecord"/>.
         /// </summary>
+        /// <value>Minimum birth date.</value>
         public DateTime DateOfBirth_From { get; set; }
 
         /// <summary>
-        /// Get's or set's maximum date of date of birth to <see cref="FileCabinetRecord"/>.
+        /// Gets or sets maximum date of date of birth to <see cref="FileCabinetRecord"/>.
         /// </summary>
+        /// <value>Maximum birth date.</value>
         public DateTime DateOfBirth_To { get; set; }
 
         /// <summary>
-        /// Get's or set's min height to <see cref="FileCabinetRecord"/>.
+        /// Gets or sets min height to <see cref="FileCabinetRecord"/>.
         /// </summary>
+        /// <value>Minimum height.</value>
         public short Height_Min { get; set; }
 
         /// <summary>
-        /// Get's or set's max height to <see cref="FileCabinetRecord"/>.
+        /// Gets or sets max height to <see cref="FileCabinetRecord"/>.
         /// </summary>
+        /// Maximum height.
         public short Height_Max { get; set; }
 
         /// <summary>
-        /// Get's or set's min amount of money to <see cref="FileCabinetRecord"/>.
+        /// Gets or sets min amount of money to <see cref="FileCabinetRecord"/>.
         /// </summary>
+        /// <value>Minimum amount of money.</value>
         public decimal Money_Min { get; set; }
 
         /// <summary>
-        /// Get's or set's max amount of money to <see cref="FileCabinetRecord"/>.
+        /// Gets or sets max amount of money to <see cref="FileCabinetRecord"/>.
         /// </summary>
+        /// <value>Maximum amount of money.</value>
         public decimal Money_Max { get; set; }
     }
 }

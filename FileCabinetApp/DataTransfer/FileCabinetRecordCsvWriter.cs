@@ -8,7 +8,7 @@ namespace FileCabinetApp.DataTransfer
     /// <summary>
     /// Create CSV document serialize records data to it.
     /// </summary>
-    public class FileCabinetRecordCsvWriter : IRecordDataSaver
+    public sealed class FileCabinetRecordCsvWriter : IRecordDataSaver, IDisposable
     {
         private readonly string filepath;
         private TextWriter writer;
@@ -29,6 +29,11 @@ namespace FileCabinetApp.DataTransfer
         public FileCabinetRecordCsvWriter(string filepath) => this.filepath = filepath ?? throw new ArgumentNullException(nameof(filepath), "File path can't be null");
 
         /// <summary>
+        /// Finalizes an instance of the <see cref="FileCabinetRecordCsvWriter"/> class.
+        /// </summary>
+        ~FileCabinetRecordCsvWriter() => this.Dispose(false);
+
+        /// <summary>
         /// Write <see cref="FileCabinetRecord"/> sequence to CSV file and save it.
         /// </summary>
         /// <param name="source">Contains actual <see cref="FileCabinetRecord"/> data.</param>
@@ -44,5 +49,16 @@ namespace FileCabinetApp.DataTransfer
 
             this.writer.Dispose();
         }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing) => this.writer?.Dispose();
     }
 }

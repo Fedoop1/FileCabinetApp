@@ -17,14 +17,14 @@ namespace FileCabinetApp.CommandHandlers
         /// <returns>Sorted dictionary from source string.</returns>
         internal static SortedDictionary<string, string> ExtractKeyValuePair(string source, string[] separator)
         {
-            const int KeyIndex = 0;
-            const int ValuesIndex = 1;
+            const int keyIndex = 0;
+            const int valuesIndex = 1;
             var result = new SortedDictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
             var parameterPairs = source.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             var parameterValuePair = parameterPairs.Select(x => x.Split('=', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
             foreach (var pair in parameterValuePair)
             {
-                result.Add(pair[KeyIndex], pair[ValuesIndex].Trim('\u0027'));
+                result.Add(pair[keyIndex], pair[valuesIndex].Trim('\u0027'));
             }
 
             return result;

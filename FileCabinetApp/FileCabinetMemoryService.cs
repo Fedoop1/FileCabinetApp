@@ -19,25 +19,24 @@ namespace FileCabinetApp
 
         private readonly IRecordValidator validator;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileCabinetMemoryService"/> class.
+        /// </summary>
+        /// <param name="validator">Record validator.</param>
         public FileCabinetMemoryService(IRecordValidator validator) => this.validator = validator ?? throw new ArgumentNullException(nameof(validator), "Validator can't be null");
 
-        /// <summary>
-        /// Initialize a new <see cref="FileCabinetSnapshotService"/> which contains <see cref="FileCabinetRecord"/> array.
-        /// </summary>
-        /// <returns>Returns <see cref="FileCabinetSnapshotService"/> with data about existing records.</returns>
+        /// <inheritdoc/>
         public RecordSnapshot MakeSnapshot() => new (this.GetRecords());
 
         /// <inheritdoc/>
         public bool ValidateRecord(FileCabinetRecord record) => this.validator.ValidateRecord(record);
 
-        /// <summary>
-        /// Create a new instance of <see cref="FileCabinetRecord"/> and save it to storage.
-        /// </summary>
+        /// <inheritdoc/>
         public void AddRecord(FileCabinetRecord record)
         {
             this.ValidateInputRecord(record);
 
-            if (this.isExist(record.Id))
+            if (this.IsExist(record.Id))
             {
                 throw new ArgumentException("Record with this Id already exists");
             }
@@ -55,10 +54,10 @@ namespace FileCabinetApp
                 return result;
             }
 
-            if (this.firstNameDictionary.TryGetValue(firstName, out List<FileCabinetRecord> recordList))
+            if (this.firstNameDictionary.TryGetValue(firstName, out var records))
             {
-                this.cache[firstName] = recordList;
-                return RecordsIterator(this.cache[firstName]);
+                this.cache[firstName] = records;
+                return this.cache[firstName];
             }
 
             return Array.Empty<FileCabinetRecord>();
@@ -72,10 +71,10 @@ namespace FileCabinetApp
                 return result;
             }
 
-            if (this.lastNameDictionary.TryGetValue(lastName, out List<FileCabinetRecord> recordList))
+            if (this.lastNameDictionary.TryGetValue(lastName, out var records))
             {
-                this.cache[lastName] = recordList;
-                return RecordsIterator(this.cache[lastName]);
+                this.cache[lastName] = records;
+                return this.cache[lastName];
             }
 
             return Array.Empty<FileCabinetRecord>();
@@ -89,10 +88,10 @@ namespace FileCabinetApp
                 return result;
             }
 
-            if (DateTime.TryParse(dateOfBirth, out DateTime birthDate) && this.dateOfBirthDictionary.TryGetValue(birthDate, out List<FileCabinetRecord> recordList))
+            if (DateTime.TryParse(dateOfBirth, out DateTime birthDate) && this.dateOfBirthDictionary.TryGetValue(birthDate, out var records))
             {
-                this.cache[dateOfBirth] = recordList;
-                return RecordsIterator(this.cache[dateOfBirth]);
+                this.cache[dateOfBirth] = records;
+                return this.cache[dateOfBirth];
             }
 
             return Array.Empty<FileCabinetRecord>();
@@ -103,7 +102,7 @@ namespace FileCabinetApp
         {
             this.ValidateInputRecord(record);
 
-            if (!this.isExist(record.Id))
+            if (!this.IsExist(record.Id))
             {
                 throw new ArgumentException("Record with this Id already exists");
             }
@@ -124,11 +123,11 @@ namespace FileCabinetApp
 
             if (this.cache.TryGetValue(query.QueryHashCode, out var result))
             {
-                return RecordsIterator(result);
+                return result;
             }
 
             this.cache[query.QueryHashCode] = this.recordList.Where(record => query.Predicate(record));
-            return RecordsIterator(this.cache[query.QueryHashCode]);
+            return this.cache[query.QueryHashCode];
         }
 
         /// <inheritdoc/>
@@ -190,7 +189,7 @@ namespace FileCabinetApp
         /// <param name="record">Record to add.</param>
         private void DictionaryAdd(FileCabinetRecord record)
         {
-            if (this.firstNameDictionary.TryGetValue(record.FirstName, out List<FileCabinetRecord> firstNameList))
+            if (this.firstNameDictionary.TryGetValue(record.FirstName, out var firstNameList))
             {
                 firstNameList.Add(record);
             }
@@ -199,7 +198,7 @@ namespace FileCabinetApp
                 this.firstNameDictionary.Add(record.FirstName, new List<FileCabinetRecord> { record });
             }
 
-            if (this.lastNameDictionary.TryGetValue(record.LastName, out List<FileCabinetRecord> lastNameList))
+            if (this.lastNameDictionary.TryGetValue(record.LastName, out var lastNameList))
             {
                 lastNameList.Add(record);
             }
@@ -208,7 +207,7 @@ namespace FileCabinetApp
                 this.lastNameDictionary.Add(record.LastName, new List<FileCabinetRecord> { record });
             }
 
-            if (this.dateOfBirthDictionary.TryGetValue(record.DateOfBirth, out List<FileCabinetRecord> dateOfBirthList))
+            if (this.dateOfBirthDictionary.TryGetValue(record.DateOfBirth, out var dateOfBirthList))
             {
                 dateOfBirthList.Add(record);
             }
@@ -229,15 +228,7 @@ namespace FileCabinetApp
             this.dateOfBirthDictionary[record.DateOfBirth].Remove(record);
         }
 
-        private static IEnumerable<FileCabinetRecord> RecordsIterator(IEnumerable<FileCabinetRecord> source)
-        {
-            foreach (var record in source)
-            {
-                yield return record;
-            }
-        }
-
-        private bool isExist(int id) => this.recordList.Contains(new FileCabinetRecord { Id = id });
+        private bool IsExist(int id) => this.recordList.Contains(new FileCabinetRecord { Id = id });
 
         private void ValidateInputRecord(FileCabinetRecord record)
         {

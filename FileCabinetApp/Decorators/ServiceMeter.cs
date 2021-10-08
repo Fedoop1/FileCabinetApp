@@ -7,14 +7,24 @@ using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.Decorators
 {
+    /// <summary>
+    /// Decorator that wrap instance of <see cref="IFileCabinetService"/> and add profiling to it.
+    /// </summary>
+    /// <seealso cref="FileCabinetApp.Interfaces.IFileCabinetService" />
     public sealed class ServiceMeter : IFileCabinetService
     {
         private readonly IFileCabinetService service;
         private readonly Stopwatch stopwatch = new ();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ServiceMeter"/> class.
+        /// </summary>
+        /// <param name="service">Record service.</param>
+        /// <exception cref="System.ArgumentNullException">Throws when record service is null.</exception>
         public ServiceMeter(IFileCabinetService service) => this.service =
             service ?? throw new ArgumentNullException(nameof(service), "Service can't be null");
 
+        /// <inheritdoc/>
         public void AddRecord(FileCabinetRecord record)
         {
             this.stopwatch.Restart();
@@ -23,6 +33,7 @@ namespace FileCabinetApp.Decorators
             WriteResult(this.stopwatch.ElapsedTicks);
         }
 
+        /// <inheritdoc/>
         public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
             this.stopwatch.Restart();
@@ -32,6 +43,7 @@ namespace FileCabinetApp.Decorators
             return result;
         }
 
+        /// <inheritdoc/>
         public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
         {
             this.stopwatch.Restart();
@@ -41,6 +53,7 @@ namespace FileCabinetApp.Decorators
             return result;
         }
 
+        /// <inheritdoc/>
         public IEnumerable<FileCabinetRecord> FindByDayOfBirth(string dateOfBirth)
         {
             this.stopwatch.Restart();
@@ -50,6 +63,7 @@ namespace FileCabinetApp.Decorators
             return result;
         }
 
+        /// <inheritdoc/>
         public void EditRecord(FileCabinetRecord record)
         {
             this.stopwatch.Restart();
@@ -58,6 +72,7 @@ namespace FileCabinetApp.Decorators
             WriteResult(this.stopwatch.ElapsedTicks);
         }
 
+        /// <inheritdoc/>
         public IEnumerable<FileCabinetRecord> GetRecords()
         {
             this.stopwatch.Restart();
@@ -67,6 +82,7 @@ namespace FileCabinetApp.Decorators
             return result;
         }
 
+        /// <inheritdoc/>
         public IEnumerable<FileCabinetRecord> GetRecords(IRecordQuery query)
         {
             this.stopwatch.Restart();
@@ -76,6 +92,7 @@ namespace FileCabinetApp.Decorators
             return result;
         }
 
+        /// <inheritdoc/>
         public RecordSnapshot MakeSnapshot()
         {
             this.stopwatch.Restart();
@@ -85,6 +102,7 @@ namespace FileCabinetApp.Decorators
             return result;
         }
 
+        /// <inheritdoc/>
         public int Restore(RecordSnapshot restoreSnapshot)
         {
             this.stopwatch.Restart();
@@ -94,6 +112,7 @@ namespace FileCabinetApp.Decorators
             return result;
         }
 
+        /// <inheritdoc/>
         public (int AliveRecords, int DeletedRecords) GetStat()
         {
             this.stopwatch.Restart();
@@ -103,6 +122,7 @@ namespace FileCabinetApp.Decorators
             return result;
         }
 
+        /// <inheritdoc/>
         public void DeleteRecord(FileCabinetRecord record)
         {
             this.stopwatch.Restart();
@@ -111,6 +131,7 @@ namespace FileCabinetApp.Decorators
             WriteResult(this.stopwatch.ElapsedTicks);
         }
 
+        /// <inheritdoc/>
         public string Purge()
         {
             this.stopwatch.Restart();

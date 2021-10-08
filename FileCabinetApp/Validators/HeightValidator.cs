@@ -8,14 +8,7 @@ namespace FileCabinetApp.Validators
     /// </summary>
     public class HeightValidator : IRecordValidator
     {
-        /// <summary>
-        /// The maximum value is the height of growth.
-        /// </summary>
         private readonly short maxHeight;
-
-        /// <summary>
-        /// The minimum value is the height of the growth.
-        /// </summary>
         private readonly short minHeight;
 
         /// <summary>

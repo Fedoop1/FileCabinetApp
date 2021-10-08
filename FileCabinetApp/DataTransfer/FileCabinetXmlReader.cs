@@ -11,7 +11,7 @@ namespace FileCabinetApp.DataTransfer
     /// <summary>
     /// Class for deserializing <see cref="FileCabinetRecord"/> information from XML file.
     /// </summary>
-    public class FileCabinetXmlReader : IRecordDataLoader
+    public sealed class FileCabinetXmlReader : IRecordDataLoader, IDisposable
     {
         private readonly string filepath;
         private TextReader reader;
@@ -31,6 +31,14 @@ namespace FileCabinetApp.DataTransfer
             filepath ?? throw new ArgumentNullException(nameof(filepath), "File path can't be null");
 
         /// <summary>
+        /// Finalizes an instance of the <see cref="FileCabinetXmlReader"/> class.
+        /// </summary>
+        ~FileCabinetXmlReader()
+        {
+            this.Dispose(false);
+        }
+
+        /// <summary>
         /// Read and deserialize all information from file and return it <see cref="IList{FileCabinetRecord}"/> representation.
         /// </summary>
         /// <returns><see cref="IList{FileCabinetRecord}"/> representation of records into XML file.</returns>
@@ -43,8 +51,8 @@ namespace FileCabinetApp.DataTransfer
                 yield return new FileCabinetRecord()
                 {
                     Id = int.Parse(record !.Attribute("Id") !.Value, CultureInfo.CurrentCulture),
-                    FirstName = record.XPathSelectElement("Name")?.Attribute("First") !.Value,
-                    LastName = record?.XPathSelectElement("Name")?.Attribute("Last") !.Value,
+                    FirstName = record !.XPathSelectElement("Name")?.Attribute("First") !.Value,
+                    LastName = record !.XPathSelectElement("Name")?.Attribute("Last") !.Value,
                     DateOfBirth = DateTime.Parse(record.XPathSelectElement("DateOfBirth") !.Value, CultureInfo.CurrentCulture),
                     Height = short.Parse(record.XPathSelectElement("Height") !.Value, CultureInfo.CurrentCulture),
                     Gender = char.Parse(record.XPathSelectElement("Gender") !.Value),
@@ -52,7 +60,18 @@ namespace FileCabinetApp.DataTransfer
                 };
             }
 
-            this.reader.Dispose();
+            this.Dispose(true);
         }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing) => this.reader?.Dispose();
     }
 }

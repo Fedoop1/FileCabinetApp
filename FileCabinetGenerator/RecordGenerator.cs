@@ -9,9 +9,9 @@ namespace FileCabinetGenerator
     /// </summary>
     public static class RecordGenerator
     {
-        private static readonly char[] validGenderValue = { 'f', 'F', 'M', 'm' };
-        private static readonly string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        private static readonly Random random = new ();
+        private static readonly char[] ValidGenderValue = { 'f', 'F', 'M', 'm' };
+        private static readonly string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        private static readonly Random Random = new ();
 
         /// <summary>
         /// Generate <see cref="FileCabinetRecord"/> instances.
@@ -27,21 +27,21 @@ namespace FileCabinetGenerator
                     Id = settings.StartId++,
                     FirstName = GenerateString(),
                     LastName = GenerateString(),
-                    DateOfBirth = new DateTime(random.Next(1950, DateTime.Now.Year), random.Next(1, 13), random.Next(1, 31)),
-                    Height = (short)random.Next(0, 250),
-                    Money = random.Next(0, int.MaxValue),
-                    Gender = validGenderValue[random.Next(0, validGenderValue.Length)],
+                    DateOfBirth = new DateTime(Random.Next(1950, DateTime.Now.Year), Random.Next(1, 13), Random.Next(1, 31)),
+                    Height = (short)Random.Next(0, 250),
+                    Money = Random.Next(0, int.MaxValue),
+                    Gender = ValidGenderValue[Random.Next(0, ValidGenderValue.Length)],
                 };
             }
         }
 
         private static string GenerateString()
         {
-            char[] word = new char[random.Next(0, 50)];
+            char[] word = new char[Random.Next(0, 50)];
 
             for (int index = 0; index < word.Length; index++)
             {
-                word[index] = chars[random.Next(chars.Length)];
+                word[index] = Chars[Random.Next(Chars.Length)];
             }
 
             return new string(word);

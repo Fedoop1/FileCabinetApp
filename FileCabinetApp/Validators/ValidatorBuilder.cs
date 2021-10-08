@@ -17,9 +17,11 @@ namespace FileCabinetApp.Validators
         private ValidatorBuilder() => this.validators = new List<IRecordValidator>();
 
         /// <summary>
-        /// Extension method which create <see cref="CompositeValidator"/> with the custom rules.
+        /// Creates the validator with validation rules according to specified configuration.
         /// </summary>
-        /// <returns>New instance of <see cref="CompositeValidator"/> with the custom rules.</returns>
+        /// <param name="settings">The settings.</param>
+        /// <returns>Record validator.</returns>
+        /// <exception cref="ArgumentNullException">Throws when validation settings is null.</exception>
         public static IRecordValidator CreateValidator(IValidationSettings settings)
         {
             if (settings is null)
@@ -99,7 +101,7 @@ namespace FileCabinetApp.Validators
         /// Add gender validator to validators list.
         /// </summary>
         /// <param name="validGenderArray">Array of valid genders.</param>
-        /// <returns>Instance of validator builder with gedner validator in validators list.</returns>
+        /// <returns>Instance of validator builder with gender validator in validators list.</returns>
         private ValidatorBuilder ValidateGender(char[] validGenderArray)
         {
             this.validators.Add(new GenderValidator(validGenderArray));

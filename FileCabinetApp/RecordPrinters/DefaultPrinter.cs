@@ -6,6 +6,10 @@ using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.RecordPrinters
 {
+    /// <summary>
+    /// Class which prints information to destination stream in ToString() format.
+    /// </summary>
+    /// <seealso cref="IRecordPrinter" />
     public class DefaultPrinter : IRecordPrinter
     {
         private readonly TextWriter destinationStream;
@@ -23,7 +27,7 @@ namespace FileCabinetApp.RecordPrinters
         /// </summary>
         /// <param name="source">Records source.</param>
         /// <param name="selectedFields">Collection of selected fields.</param>
-        /// <exception cref="System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// Throws when source is null
         /// or
         /// Collection of selected fields is null.
@@ -37,7 +41,7 @@ namespace FileCabinetApp.RecordPrinters
 
             if (selectedFields is null)
             {
-                throw new ArgumentNullException(nameof(source), "Source of selected fields can't be null");
+                throw new ArgumentNullException(nameof(selectedFields), "Source of selected fields can't be null");
             }
 
             foreach (var record in source)

@@ -5,12 +5,14 @@ using System.Text;
 using FileCabinetApp.DataTransfer;
 using FileCabinetApp.Interfaces;
 
+#pragma warning disable SA1305 // Field names should not use Hungarian notation
+
 namespace FileCabinetApp
 {
     /// <summary>
     /// Organizes work through a <see cref="FileStream"/> in a byte format. Is an alternative of <see cref="FileCabinetMemoryService"/>.
     /// </summary>
-    public class FileCabinetFilesystemService : IFileCabinetService, IRecordValidator
+    public sealed class FileCabinetFilesystemService : IFileCabinetService, IRecordValidator, IDisposable
     {
         private const int MaxRecordLength = 255 + sizeof(short) + sizeof(decimal) + sizeof(char) + sizeof(bool);
         private const int MaxStringLength = 120;
@@ -43,7 +45,7 @@ namespace FileCabinetApp
         /// Finalizes an instance of the <see cref="FileCabinetFilesystemService"/> class.
         /// </summary>
         /// <returns></returns>
-        ~FileCabinetFilesystemService() => this.fileStream.Dispose();
+        ~FileCabinetFilesystemService() => this.Dispose(false);
 
         private enum RecordState : byte
         {
@@ -129,20 +131,10 @@ namespace FileCabinetApp
             return this.FindByLastNameEnumerable(lastName);
         }
 
-        private IEnumerable<FileCabinetRecord> FindByLastNameEnumerable(string lastName)
-        {
-            var recordBuffer = new byte[MaxRecordLength];
-            foreach (var position in this.lastNameOffsetDictionary[lastName])
-            {
-                this.fileStream.Position = position;
-                this.fileStream.Read(recordBuffer);
-                yield return FromByteToRecord(recordBuffer, out _);
-            }
-        }
-
         /// <inheritdoc/>
         public IEnumerable<FileCabinetRecord> GetRecords() => this.GetRecords(new RecordQuery(_ => true, string.Empty)); // HashCode omitted cause FileStream service doesn't use caching mechanism.
 
+        /// <inheritdoc/>
         public IEnumerable<FileCabinetRecord> GetRecords(IRecordQuery query)
         {
             if (query is null)
@@ -153,23 +145,6 @@ namespace FileCabinetApp
             return this.GetRecordsIterator(query);
         }
 
-        private IEnumerable<FileCabinetRecord> GetRecordsIterator(IRecordQuery query)
-        {
-            var recordBuffer = new byte[MaxRecordLength];
-
-            this.fileStream.Position = default;
-            while (this.fileStream.Position != this.fileStream.Length)
-            {
-                this.fileStream.Read(recordBuffer);
-                var record = FromByteToRecord(recordBuffer, out RecordState state);
-
-                if (state == RecordState.Alive && query.Predicate(record))
-                {
-                    yield return record;
-                }
-            }
-        }
-
         /// <inheritdoc/>
         public (int AliveRecords, int DeletedRecords) GetStat()
         {
@@ -177,7 +152,7 @@ namespace FileCabinetApp
             int deletedCount = default;
 
             this.fileStream.Position = default;
-            using BinaryReader binaryReader = new BinaryReader(this.fileStream, Encoding.Default, true);
+            using BinaryReader binaryReader = new (this.fileStream, Encoding.Default, true);
             while (this.fileStream.Position < this.fileStream.Length)
             {
                 this.fileStream.Position += MaxRecordLength - sizeof(bool);
@@ -195,10 +170,7 @@ namespace FileCabinetApp
             return (aliveCount, deletedCount);
         }
 
-        /// <summary>
-        /// Create a new instance of <see cref="FileCabinetSnapshotService"/> which contain all information about exists records.
-        /// </summary>
-        /// <returns>Instance of <see cref="FileCabinetSnapshotService"/>.</returns>
+        /// <inheritdoc/>
         public RecordSnapshot MakeSnapshot() => new (this.GetRecords());
 
         /// <inheritdoc/>
@@ -213,11 +185,10 @@ namespace FileCabinetApp
             }
 
             int affectedRecordsCount = default;
-            var recordByteArray = new byte[MaxRecordLength];
             (FileCabinetRecord actualRecord, RecordState state, int position) recordData;
             foreach (var restoreRecord in snapshot.Records)
             {
-                recordByteArray = RecordToByteConverter(restoreRecord);
+                var recordByteArray = RecordToByteConverter(restoreRecord);
                 if ((recordData = this.TryFindRecordById(restoreRecord.Id)).actualRecord != null)
                 {
                     this.fileStream.Position = recordData.position;
@@ -254,7 +225,7 @@ namespace FileCabinetApp
             int purgedCount = default;
             byte[] aliveRecordBuffer = new byte[MaxRecordLength];
             byte[] deletedRecordBuffer = new byte[MaxRecordLength];
-            var initialStat = this.GetStat();
+            var (aliveRecords, deletedRecords) = this.GetStat();
             (int Index, int Position) deletedRecordData;
             (int Index, int Position) aliveRecordData;
 
@@ -281,7 +252,16 @@ namespace FileCabinetApp
                 purgedCount++;
             }
 
-            return $"Data file processing is completed: {purgedCount} of {initialStat.DeletedRecords + initialStat.AliveRecords} records were purged.";
+            return $"Data file processing is completed: {purgedCount} of {deletedRecords + aliveRecords} records were purged.";
+        }
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -314,8 +294,8 @@ namespace FileCabinetApp
 
         private static FileCabinetRecord FromByteToRecord(byte[] bytes, out RecordState state)
         {
-            using MemoryStream memStream = new MemoryStream(bytes);
-            using BinaryReader binaryReader = new BinaryReader(memStream);
+            using MemoryStream memStream = new (bytes);
+            using BinaryReader binaryReader = new (memStream);
 
             var result = new FileCabinetRecord()
             {
@@ -341,7 +321,7 @@ namespace FileCabinetApp
         private static byte[] StringToBytes(string text)
         {
             var result = new byte[MaxStringLength];
-            var textASCII = Encoding.ASCII.GetBytes(text);
+            var asciiText = Encoding.ASCII.GetBytes(text);
             int textLength = text.Length;
 
             if (textLength > MaxStringLength)
@@ -349,7 +329,7 @@ namespace FileCabinetApp
                 textLength = MaxStringLength;
             }
 
-            Array.Copy(textASCII, result, textLength);
+            Array.Copy(asciiText, result, textLength);
             return result;
         }
 
@@ -362,6 +342,34 @@ namespace FileCabinetApp
         {
             var result = Encoding.ASCII.GetString(byteName);
             return result.TrimEnd('\0');
+        }
+
+        private IEnumerable<FileCabinetRecord> FindByLastNameEnumerable(string lastName)
+        {
+            var recordBuffer = new byte[MaxRecordLength];
+            foreach (var position in this.lastNameOffsetDictionary[lastName])
+            {
+                this.fileStream.Position = position;
+                this.fileStream.Read(recordBuffer);
+                yield return FromByteToRecord(recordBuffer, out _);
+            }
+        }
+
+        private IEnumerable<FileCabinetRecord> GetRecordsIterator(IRecordQuery query)
+        {
+            var recordBuffer = new byte[MaxRecordLength];
+
+            this.fileStream.Position = default;
+            while (this.fileStream.Position != this.fileStream.Length)
+            {
+                this.fileStream.Read(recordBuffer);
+                var record = FromByteToRecord(recordBuffer, out var state);
+
+                if (state == RecordState.Alive && query.Predicate(record))
+                {
+                    yield return record;
+                }
+            }
         }
 
         private (int index, int position) FindDeletedRecord()
@@ -403,14 +411,14 @@ namespace FileCabinetApp
         private (FileCabinetRecord actualRecord, RecordState state, int position) TryFindRecordById(int id)
         {
             byte[] recordBuffer = new byte[MaxRecordLength];
-            using BinaryReader reader = new BinaryReader(this.fileStream, Encoding.Default, true);
+            using BinaryReader reader = new (this.fileStream, Encoding.Default, true);
             FileCabinetRecord record;
 
             if (this.idOffsetDictionary.ContainsKey(id))
             {
                 this.fileStream.Position = this.idOffsetDictionary[id];
                 this.fileStream.Read(recordBuffer);
-                record = FromByteToRecord(recordBuffer, out RecordState state);
+                record = FromByteToRecord(recordBuffer, out var state);
                 return (record, state, this.idOffsetDictionary[id]);
             }
 
@@ -421,8 +429,8 @@ namespace FileCabinetApp
                 {
                     this.fileStream.Position -= sizeof(int);
                     this.fileStream.Read(recordBuffer);
-                    record = FromByteToRecord(recordBuffer, out RecordState state);
-                    return (null, state, (int)(this.fileStream.Position - MaxRecordLength));
+                    record = FromByteToRecord(recordBuffer, out var state);
+                    return (record, state, (int)(this.fileStream.Position - MaxRecordLength));
                 }
 
                 this.fileStream.Position += MaxRecordLength - sizeof(int);
@@ -556,5 +564,7 @@ namespace FileCabinetApp
                 yield return FromByteToRecord(recordBuffer, out _);
             }
         }
+
+        private void Dispose(bool disposing) => this.fileStream?.Dispose();
     }
 }

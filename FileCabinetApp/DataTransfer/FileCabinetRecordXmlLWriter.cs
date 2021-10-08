@@ -5,12 +5,14 @@ using System.Linq;
 using System.Xml.Linq;
 using FileCabinetApp.Interfaces;
 
+#pragma warning disable SA1116 // Split parameters should start on line after declaration
+
 namespace FileCabinetApp.DataTransfer
 {
     /// <summary>
     /// Serialize <see cref="FileCabinetRecord"/> data and save it to destination file.
     /// </summary>
-    public class FileCabinetRecordXmlLWriter : IRecordDataSaver
+    public sealed class FileCabinetRecordXmlLWriter : IRecordDataSaver, IDisposable
     {
         private readonly string filepath;
         private TextWriter writer;
@@ -31,7 +33,10 @@ namespace FileCabinetApp.DataTransfer
         /// <summary>
         /// Finalizes an instance of the <see cref="FileCabinetRecordXmlLWriter"/> class.
         /// </summary>
-        ~FileCabinetRecordXmlLWriter() => this.writer.Dispose();
+        ~FileCabinetRecordXmlLWriter()
+        {
+            this.Dispose(false);
+        }
 
         /// <summary>
         /// Create and Write <see cref="FileCabinetRecord"/> source to XML format and save it to destination file.
@@ -54,7 +59,22 @@ namespace FileCabinetApp.DataTransfer
                     new XElement("Money", record.Money))));
 
             document.Save(this.writer);
-            this.writer.Dispose();
+            this.Dispose(true);
         }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        private void Dispose(bool disposing) => this.writer?.Dispose();
     }
 }

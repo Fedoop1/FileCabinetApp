@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FileCabinetApp.DataTransfer;
 
 namespace FileCabinetApp.Interfaces
@@ -10,77 +9,78 @@ namespace FileCabinetApp.Interfaces
     public interface IFileCabinetService
     {
         /// <summary>
-        /// The method that creates a new FileCabinetRecord.
+        /// Adds the record.
         /// </summary>
+        /// <param name="record">The record.</param>
         public void AddRecord(FileCabinetRecord record);
 
         /// <summary>
-        /// A method that searches for a record by name.
+        /// Finds the record by first name.
         /// </summary>
-        /// <param name="firstName">A parameter consisting of the first name.</param>
-        /// <returns>Returns an array of all records matching the search term.</returns>
+        /// <param name="firstName">The first name.</param>
+        /// <returns>The sequence of records that satisfy the condition.</returns>
         public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName);
 
         /// <summary>
-        /// A method that searches for a record by second name.
+        /// Finds the record by last name.
         /// </summary>
-        /// <param name="lastName">A parameter consisting of the last name.</param>
-        /// <returns>Returns an array of all records matching the search term.</returns>
+        /// <param name="lastName">The last name.</param>
+        /// <returns>The sequence of records that satisfy the condition.</returns>
         public IEnumerable<FileCabinetRecord> FindByLastName(string lastName);
 
         /// <summary>
-        /// A method that searches for a record by date of birth.
+        /// Finds the record by day of birth.
         /// </summary>
-        /// <param name="dateOfBirth">A parameter consisting of the date of birth.</param>
-        /// <returns>Returns an array of all records matching the search term.</returns>
+        /// <param name="dateOfBirth">The date of birth.</param>
+        /// <returns>The sequence of records that satisfy the condition.</returns>
         public IEnumerable<FileCabinetRecord> FindByDayOfBirth(string dateOfBirth);
 
         /// <summary>
-        /// A method for editing data in a particular record.
+        /// Editing data in the record.
         /// </summary>
         /// <param name="record">Updated record.</param>
         public void EditRecord(FileCabinetRecord record);
 
         /// <summary>
-        /// A method that returns a collection of records.
+        /// Returns sequence of stored records.
         /// </summary>
         /// <returns>Sequence of records.</returns>
         public IEnumerable<FileCabinetRecord> GetRecords();
 
         /// <summary>
-        /// A method that return the collection of records selected by <see cref="IRecordQuery"/>.
+        /// Returns the collection of records selected by <see cref="IRecordQuery"/>.
         /// </summary>
         /// <param name="query">The query.</param>
-        /// <returns>Sequence of records.</returns>
+        /// <returns>The sequence of records that satisfy the condition.</returns>
         public IEnumerable<FileCabinetRecord> GetRecords(IRecordQuery query);
 
         /// <summary>
-        /// A method that returns actual records.
+        /// Returns actual records in <see cref="RecordSnapshot"/> format.
         /// </summary>
-        /// <returns>Count of records.</returns>
+        /// <returns>Service snapshot.</returns>
         public RecordSnapshot MakeSnapshot();
 
         /// <summary>
-        /// Restore information from <see cref="FileCabinetSnapshotService"/> instance.
+        /// Restores the specified records from service snapshot.
         /// </summary>
-        /// <param name="restoreSnapshot">Snapshot with information about records.</param>
-        /// <returns>Count of affected records.</returns>
+        /// <param name="restoreSnapshot">The restore snapshot.</param>
+        /// <returns>Count of restored records.</returns>
         public int Restore(RecordSnapshot restoreSnapshot);
 
         /// <summary>
         /// Get the count of existing and deleted <see cref="FileCabinetRecord"/>'s.
         /// </summary>
-        /// <returns>The count of the records.</returns>
+        /// <returns>The count of existing and deleted records.</returns>
         public (int AliveRecords, int DeletedRecords) GetStat();
 
         /// <summary>
-        /// Removes a record from a data source.
+        /// Removes a record from service.
         /// </summary>
         /// <param name="record">Record to delete.</param>
         public void DeleteRecord(FileCabinetRecord record);
 
         /// <summary>
-        /// Find and remove record from data source file by index.
+        /// Optimize records memory by cleaning deleted records and defragmentate memory into one contiguous block.
         /// </summary>
         /// <returns>Removal result.</returns>
         public string Purge();

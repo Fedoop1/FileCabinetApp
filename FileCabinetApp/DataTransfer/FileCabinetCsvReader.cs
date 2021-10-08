@@ -8,7 +8,7 @@ namespace FileCabinetApp.DataTransfer
     /// <summary>
     /// Reads records from a CSV file.
     /// </summary>
-    public class FileCabinetCsvReader : IRecordDataLoader
+    public sealed class FileCabinetCsvReader : IRecordDataLoader, IDisposable
     {
         private const int IdIndex = 0;
         private const int FirstNameIndex = 1;
@@ -38,7 +38,10 @@ namespace FileCabinetApp.DataTransfer
         /// <summary>
         /// Finalizes an instance of the <see cref="FileCabinetCsvReader"/> class.
         /// </summary>
-        ~FileCabinetCsvReader() => this.reader.Dispose();
+        ~FileCabinetCsvReader()
+        {
+            this.Dispose(false);
+        }
 
         /// <summary>
         /// Read all <see cref="FileCabinetRecord"/> from the CSV file and add it to <see cref="IList{T}"/>.
@@ -92,5 +95,16 @@ namespace FileCabinetApp.DataTransfer
 
             this.reader.Dispose();
         }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing) => this.reader?.Dispose();
     }
 }

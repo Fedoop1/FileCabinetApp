@@ -8,11 +8,7 @@ namespace FileCabinetApp.Validators
     /// </summary>
     public class DateOfBirthValidator : IRecordValidator
     {
-        /// <summary>
-        /// The minimum allowed date of birth.
-        /// </summary>
         private readonly DateTime minDateOfBirth;
-
         private readonly DateTime maxDateOfBirth = DateTime.Now;
 
         /// <summary>
@@ -24,6 +20,11 @@ namespace FileCabinetApp.Validators
             this.minDateOfBirth = minDateOfBirth;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DateOfBirthValidator"/> class.
+        /// </summary>
+        /// <param name="minDateOfBirth">The minimum date of birth.</param>
+        /// <param name="maxDateOfBirth">The maximum date of birth.</param>
         public DateOfBirthValidator(DateTime minDateOfBirth, DateTime maxDateOfBirth)
         {
             this.minDateOfBirth = minDateOfBirth;
