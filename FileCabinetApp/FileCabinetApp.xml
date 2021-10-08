@@ -782,7 +782,7 @@
         </member>
         <member name="P:FileCabinetApp.FileCabinetRecord.Id">
             <summary>
-            Gets or sets the id field.
+            Gets the id field.
             </summary>
             <value>
             Id property.
@@ -790,7 +790,7 @@
         </member>
         <member name="P:FileCabinetApp.FileCabinetRecord.Height">
             <summary>
-            Gets or sets the height field.
+            Gets the height field.
             </summary>
             <value>
             Height property.
@@ -798,7 +798,7 @@
         </member>
         <member name="P:FileCabinetApp.FileCabinetRecord.Money">
             <summary>
-            Gets or sets the money field.
+            Gets the money field.
             </summary>
             <value>
             Money property.
@@ -806,7 +806,7 @@
         </member>
         <member name="P:FileCabinetApp.FileCabinetRecord.Gender">
             <summary>
-            Gets or sets the gender field.
+            Gets the gender field.
             </summary>
             <value>
             Gender property.
@@ -814,7 +814,7 @@
         </member>
         <member name="P:FileCabinetApp.FileCabinetRecord.FirstName">
             <summary>
-            Gets or sets the first name field.
+            Gets or the first name field.
             </summary>
             <value>
             First name property.
@@ -830,7 +830,7 @@
         </member>
         <member name="P:FileCabinetApp.FileCabinetRecord.DateOfBirth">
             <summary>
-            Gets or sets the date of birth field.
+            Gets the date of birth field.
             </summary>
             <value>
             Date of birth property.

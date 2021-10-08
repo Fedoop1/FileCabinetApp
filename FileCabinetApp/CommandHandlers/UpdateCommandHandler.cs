@@ -58,10 +58,10 @@ namespace FileCabinetApp.CommandHandlers
         private static Dictionary<PropertyInfo, object> BindPropertyAndValue(IDictionary<string, string> source)
         {
             Dictionary<PropertyInfo, object> result = new ();
-
+            const int equal = 0;
             foreach (var keyValuePair in source)
             {
-                var property = typeof(FileCabinetRecord).GetProperties().FirstOrDefault(property => property.Name.Contains(keyValuePair.Key, StringComparison.CurrentCultureIgnoreCase));
+                var property = typeof(FileCabinetRecord).GetProperties().FirstOrDefault(property => StringComparer.CurrentCultureIgnoreCase.Compare(keyValuePair.Key, property.Name) == equal) ?? throw new ArgumentException($"Property with name {keyValuePair.Key} doesn't exist");
                 var parseMethod = property?.PropertyType.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase)
                     .FirstOrDefault(method => method.Name.Contains("Parse") && method.GetParameters().Length == 1);
                 var value = property?.PropertyType.Name == "String" ? keyValuePair.Value : parseMethod?.Invoke(null, new object[] { keyValuePair.Value });

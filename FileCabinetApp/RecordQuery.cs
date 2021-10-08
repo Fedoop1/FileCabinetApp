@@ -63,12 +63,9 @@ namespace FileCabinetApp
                 "where",
                 StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
-            const int whereQuery = 1;
-            var whereString = queryString[^whereArray[whereQuery].Length..];
-
             var keyValuePair =
 
-                CommandHandlerExtensions.ExtractKeyValuePair(whereString.ToLowerInvariant(), new[] { "and" });
+                CommandHandlerExtensions.ExtractKeyValuePair(whereArray[^1].ToLowerInvariant(), new[] { "and" });
 
             return GenerateHashCode(keyValuePair);
         }
