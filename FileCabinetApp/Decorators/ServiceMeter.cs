@@ -76,7 +76,7 @@ namespace FileCabinetApp.Decorators
             return result;
         }
 
-        public RecordShapshot MakeSnapshot()
+        public RecordSnapshot MakeSnapshot()
         {
             this.stopwatch.Restart();
             var result = this.service.MakeSnapshot();
@@ -85,7 +85,7 @@ namespace FileCabinetApp.Decorators
             return result;
         }
 
-        public int Restore(RecordShapshot restoreSnapshot)
+        public int Restore(RecordSnapshot restoreSnapshot)
         {
             this.stopwatch.Restart();
             var result = this.service.Restore(restoreSnapshot);

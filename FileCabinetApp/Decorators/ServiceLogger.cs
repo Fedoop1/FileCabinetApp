@@ -93,7 +93,7 @@ namespace FileCabinetApp.Decorators
         }
 
         /// <inheritdoc/>
-        public RecordShapshot MakeSnapshot()
+        public RecordSnapshot MakeSnapshot()
         {
             this.logger.LogInformation($"{DateTime.Now} - Calling MakeSnapshot()");
             var result = this.service.MakeSnapshot();
@@ -102,7 +102,7 @@ namespace FileCabinetApp.Decorators
         }
 
         /// <inheritdoc/>
-        public int Restore(RecordShapshot snapshot)
+        public int Restore(RecordSnapshot snapshot)
         {
             this.logger.LogInformation($"{DateTime.Now} - Calling Restore(restoreSnapshot)");
             var result = this.service.Restore(snapshot);

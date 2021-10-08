@@ -42,13 +42,13 @@ namespace FileCabinetApp.DataTransfer
             {
                 yield return new FileCabinetRecord()
                 {
-                    Id = int.Parse(record?.Attribute("Id")?.Value, CultureInfo.CurrentCulture),
-                    FirstName = record.XPathSelectElement("Name")?.Attribute("First")?.Value,
-                    LastName = record?.XPathSelectElement("Name")?.Attribute("Last")?.Value,
-                    DateOfBirth = DateTime.Parse(record.XPathSelectElement("DateOfBirth")?.Value, CultureInfo.CurrentCulture),
-                    Height = short.Parse(record.XPathSelectElement("Height")?.Value, CultureInfo.CurrentCulture),
-                    Gender = char.Parse(record.XPathSelectElement("Gender")?.Value),
-                    Money = decimal.Parse(record.XPathSelectElement("Money")?.Value, CultureInfo.CurrentCulture),
+                    Id = int.Parse(record !.Attribute("Id") !.Value, CultureInfo.CurrentCulture),
+                    FirstName = record.XPathSelectElement("Name")?.Attribute("First") !.Value,
+                    LastName = record?.XPathSelectElement("Name")?.Attribute("Last") !.Value,
+                    DateOfBirth = DateTime.Parse(record.XPathSelectElement("DateOfBirth") !.Value, CultureInfo.CurrentCulture),
+                    Height = short.Parse(record.XPathSelectElement("Height") !.Value, CultureInfo.CurrentCulture),
+                    Gender = char.Parse(record.XPathSelectElement("Gender") !.Value),
+                    Money = decimal.Parse(record.XPathSelectElement("Money") !.Value, CultureInfo.CurrentCulture),
                 };
             }
 

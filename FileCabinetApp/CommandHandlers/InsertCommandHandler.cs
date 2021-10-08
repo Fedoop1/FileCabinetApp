@@ -10,13 +10,13 @@ using FileCabinetApp.Interfaces;
 namespace FileCabinetApp.CommandHandlers
 {
     /// <summary>
-    /// Handle "Insert" command from user input.
+    /// Command handler which process 'Insert' operation.
     /// </summary>
     public class InsertCommandHandler : ServiceCommandHandlerBase
     {
         private const int FieldsIndex = 0;
         private const int ValuesIndex = 1;
-        private const int ParametersCount = 2;
+        private const int ParametersCount = 1;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InsertCommandHandler"/> class.
@@ -61,7 +61,7 @@ namespace FileCabinetApp.CommandHandlers
             {
                 var parseMethod = property.PropertyType.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase)
                     .FirstOrDefault(method =>
-                        method.Name.Contains("Parse") && method.GetParameters().Length == 1);
+                        method.Name.Contains("Parse") && method.GetParameters().Length == ParametersCount);
                 property!.SetValue(result, property.PropertyType.Name == "String" ? keyValueTuple[property.Name] : parseMethod!.Invoke(null, new object[] { keyValueTuple[property.Name] }));
             }
 

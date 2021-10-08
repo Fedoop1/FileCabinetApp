@@ -37,14 +37,14 @@ namespace FileCabinetApp.DataTransfer
         }
 
         /// <inheritdoc/>
-        public RecordShapshot LoadFrom(string fileFormat, string filePath)
+        public RecordSnapshot LoadFrom(string fileFormat, string filePath)
         {
             if (!this.dataLoaderProviders.TryGetValue(fileFormat, out var storageLoader) || storageLoader.Invoke(filePath) is not IRecordDataLoader loader)
             {
                 throw new ArgumentException("File format doesn't support");
             }
 
-            return new RecordShapshot(loader.Load());
+            return new RecordSnapshot(loader.Load());
         }
 
         /// <summary>

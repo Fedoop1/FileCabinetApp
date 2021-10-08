@@ -4,14 +4,14 @@ using FileCabinetApp.Interfaces;
 namespace FileCabinetApp.CommandHandlers
 {
     /// <summary>
-    /// Handle "purge" command from user input.
+    /// Command handler which process 'Purge' operation.
     /// </summary>
     public class PurgeCommandHandler : ServiceCommandHandlerBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PurgeCommandHandler"/> class.
         /// </summary>
-        /// <param name="service"><see cref="IFileCabinetService"/> context required for the correct operation of the methods.</param>
+        /// <param name="service">Record service.</param>
         public PurgeCommandHandler(IFileCabinetService service)
             : base(service)
         {
@@ -38,10 +38,6 @@ namespace FileCabinetApp.CommandHandlers
         /// <summary>
         /// Compresses and clean up deleted data.
         /// </summary>
-        private void Purge()
-        {
-            string result = this.Service.Purge();
-            Console.WriteLine(result);
-        }
+        private void Purge() => Console.WriteLine(this.Service.Purge());
     }
 }

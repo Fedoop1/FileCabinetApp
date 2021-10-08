@@ -58,14 +58,14 @@ namespace FileCabinetApp.Interfaces
         /// A method that returns actual records.
         /// </summary>
         /// <returns>Count of records.</returns>
-        public RecordShapshot MakeSnapshot();
+        public RecordSnapshot MakeSnapshot();
 
         /// <summary>
         /// Restore information from <see cref="FileCabinetSnapshotService"/> instance.
         /// </summary>
         /// <param name="restoreSnapshot">Snapshot with information about records.</param>
         /// <returns>Count of affected records.</returns>
-        public int Restore(RecordShapshot restoreSnapshot);
+        public int Restore(RecordSnapshot restoreSnapshot);
 
         /// <summary>
         /// Get the count of existing and deleted <see cref="FileCabinetRecord"/>'s.

@@ -199,13 +199,13 @@ namespace FileCabinetApp
         /// Create a new instance of <see cref="FileCabinetSnapshotService"/> which contain all information about exists records.
         /// </summary>
         /// <returns>Instance of <see cref="FileCabinetSnapshotService"/>.</returns>
-        public RecordShapshot MakeSnapshot() => new (this.GetRecords());
+        public RecordSnapshot MakeSnapshot() => new (this.GetRecords());
 
         /// <inheritdoc/>
         public bool ValidateRecord(FileCabinetRecord record) => this.validator.ValidateRecord(record);
 
         /// <inheritdoc/>
-        public int Restore(RecordShapshot snapshot)
+        public int Restore(RecordSnapshot snapshot)
         {
             if (snapshot is null)
             {

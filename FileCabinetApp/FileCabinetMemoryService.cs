@@ -25,7 +25,7 @@ namespace FileCabinetApp
         /// Initialize a new <see cref="FileCabinetSnapshotService"/> which contains <see cref="FileCabinetRecord"/> array.
         /// </summary>
         /// <returns>Returns <see cref="FileCabinetSnapshotService"/> with data about existing records.</returns>
-        public RecordShapshot MakeSnapshot() => new (this.GetRecords());
+        public RecordSnapshot MakeSnapshot() => new (this.GetRecords());
 
         /// <inheritdoc/>
         public bool ValidateRecord(FileCabinetRecord record) => this.validator.ValidateRecord(record);
@@ -138,7 +138,7 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public int Restore(RecordShapshot snapshot)
+        public int Restore(RecordSnapshot snapshot)
         {
             if (snapshot is null)
             {

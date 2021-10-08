@@ -48,7 +48,7 @@ namespace FileCabinetApp.CommandHandlers
             {
                 var property =
                     typeof(FileCabinetRecord).GetProperties().FirstOrDefault(property => property.Name.Contains(pair.Key, StringComparison.CurrentCultureIgnoreCase));
-                intermediateResult += record => property?.GetValue(record)?.ToString()?.Contains(pair.Value, StringComparison.CurrentCultureIgnoreCase) ?? throw new ArgumentNullException(nameof(property), $"Property with name {pair.Key} doesn't exists");
+                intermediateResult += record => property?.GetValue(record) !.ToString() !.Contains(pair.Value, StringComparison.CurrentCultureIgnoreCase) ?? throw new ArgumentException($"Property with name {pair.Key} doesn't exists");
             }
 
             return intermediateResult!.GetInvocationList().Length > 0 ? CombinePredicateIntoOneMethod(intermediateResult) : intermediateResult;

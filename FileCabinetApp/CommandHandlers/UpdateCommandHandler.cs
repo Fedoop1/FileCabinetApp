@@ -57,7 +57,7 @@ namespace FileCabinetApp.CommandHandlers
 
         private static Dictionary<PropertyInfo, object> BindPropertyAndValue(IDictionary<string, string> source)
         {
-            Dictionary<PropertyInfo, object> result = new();
+            Dictionary<PropertyInfo, object> result = new ();
 
             foreach (var keyValuePair in source)
             {
@@ -89,8 +89,7 @@ namespace FileCabinetApp.CommandHandlers
                     return;
                 }
 
-                var parametersArray = parameters.ToLowerInvariant().Split(new[] { "set", "where" },
-                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                var parametersArray = parameters.ToLowerInvariant().Split(new[] { "set", "where" }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
                 if (parametersArray.Length < UpdateWithoutPredicate)
                 {
@@ -116,7 +115,7 @@ namespace FileCabinetApp.CommandHandlers
                 }
 
                 Console.WriteLine(updatedRecords.Count > 0
-                    ? $"Record(s) {string.Join(", ", updatedRecords.Select(record => $"#{record}")).TrimEnd(new[] { ',', ' ' })} were updated."
+                    ? $"Record(s) {string.Join(", ", updatedRecords.Select(record => $"#{record}")).TrimEnd(',', ' ')} were updated."
                     : "There isn't record to update");
             }
             catch (Exception exception)

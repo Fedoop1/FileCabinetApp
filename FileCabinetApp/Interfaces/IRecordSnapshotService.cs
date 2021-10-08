@@ -22,6 +22,6 @@ namespace FileCabinetApp.Interfaces
         /// <param name="fileFormat">The file format.</param>
         /// <param name="filePath">The file path.</param>
         /// <returns>Loaded records snapshot.</returns>
-        public RecordShapshot LoadFrom(string fileFormat, string filePath);
+        public RecordSnapshot LoadFrom(string fileFormat, string filePath);
     }
 }
