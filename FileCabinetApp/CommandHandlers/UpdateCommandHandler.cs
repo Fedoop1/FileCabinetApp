@@ -57,11 +57,11 @@ namespace FileCabinetApp.CommandHandlers
 
         private static Dictionary<PropertyInfo, object> BindPropertyAndValue(IDictionary<string, string> source)
         {
-            Dictionary<PropertyInfo, object> result = new();
-
+            Dictionary<PropertyInfo, object> result = new ();
+            const int equal = 0;
             foreach (var keyValuePair in source)
             {
-                var property = typeof(FileCabinetRecord).GetProperties().FirstOrDefault(property => property.Name.Contains(keyValuePair.Key, StringComparison.CurrentCultureIgnoreCase));
+                var property = typeof(FileCabinetRecord).GetProperties().FirstOrDefault(property => StringComparer.CurrentCultureIgnoreCase.Compare(keyValuePair.Key, property.Name) == equal) ?? throw new ArgumentException($"Property with name {keyValuePair.Key} doesn't exist");
                 var parseMethod = property?.PropertyType.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase)
                     .FirstOrDefault(method => method.Name.Contains("Parse") && method.GetParameters().Length == 1);
                 var value = property?.PropertyType.Name == "String" ? keyValuePair.Value : parseMethod?.Invoke(null, new object[] { keyValuePair.Value });
@@ -89,8 +89,7 @@ namespace FileCabinetApp.CommandHandlers
                     return;
                 }
 
-                var parametersArray = parameters.ToLowerInvariant().Split(new[] { "set", "where" },
-                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                var parametersArray = parameters.ToLowerInvariant().Split(new[] { "set", "where" }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
                 if (parametersArray.Length < UpdateWithoutPredicate)
                 {
@@ -116,7 +115,7 @@ namespace FileCabinetApp.CommandHandlers
                 }
 
                 Console.WriteLine(updatedRecords.Count > 0
-                    ? $"Record(s) {string.Join(", ", updatedRecords.Select(record => $"#{record}")).TrimEnd(new[] { ',', ' ' })} were updated."
+                    ? $"Record(s) {string.Join(", ", updatedRecords.Select(record => $"#{record}")).TrimEnd(',', ' ')} were updated."
                     : "There isn't record to update");
             }
             catch (Exception exception)

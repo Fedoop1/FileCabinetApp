@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.Validators
 {
     /// <summary>
-    /// Сomposite class that collects all the necessary validations rules inside and validate incoming data.
+    /// Class that composite all the necessary validations rules inside and validate record according to them.
     /// </summary>
     public class CompositeValidator : IRecordValidator
     {
@@ -20,18 +21,6 @@ namespace FileCabinetApp.Validators
         }
 
         /// <inheritdoc/>
-        public bool ValidateRecord(FileCabinetRecord record)
-        {
-            bool isValid = true;
-            foreach (var validator in this.validators)
-            {
-                if (!validator.ValidateRecord(record))
-                {
-                    return false;
-                }
-            }
-
-            return isValid;
-        }
+        public bool ValidateRecord(FileCabinetRecord record) => this.validators.All(validator => validator.ValidateRecord(record));
     }
 }

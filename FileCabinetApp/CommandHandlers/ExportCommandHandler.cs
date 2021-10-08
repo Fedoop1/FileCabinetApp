@@ -2,6 +2,8 @@
 using System.IO;
 using FileCabinetApp.Interfaces;
 
+#pragma warning disable CA1031 // Do not catch general exception types
+
 namespace FileCabinetApp.CommandHandlers
 {
     /// <summary>

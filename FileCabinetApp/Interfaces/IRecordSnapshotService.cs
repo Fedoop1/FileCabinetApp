@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using FileCabinetApp.DataTransfer;
+﻿using FileCabinetApp.DataTransfer;
 
 namespace FileCabinetApp.Interfaces
 {
@@ -13,7 +12,7 @@ namespace FileCabinetApp.Interfaces
         /// </summary>
         /// <param name="fileFormat">The file format.</param>
         /// <param name="filePath">The file path.</param>
-        /// <param name="append">if set to <c>true</c> append destination file, otherwise recreate it.</param>
+        /// <param name="append">if set to <c>true</c> append destination file, otherwise rewrite it.</param>
         public void SaveTo(string fileFormat, string filePath, bool append);
 
         /// <summary>
@@ -22,6 +21,6 @@ namespace FileCabinetApp.Interfaces
         /// <param name="fileFormat">The file format.</param>
         /// <param name="filePath">The file path.</param>
         /// <returns>Loaded records snapshot.</returns>
-        public RecordShapshot LoadFrom(string fileFormat, string filePath);
+        public RecordSnapshot LoadFrom(string fileFormat, string filePath);
     }
 }

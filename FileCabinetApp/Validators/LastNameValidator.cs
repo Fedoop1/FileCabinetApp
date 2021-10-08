@@ -9,14 +9,7 @@ namespace FileCabinetApp.Validators
     /// </summary>
     public class LastNameValidator : IRecordValidator
     {
-        /// <summary>
-        /// The minimum length of the last name.
-        /// </summary>
         private readonly int minNameLength;
-
-        /// <summary>
-        /// The maximum length of the last name.
-        /// </summary>
         private readonly int maxNameLength;
 
         /// <summary>

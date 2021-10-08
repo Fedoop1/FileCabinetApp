@@ -6,9 +6,14 @@ using FileCabinetApp.Interfaces;
 using static FileCabinetApp.CommandHandlers.CommandHandlerExtensions;
 
 #pragma warning disable CA1308 // Normalize strings to uppercase
+#pragma warning disable CA1031 // Do not catch general exception types
 
 namespace FileCabinetApp.CommandHandlers
 {
+    /// <summary>
+    /// Command handler class which process 'select' operation.
+    /// </summary>
+    /// <seealso cref="ServiceCommandHandlerBase" />
     public class SelectCommandHandler
         : ServiceCommandHandlerBase
     {
@@ -19,22 +24,30 @@ namespace FileCabinetApp.CommandHandlers
 
         private readonly IRecordPrinter printer;
 
-        public override string Command => "select";
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SelectCommandHandler"/> class.
+        /// </summary>
+        /// <param name="service">Records service.</param>
+        /// <param name="printer">Records printer.</param>
+        /// <exception cref="ArgumentNullException">Throws when printer is null.</exception>
         public SelectCommandHandler(IFileCabinetService service, IRecordPrinter printer)
             : base(service)
         {
             this.printer = printer ?? throw new ArgumentNullException(nameof(printer), "Printer can't be null");
         }
 
+        /// <inheritdoc/>
+        public override string Command => "select";
+
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (commandRequest is not null && commandRequest.Command.Contains("select", StringComparison.CurrentCultureIgnoreCase))
             {
                 try
                 {
-                    var result = this.SelectRecords(commandRequest.Parameters);
-                    this.printer.Print(result.source, result.selectedFields);
+                    var (source, selectedFields) = this.SelectRecords(commandRequest.Parameters);
+                    this.printer.Print(source, selectedFields);
                 }
                 catch (Exception exception)
                 {
@@ -75,8 +88,7 @@ namespace FileCabinetApp.CommandHandlers
                 throw new ArgumentException("Invalid parameters. Check your query to for availability of 'where' or '*' ");
             }
 
-            var parametersArray = parameters.ToLowerInvariant().Split("where",
-                StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            var parametersArray = parameters.ToLowerInvariant().Split("where", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
             string columnsString = parameters[..parametersArray[ParametersIndex].Length];
             string whereString = parametersArray.Length == SelectWithWhere ? parameters[^parametersArray[PredicateIndex].Length..] : null;

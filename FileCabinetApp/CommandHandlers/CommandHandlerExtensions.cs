@@ -17,14 +17,14 @@ namespace FileCabinetApp.CommandHandlers
         /// <returns>Sorted dictionary from source string.</returns>
         internal static SortedDictionary<string, string> ExtractKeyValuePair(string source, string[] separator)
         {
-            const int KeyIndex = 0;
-            const int ValuesIndex = 1;
+            const int keyIndex = 0;
+            const int valuesIndex = 1;
             var result = new SortedDictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
             var parameterPairs = source.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             var parameterValuePair = parameterPairs.Select(x => x.Split('=', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
             foreach (var pair in parameterValuePair)
             {
-                result.Add(pair[KeyIndex], pair[ValuesIndex].Trim('\u0027'));
+                result.Add(pair[keyIndex], pair[valuesIndex].Trim('\u0027'));
             }
 
             return result;
@@ -48,7 +48,7 @@ namespace FileCabinetApp.CommandHandlers
             {
                 var property =
                     typeof(FileCabinetRecord).GetProperties().FirstOrDefault(property => property.Name.Contains(pair.Key, StringComparison.CurrentCultureIgnoreCase));
-                intermediateResult += record => property?.GetValue(record)?.ToString()?.Contains(pair.Value, StringComparison.CurrentCultureIgnoreCase) ?? throw new ArgumentNullException(nameof(property), $"Property with name {pair.Key} doesn't exists");
+                intermediateResult += record => property?.GetValue(record) !.ToString() !.Contains(pair.Value, StringComparison.CurrentCultureIgnoreCase) ?? throw new ArgumentException($"Property with name {pair.Key} doesn't exists");
             }
 
             return intermediateResult!.GetInvocationList().Length > 0 ? CombinePredicateIntoOneMethod(intermediateResult) : intermediateResult;

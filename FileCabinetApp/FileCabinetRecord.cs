@@ -4,56 +4,56 @@ using System.Xml.Serialization;
 namespace FileCabinetApp
 {
     /// <summary>
-    /// A class describing the fields and behavior of a unit such as a record.
+    /// Class which representing standard, POCO record.
     /// </summary>
     [Serializable]
-    [XmlRoot]
+    [XmlRoot("Record")]
     public class FileCabinetRecord : IEquatable<FileCabinetRecord>
     {
         /// <summary>
-        /// Gets or sets the id field.
+        /// Gets the id field.
         /// </summary>
         /// <value>
         /// Id property.
         /// </value>
         [XmlAttribute("Id")]
-        public int Id { get; set; }
+        public int Id { get; init; }
 
         /// <summary>
-        /// Gets or sets the height field.
+        /// Gets the height field.
         /// </summary>
         /// <value>
         /// Height property.
         /// </value>
         [XmlElement("Height")]
-        public short Height { get; set; }
+        public short Height { get; init; }
 
         /// <summary>
-        /// Gets or sets the money field.
+        /// Gets the money field.
         /// </summary>
         /// <value>
         /// Money property.
         /// </value>
         [XmlElement("Money")]
-        public decimal Money { get; set; }
+        public decimal Money { get; init; }
 
         /// <summary>
-        /// Gets or sets the gender field.
+        /// Gets the gender field.
         /// </summary>
         /// <value>
         /// Gender property.
         /// </value>
         [XmlElement("Gender")]
-        public char Gender { get; set; }
+        public char Gender { get; init; }
 
         /// <summary>
-        /// Gets or sets the first name field.
+        /// Gets or the first name field.
         /// </summary>
         /// <value>
         /// First name property.
         /// </value>
         [XmlAttribute("First")]
-        public string FirstName { get; set; }
+        public string FirstName { get; init; }
 
         /// <summary>
         /// Gets or sets the last name field.
@@ -62,16 +62,16 @@ namespace FileCabinetApp
         /// Last name property.
         /// </value>
         [XmlAttribute("Last")]
-        public string LastName { get; set; }
+        public string LastName { get; init; }
 
         /// <summary>
-        /// Gets or sets the date of birth field.
+        /// Gets the date of birth field.
         /// </summary>
         /// <value>
         /// Date of birth property.
         /// </value>
         [XmlElement("DateofBirth")]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime DateOfBirth { get; init; }
 
         /// <summary>
         /// Overriding the ToString() method.
@@ -100,7 +100,7 @@ namespace FileCabinetApp
         /// </returns>
         public bool Equals(FileCabinetRecord other)
         {
-            if (ReferenceEquals(null, other))
+            if (other is null)
             {
                 return false;
             }
@@ -117,7 +117,7 @@ namespace FileCabinetApp
         /// Returns a hash code for this instance.
         /// </summary>
         /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         /// </returns>
         public override int GetHashCode() => this.Id;
     }

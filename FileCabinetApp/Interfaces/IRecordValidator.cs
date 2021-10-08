@@ -6,9 +6,10 @@
     public interface IRecordValidator
     {
         /// <summary>
-        /// A method that invokes parameter validation through the class that implements this interface.
+        /// Validates the record be specified rules.
         /// </summary>
-        /// <param name="record">The container class includes all the information about the record.</param>
+        /// <param name="record">Record to validate.</param>
+        /// <returns>Result of validating.</returns>
         bool ValidateRecord(FileCabinetRecord record);
     }
 }

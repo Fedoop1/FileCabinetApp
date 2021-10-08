@@ -4,17 +4,19 @@ using System.Linq;
 using FileCabinetApp.CommandHandlers;
 using FileCabinetApp.Interfaces;
 
+#pragma warning disable CA1308 // Normalize strings to uppercase
+
 namespace FileCabinetApp
 {
     /// <summary>
     /// Represent a instance of record query.
     /// </summary>
-    /// <seealso cref="FileCabinetApp.Interfaces.IRecordQuery" />
+    /// <seealso cref="IRecordQuery" />
     /// <seealso cref="RecordQuery" />
     public record RecordQuery : IRecordQuery
     {
         private string hashCode;
-        private string queryString;
+        private readonly string queryString;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RecordQuery"/> class.
@@ -40,11 +42,12 @@ namespace FileCabinetApp
         {
             get
             {
-                if (this.hashCode == default)
+                if (this.hashCode != default)
                 {
-                    this.hashCode = CalculateHashCode(this.queryString);
+                    return this.hashCode;
                 }
 
+                this.hashCode = CalculateHashCode(this.queryString);
                 return this.hashCode;
             }
         }
@@ -56,14 +59,13 @@ namespace FileCabinetApp
                 return string.Empty;
             }
 
-            var whereArray = queryString.ToLowerInvariant().Split("where",
+            var whereArray = queryString.ToLowerInvariant().Split(
+                "where",
                 StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
-            const int whereQuery = 1;
-            var whereString = queryString[^whereArray[whereQuery].Length..];
-
             var keyValuePair =
-                CommandHandlerExtensions.ExtractKeyValuePair(whereString.ToLowerInvariant(), new[] { "and" });
+
+                CommandHandlerExtensions.ExtractKeyValuePair(whereArray[^1].ToLowerInvariant(), new[] { "and" });
 
             return GenerateHashCode(keyValuePair);
         }

@@ -8,11 +8,7 @@ namespace FileCabinetApp.Validators
     /// </summary>
     public class MoneyValidator : IRecordValidator
     {
-        /// <summary>
-        /// The minimum amount of money.
-        /// </summary>
         private readonly decimal minMoney;
-
         private readonly decimal maxMoney;
 
         /// <summary>

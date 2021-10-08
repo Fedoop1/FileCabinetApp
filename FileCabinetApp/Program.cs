@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 #pragma warning disable SA1600 // Elements should be documented
+#pragma warning disable SA1116 // Split parameters should start on line after declaration
 
 namespace FileCabinetApp
 {
@@ -162,7 +163,7 @@ namespace FileCabinetApp
             do
             {
                 Console.Write("> ");
-                var inputs = Console.ReadLine().Split(" ", 2);
+                var inputs = Console.ReadLine() !.Split(" ", 2);
 
                 const int commandIndex = 0;
                 const int parametersIndex = 1;
